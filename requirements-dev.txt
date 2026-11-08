@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest>=8
+playwright>=1.45
+openpyxl>=3.1      # reads back the Excel tables in tests/test_unpaid_report_export.py

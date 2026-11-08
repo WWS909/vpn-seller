@@ -1,0 +1,72 @@
+# VPN Seller — the shop plus, depending on the server, one way in from outside.
+#
+# install.sh picks the mode and writes it to .env as COMPOSE_PROFILES:
+#
+#   caddy   own Caddy on ports 80/443 with an automatic certificate
+#           (a clean server with a domain)
+#   tunnel  a temporary Cloudflare tunnel, no domain needed; its address
+#           changes when the tunnel restarts and the shop follows it itself
+#   (empty) no proxy of its own: an existing Caddy/nginx on the server
+#           reaches the shop — install.sh writes docker-compose.override.yml
+#
+# By hand:  cp .env.example .env  (fill it in)  &&  docker compose up -d
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATA_DIR: /app/data
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////app/data/vpn.db}
+    volumes:
+      - ./data:/app/data
+    # Never published to the internet: the app trusts X-Forwarded-For from
+    # whoever talks to it, so only a proxy may reach it (the login rate
+    # limit relies on this).
+    expose:
+      - "8000"
+    networks:
+      default:
+        aliases: [vpnshop-app]
+
+  caddy:
+    image: caddy:2
+    profiles: [caddy]
+    restart: unless-stopped
+    depends_on: [app]
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    profiles: [tunnel]
+    restart: unless-stopped
+    depends_on: [app]
+    command: tunnel --no-autoupdate --metrics 0.0.0.0:2000 --url http://app:8000
+
+  # PostgreSQL instead of the built-in SQLite (optional). Uncomment, add
+  # the volume below and set in .env:
+  #   DATABASE_URL=postgresql+psycopg://vpn:CHANGE_ME@db:5432/vpn
+  # db:
+  #   image: postgres:16
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: vpn
+  #     POSTGRES_PASSWORD: CHANGE_ME
+  #     POSTGRES_DB: vpn
+  #   volumes:
+  #     - pg_data:/var/lib/postgresql/data
+
+volumes:
+  caddy_data:
+  caddy_config:
+  # pg_data:

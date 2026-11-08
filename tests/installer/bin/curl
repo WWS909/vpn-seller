@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Stand-in for curl while testing install.sh: https://<shop>/health goes to
+# the locally running shop; "what is my IP" services answer 203.0.113.10;
+# everything else is the real curl.
+args=()
+for a in "$@"; do
+  case "$a" in
+    https://api.ipify.org*|https://ifconfig.me*|https://icanhazip.com*) echo "203.0.113.10"; exit 0 ;;
+    https://*/health)
+      if [ "${FAKE_PUBLIC_OK:-1}" = 1 ]; then a="http://127.0.0.1:18000/health"; fi ;;
+  esac
+  args+=("$a")
+done
+exec /usr/bin/curl "${args[@]}"

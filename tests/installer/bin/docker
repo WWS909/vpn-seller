@@ -1,0 +1,229 @@
+#!/usr/bin/env python3
+"""
+A stand-in for `docker` for testing install.sh where images cannot be
+pulled. What it does for real:
+
+  * `docker compose up`  validates the compose files with the REAL docker
+    compose (`config`), then runs the shop with uvicorn on 127.0.0.1:18000
+    using exactly the .env the installer wrote;
+  * `docker exec <proxy> caddy validate|reload` runs the REAL caddy binary
+    against the Caddyfile on disk.
+
+Everything else (ps, inspect, networks) answers from the scenario in
+$FAKE_DIR/scenario.json.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+FAKE = Path(os.environ.get("FAKE_DIR", "/tmp/fake"))
+REAL_DOCKER = os.environ.get("REAL_DOCKER", "/usr/bin/docker")
+CADDY = os.environ.get("CADDY_BIN", "/tmp/caddy")
+APP_PORT = 18000
+scenario = json.loads((FAKE / "scenario.json").read_text()) if (FAKE / "scenario.json").exists() else {}
+proxy = scenario.get("proxy") or {}
+
+
+def log(*a):
+    with open(FAKE / "docker.log", "a") as f:
+        f.write(" ".join(a) + "\n")
+
+
+def env_file(d: Path) -> dict:
+    out = {}
+    for line in (d / ".env").read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        v = v.strip()
+        if len(v) >= 2 and v[0] == v[-1] and v[0] in "'\"":
+            v = v[1:-1]
+        out[k.strip()] = v
+    return out
+
+
+def app_env(d: Path) -> dict:
+    e = dict(os.environ)
+    e.update(env_file(d))
+    e["DATA_DIR"] = str(d / "data")
+    e["DATABASE_URL"] = f"sqlite:///{d}/data/vpn.db"
+    e["TG_API_BASE"] = "http://127.0.0.1:18081"
+    if e.get("TUNNEL_METRICS_URL"):
+        e["TUNNEL_METRICS_URL"] = "http://127.0.0.1:18082"
+    for k in ("HTTPS_PROXY", "https_proxy", "HTTP_PROXY", "http_proxy"):
+        e.pop(k, None)
+    return e
+
+
+def pidfile() -> Path:
+    return FAKE / "app.pid"
+
+
+def app_running() -> bool:
+    try:
+        os.kill(int(pidfile().read_text()), 0)
+        return True
+    except (OSError, ValueError):
+        return False
+
+
+def stop_app():
+    if app_running():
+        pid = int(pidfile().read_text())
+        os.kill(pid, signal.SIGTERM)
+        for _ in range(50):
+            try:
+                os.kill(pid, 0)
+                time.sleep(0.1)
+            except OSError:
+                break
+    pidfile().unlink(missing_ok=True)
+
+
+def start_app(d: Path):
+    (d / "data").mkdir(exist_ok=True)
+    out = open(FAKE / "app.log", "a")
+    p = subprocess.Popen([sys.executable, "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1",
+                          "--port", str(APP_PORT), "--proxy-headers", "--forwarded-allow-ips", "*"],
+                         cwd=d, env=app_env(d), stdout=out, stderr=out, start_new_session=True)
+    pidfile().write_text(str(p.pid))
+
+
+def profiles(d: Path) -> list[str]:
+    return [p for p in env_file(d).get("COMPOSE_PROFILES", "").split(",") if p]
+
+
+def compose(args: list[str]) -> int:
+    d = Path.cwd()
+    if not args or args[0] == "version":
+        print("Docker Compose version v2.99.0-fake")
+        return 0
+    sub = args[0]
+    log("compose", str(d), *args)
+    if sub == "up":
+        # The real compose checks the files the installer produced.
+        r = subprocess.run([REAL_DOCKER, "compose", "config", "--format", "json"], cwd=d,
+                           capture_output=True, text=True)
+        if r.returncode != 0:
+            print(r.stderr, file=sys.stderr)
+            return r.returncode
+        (FAKE / "compose.json").write_text(r.stdout)
+        # --build makes a new image, and compose recreates the container from it
+        if "--force-recreate" in args or "--build" in args or not app_running():
+            stop_app()
+            start_app(d)
+        return 0
+    if sub in ("down", "stop"):
+        stop_app()
+        return 0
+    if sub == "start":
+        if not app_running():
+            start_app(d)
+        return 0
+    if sub == "ps":
+        print(f"app\t{'running' if app_running() else 'exited'}\tUp (fake)")
+        for p in profiles(d):
+            print(f"{p}\trunning\tUp (fake)")
+        return 0
+    if sub == "logs":
+        if "tunnel" in args and "tunnel" in profiles(d):
+            host = os.environ.get("FAKE_TUNNEL_HOST", "sandbox-test-tunnel.trycloudflare.com")
+            print(f"tunnel-1  | 2026-01-01T00:00:00Z INF |  https://{host}  |")
+        return 0
+    if sub == "exec":
+        rest = [a for a in args[1:]]
+        # drop flags: -T, -u app
+        cleaned, skip = [], False
+        for a in rest:
+            if skip:
+                skip = False
+                continue
+            if a == "-u":
+                skip = True
+                continue
+            if a == "-T":
+                continue
+            cleaned.append(a)
+        service, cmd = cleaned[0], cleaned[1:]
+        if not app_running():
+            return 1
+        if cmd[:2] == ["python", "-c"]:
+            code = cmd[2].replace("127.0.0.1:8000", f"127.0.0.1:{APP_PORT}")
+            return subprocess.run([sys.executable, "-c", code], cwd=d, env=app_env(d)).returncode
+        if cmd[:1] == ["python"]:
+            return subprocess.run([sys.executable] + cmd[1:], cwd=d, env=app_env(d)).returncode
+        return 0
+    return 0
+
+
+def inspect(args: list[str]) -> int:
+    fmt = args[args.index("-f") + 1] if "-f" in args else ""
+    name = args[-1]
+    if name != proxy.get("name"):
+        return 1
+    if "working_dir" in fmt:
+        print(proxy.get("wd", "/somewhere/else"))
+    elif "Networks" in fmt:
+        print(proxy.get("net", "bridge"))
+    elif "Config.Image" in fmt:
+        print(proxy.get("image", "caddy:2"))
+    elif "Config.Cmd" in fmt:
+        print(f"caddy run --config {proxy.get('cfg_ctr', '/etc/caddy/Caddyfile')} --adapter caddyfile")
+    elif "Mounts" in fmt:
+        if proxy.get("cfg_host"):
+            print(f"{proxy['cfg_host']}|{proxy.get('cfg_ctr', '/etc/caddy/Caddyfile')}")
+        print("/var/lib/docker/volumes/omni_caddy_data/_data|/data")
+    return 0
+
+
+def main() -> int:
+    a = sys.argv[1:]
+    if a[:1] == ["--version"]:
+        print("Docker version 29.9.9, build fake")
+        return 0
+    if a[:1] == ["compose"]:
+        return compose(a[1:])
+    log(*a)
+    if a[:1] == ["ps"]:
+        m = re.search(r"publish=(\d+)", " ".join(a))
+        if m and proxy and int(m.group(1)) in proxy.get("ports", [80, 443]):
+            print(proxy["name"])
+        return 0
+    if a[:1] == ["inspect"]:
+        return inspect(a[1:])
+    if a[:1] == ["exec"]:
+        ctr, cmd = a[1], a[2:]
+        if ctr != proxy.get("name") or cmd[:1] != ["caddy"]:
+            return 1
+        action = cmd[1]
+        cfg = cmd[cmd.index("--config") + 1]
+        host = proxy["cfg_host"] if cfg == proxy.get("cfg_ctr", "/etc/caddy/Caddyfile") else cfg
+        if action == "validate":
+            r = subprocess.run([CADDY, "validate", "--config", host, "--adapter", "caddyfile"],
+                               capture_output=True, text=True)
+            sys.stdout.write(r.stdout + r.stderr)
+            log("caddy validate ->", str(r.returncode))
+            return r.returncode
+        if action == "reload":
+            r = subprocess.run([CADDY, "adapt", "--config", host, "--adapter", "caddyfile"],
+                               capture_output=True, text=True)
+            log("caddy reload ->", str(r.returncode))
+            (FAKE / "caddy.reloaded").write_text(Path(host).read_text())
+            return r.returncode
+        return 1
+    if a[:1] in (["network"], ["restart"], ["image"]):
+        return 0
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

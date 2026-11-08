@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Stand-in for ss: a program on the host holds 80/443 when the scenario says so.
+holder=$(python3 -c "import json,os;print((json.load(open(os.environ['FAKE_DIR']+'/scenario.json')).get('host_proxy') or ''))" 2>/dev/null)
+[ -z "$holder" ] && exit 0
+case "$*" in
+  *":80 "*|*":443 "*|*":80)"*|*":443)"*)
+    echo "LISTEN 0 511 0.0.0.0:443 0.0.0.0:* users:((\"$holder\",pid=900,fd=6))" ;;
+esac
+exit 0

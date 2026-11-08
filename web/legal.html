@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VPN</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+:root{
+  --ground:#000000; --card:#0C0D0F; --card-2:#131519; --line:#22252B; --line-soft:#191C21;
+  --txt:#F2F4F8; --txt-2:#A2A8B6; --txt-3:#787F8E; --sig:#F2B441; --sig-rgb:242,180,65; --sig-txt:#F2B441; --on-sig:#1A1300;
+  --r:16px; --font-d:"Unbounded","Golos Text",system-ui,sans-serif; --font-b:"Golos Text",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: light){
+  :root{ --ground:#FFFFFF; --card:#F5F6F9; --card-2:#EDEFF4; --line:#DFE2EA; --line-soft:#E9ECF2;
+         --txt:#12151C; --txt-2:#4C5364; --txt-3:#5F6675; --sig-txt:#7A5406; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--txt);font-family:var(--font-b);
+  font-size:15.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(680px 420px at 50% -10%,rgba(var(--sig-rgb),.07),transparent 62%)}
+.wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:44px 20px 90px}
+header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+header .m{width:30px;height:30px;border-radius:9px;background:var(--sig);display:grid;place-items:center;color:var(--on-sig)}
+header b{font-family:var(--font-d);font-weight:500;font-size:19px}
+header i{color:var(--sig-txt);font-style:normal}
+header .m.logo{background:none;overflow:hidden}
+header .m.logo img{width:100%;height:100%;object-fit:contain;display:block}
+header .lang{margin-left:auto;display:flex;gap:6px}
+header .lang a{color:var(--txt-3);text-decoration:none;font-size:13px;padding:5px 10px;border:1px solid var(--line-soft);border-radius:999px}
+header .lang a.on{color:var(--sig-txt);border-color:var(--sig)}
+.upd{color:var(--txt-3);font-size:13px;margin:0 0 36px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:40px}
+nav a{color:var(--txt-2);text-decoration:none;font-size:13.5px;padding:7px 13px;border:1px solid var(--line-soft);border-radius:999px}
+nav a:hover{color:var(--txt);border-color:var(--line)}
+h1{font-family:var(--font-d);font-weight:500;font-size:26px;letter-spacing:-.01em;margin:0 0 10px}
+h1 i{color:var(--sig-txt);font-style:normal}
+section{margin-bottom:52px;scroll-margin-top:24px}
+h2{font-family:var(--font-d);font-weight:500;font-size:19px;margin:0 0 18px;padding-top:14px;border-top:1px solid var(--line-soft)}
+h3{font-size:15px;font-weight:600;margin:22px 0 8px}
+p{margin:0 0 14px;color:var(--txt-2)}
+p b,li b{color:var(--txt)}
+ul{margin:0 0 14px;padding-left:20px;color:var(--txt-2)}
+li{margin-bottom:6px}
+a{color:var(--sig-txt)}
+.card{background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);padding:8px 20px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:12px 6px;border-bottom:1px solid var(--line-soft)}
+tr:last-child td{border-bottom:0}
+th{color:var(--txt-3);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+td.pr{white-space:nowrap}
+s{color:var(--txt-3);font-size:12.5px;margin-left:6px}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--sig);color:var(--on-sig);
+  text-decoration:none;font-weight:600;padding:13px 18px;border-radius:13px;margin-top:6px}
+.note{background:var(--card-2);border:1px solid var(--line-soft);border-radius:12px;padding:14px 16px;font-size:13.5px;color:var(--txt-2)}
+footer{color:var(--txt-3);font-size:12.5px;padding-top:24px;border-top:1px solid var(--line-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="m" id="brandMark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2 5 6v5.6c0 4 3 7.7 7 9.2 4-1.5 7-5.2 7-9.2V6z"/><path d="m9.4 12.2 1.9 1.9 3.6-3.9"/></svg></span>
+    <b><span class="brand">VPN</span><i>.</i></b>
+    <span class="lang"><a href="?lang=ru" data-l="ru">RU</a><a href="?lang=en" data-l="en">EN</a></span>
+  </header>
+  <p class="upd" id="upd"></p>
+  <nav id="nav"></nav>
+  <main id="main"></main>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+/* The public page of the shop: what is sold and for how much, the terms,
+   privacy and contacts. Payment providers and banks check the shop here,
+   so it opens without Telegram. Filled from /api/public — the same prices
+   the app charges. */
+const esc = v => String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+if (window.KV_BRAND && KV_BRAND.logo){
+  const m = document.getElementById("brandMark");
+  m.classList.add("logo");
+  m.innerHTML = `<img src="${esc(KV_BRAND.logo)}" alt="">`;
+}
+const q = new URLSearchParams(location.search).get("lang");
+const LANG = q === "en" || q === "ru" ? q : (/^ru|^uk|^be|^kk/i.test(navigator.language || "") ? "ru" : "en");
+document.documentElement.lang = LANG;
+document.querySelectorAll("[data-l]").forEach(a => a.classList.toggle("on", a.dataset.l === LANG));
+
+const T = {
+ru: {
+  nav:[["about","О сервисе"],["pricing","Тарифы"],["terms","Соглашение"],["privacy","Конфиденциальность"],["contact","Контакты"]],
+  upd:"Актуально на", title:"Сервис подписки на VPN",
+  about:b => `<p><b>${b}</b> — сервис платной подписки на доступ к VPN-серверам для личного использования: защищённое соединение и стабильный доступ к интернету. Всё оформление — в мини-приложении Telegram: выбор тарифа, оплата, подключение устройств, поддержка.</p>
+    <p>Доступ выдаётся автоматически сразу после подтверждения оплаты. Одна ссылка подписки работает на телефоне, компьютере и телевизоре.</p>`,
+  open:"Открыть в Telegram",
+  pricing:"Тарифы", plan:"Тариф", term:"Срок", devices:"Устройств", traffic:"Трафик", price:"Цена",
+  days:n => n + " " + (n % 10 === 1 && n % 100 !== 11 ? "день" : [2,3,4].includes(n % 10) && ![12,13,14].includes(n % 100) ? "дня" : "дней"),
+  unl:"без ограничений", gb:n => n + " ГБ", free:"бесплатно",
+  priceNote:(dev) => `<p>Дополнительное устройство — ${dev} разово на оставшийся срок подписки. Действующая цена всегда показывается в приложении до оплаты. Автоматических списаний нет: подписка продлевается только вручную.</p>`,
+  pay:"<p>Способы оплаты: банковская карта и СБП, Telegram Stars, криптовалюта — доступные варианты показаны в приложении.</p>",
+  terms:"Пользовательское соглашение", privacy:"Политика конфиденциальности",
+  contact:"Контакты", support:"Поддержка", owner:"Исполнитель", email:"Для обращений",
+  noSupport:"Контакт поддержки будет указан владельцем сервиса.", noPlans:"Тарифы скоро появятся.",
+  foot:"Документ носит информационный характер.",
+},
+en: {
+  nav:[["about","About"],["pricing","Prices"],["terms","Terms"],["privacy","Privacy"],["contact","Contacts"]],
+  upd:"As of", title:"VPN subscription service",
+  about:b => `<p><b>${b}</b> is a paid subscription for access to VPN servers for personal use: a protected connection and stable internet access. Everything happens in a Telegram mini app: choosing a plan, paying, connecting devices, support.</p>
+    <p>Access is granted automatically right after the payment is confirmed. One subscription link works on a phone, a computer and a TV.</p>`,
+  open:"Open in Telegram",
+  pricing:"Prices", plan:"Plan", term:"Term", devices:"Devices", traffic:"Traffic", price:"Price",
+  days:n => n + (n === 1 ? " day" : " days"), unl:"unlimited", gb:n => n + " GB", free:"free",
+  priceNote:(dev) => `<p>An extra device is ${dev}, one-time, for the rest of the term. The current price is always shown in the app before payment. There is no auto-renewal — a subscription is only renewed manually.</p>`,
+  pay:"<p>Payment methods: bank card, Telegram Stars, cryptocurrency — the available ones are shown in the app.</p>",
+  terms:"Terms of service", privacy:"Privacy policy",
+  contact:"Contacts", support:"Support", owner:"Provider", email:"Contact",
+  noSupport:"The owner will list a support contact here.", noPlans:"Plans are coming soon.",
+  foot:"This document is for information purposes.",
+}}[LANG];
+
+function money(v, d){
+  const n = Number(v || 0).toLocaleString(LANG === "ru" ? "ru-RU" : "en-US", { maximumFractionDigits: v % 1 ? 2 : 0 });
+  return d.symbol === "$" || d.symbol === "€" || d.symbol === "£" ? d.symbol + n : n + "\u00A0" + d.symbol;
+}
+function supportLink(s){
+  if (!s) return "";
+  if (/^@?[A-Za-z0-9_]{4,}$/.test(s)) s = "https://t.me/" + s.replace("@", "");
+  if (!/^(https?:|mailto:)/.test(s)) return "";
+  return `<a href="${esc(s)}" target="_blank" rel="noopener">${esc(s.replace(/^mailto:/, ""))}</a>`;
+}
+
+fetch("/api/public").then(r => r.json()).then(d => {
+  const b = esc(d.brand || "VPN");
+  document.title = d.brand || "VPN";
+  document.querySelectorAll(".brand").forEach(el => el.textContent = d.brand || "VPN");
+  document.getElementById("upd").textContent = T.upd + " " + new Date().toLocaleDateString(LANG === "ru" ? "ru-RU" : "en-US",
+    { day:"numeric", month:"long", year:"numeric" });
+  // Only the documents the owner has written are shown — a fresh shop has none.
+  const docs = d.docs || {};
+  document.getElementById("nav").innerHTML = T.nav.filter(([id]) => !["terms", "privacy"].includes(id) || docs[id])
+    .map(([id, n]) => `<a href="#${id}">${n}</a>`).join("");
+  const own = d.about && (d.about[LANG] || d.about.ru);
+  const plans = (d.plans || []);
+  const hasTraffic = plans.some(p => p.traffic_gb);
+  const rows = plans.map(p => `<tr><td>${esc(LANG === "en" && p.name_en ? p.name_en : p.name)}</td>
+    <td>${T.days(p.days)}</td><td>${p.devices || T.unl}</td>
+    ${hasTraffic ? `<td>${p.traffic_gb ? T.gb(p.traffic_gb) : T.unl}</td>` : ""}
+    <td class="pr">${p.price ? money(p.price, d) : T.free}${p.old_price ? `<s>${money(p.old_price, d)}</s>` : ""}</td></tr>`).join("");
+  const bot = d.bot ? `<a class="cta" href="https://t.me/${esc(d.bot)}">${T.open} →</a>` : "";
+  const sup = supportLink(d.support);
+  document.getElementById("main").innerHTML = `
+    <section id="about"><h1>${b}<i>.</i></h1><p style="color:var(--txt-3);margin-top:-4px">${T.title}</p>${
+      own ? `<p style="white-space:pre-line">${esc(own)}</p>` : T.about(b)}${bot}</section>
+    <section id="pricing"><h2>${T.pricing}</h2>
+      ${plans.length ? `<div class="card"><table><tr><th>${T.plan}</th><th>${T.term}</th><th>${T.devices}</th>
+        ${hasTraffic ? `<th>${T.traffic}</th>` : ""}<th>${T.price}</th></tr>${rows}</table></div>
+      ${T.priceNote(money(d.device_price, d))}${T.pay}` : `<div class="note">${T.noPlans}</div>`}</section>
+    ${docs.terms ? `<section id="terms"><h2>${T.terms}</h2>${docs.terms[LANG] || docs.terms.ru}</section>` : ""}
+    ${docs.privacy ? `<section id="privacy"><h2>${T.privacy}</h2>${docs.privacy[LANG] || docs.privacy.ru}</section>` : ""}
+    <section id="contact"><h2>${T.contact}</h2>
+      ${sup ? `<p>${T.support}: ${sup}</p>` : `<div class="note">${T.noSupport}</div>`}
+      ${d.owner ? `<p>${T.owner}: ${esc(d.owner)}</p>` : ""}
+      ${d.contact ? `<p>${T.email}: <a href="mailto:${esc(d.contact)}">${esc(d.contact)}</a></p>` : ""}
+    </section>`;
+  document.getElementById("foot").textContent = (d.brand || "VPN") + " · " + T.foot;
+}).catch(() => { document.getElementById("main").innerHTML = "<p>…</p>"; });
+</script>
+</body>
+</html>

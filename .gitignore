@@ -1,0 +1,20 @@
+.env
+data/
+.dev/
+.panels.env
+__pycache__/
+*.py[cod]
+*.db
+*.db-*
+.pytest_cache/
+.venv/
+venv/
+.env.bak
+docker-compose.override.yml
+*.vpnshop.bak
+# private keys never belong in the repository
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+.deploy_key*

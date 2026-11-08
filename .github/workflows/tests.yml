@@ -1,0 +1,78 @@
+# Runs on GitHub for every push and pull request:
+#   tests      — all the tests, also against real 3x-ui (3.x and 2.x) and Marzban
+#                panels started right on the runner (scripts/dev-*.sh);
+#   installer  — install.sh as a person would run it, in every scenario
+#                (clean server, tunnel, another Caddy, nginx, update, menu,
+#                uninstall) and the owner's path up to a paid order.
+# A red mark here means: do not update the servers until it is green again.
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests, with real panels
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"          # the same as in the Docker image
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - name: Install
+        run: pip install -r requirements-dev.txt
+      - name: Keep the panel downloads between runs
+        uses: actions/cache@v5
+        with:
+          path: |
+            .dev/3xui/v3/x-ui
+            .dev/3xui/v2/x-ui
+            .dev/marzban/src
+            .dev/marzban/venv
+          key: panels-py3.12-${{ hashFiles('scripts/dev-3xui.sh', 'scripts/dev-marzban.sh') }}
+      - name: Start 3x-ui 3.x, 3x-ui 2.x and Marzban
+        run: |
+          scripts/dev-3xui.sh > .panels.env
+          scripts/dev-marzban.sh >> .panels.env
+          sleep 5                         # let Xray settle after the panels set up their inbounds
+      - name: Tests
+        run: |
+          . ./.panels.env
+          python -m pytest -rs
+      - name: Panel logs
+        if: failure()
+        run: tail -n 60 .dev/3xui/*/log/run.out .dev/marzban/marzban.log 2>/dev/null || true
+
+  installer:
+    name: Installer scenarios
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - name: Install
+        run: pip install -r requirements-dev.txt
+      - name: Caddy (for the "another Caddy on the server" scenarios)
+        run: curl -fsSL https://github.com/caddyserver/caddy/releases/download/v2.10.2/caddy_2.10.2_linux_amd64.tar.gz | tar -xz -C /tmp caddy
+      - name: A real 3x-ui panel for the owner's path
+        run: scripts/dev-3xui.sh > .panels.env
+      - name: install.sh in every scenario
+        run: |
+          . ./.panels.env
+          sudo -E env "PATH=$PATH" python tests/installer/run.py
