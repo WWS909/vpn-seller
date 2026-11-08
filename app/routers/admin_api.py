@@ -1490,8 +1490,12 @@ def save_settings(data: dict, db: Session = Depends(get_db), admin=A):
             raise HTTPException(400, "theme_preset: unknown theme")
         if key == "theme_mode" and value not in theme.MODES:
             raise HTTPException(400, "theme_mode: " + " | ".join(theme.MODES))
-        if key == "font" and value not in theme.FONTS:
-            raise HTTPException(400, "font: " + " | ".join(theme.FONTS))
+        if key == "font" and value not in theme.FONTS and value != "custom":
+            raise HTTPException(400, "font: " + " | ".join(theme.FONTS) + " | custom")
+        if key == "font_custom":
+            value = " ".join(value.split())
+            if value and not theme.CUSTOM_FONT.match(value):
+                raise HTTPException(400, "font_custom: a Google Fonts family name, like PT Sans")
         if key == "radius" and value not in theme.RADII:
             raise HTTPException(400, "radius: " + " | ".join(theme.RADII))
         for opt, allowed in (("backdrop", theme.BACKDROPS), ("icons", theme.ICONS),
@@ -1828,7 +1832,8 @@ def reset_brand(db: Session = Depends(get_db), admin=A):
 @router.get("/theme/fonts")
 def theme_fonts(_=A):
     from .. import theme
-    return [{"id": k, "name": v["name"], "d": v["d"], "b": v["b"], "load": v["load"]}
+    return [{"id": k, "name": v["name"], "d": v["d"], "b": v["b"], "load": v["load"], "kind": v["kind"],
+             "app_only": bool(v.get("app_only"))}
             for k, v in theme.FONTS.items()]
 
 

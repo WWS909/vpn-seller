@@ -5,18 +5,59 @@
 **Your own VPN subscription shop in Telegram: a Mini App and an admin panel for 3x-ui, Marzban and Remnawave**
 
 [![Tests](https://github.com/WWS909/vpn-seller/actions/workflows/tests.yml/badge.svg)](https://github.com/WWS909/vpn-seller/actions/workflows/tests.yml)
+[![Demo](https://img.shields.io/badge/demo-@Cristal__vpn__app-2AABEE?logo=telegram&logoColor=white)](https://t.me/Cristal_vpn_app)
+[![MIT license](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
+![Python 3.12](https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white)
 
 [Русский](README.md) · English
+
+**[Try the demo](https://t.me/Cristal_vpn_app)** · [Install](#quick-start) · [Features](#features) · [Screenshots](#screenshots) · [What's new](CHANGELOG.en.md)
 
 </div>
 
 Most open-source projects for selling VPN keys are chat bots with buttons. VPN Seller is a full app inside Telegram: the user opens it from the bot, picks a plan, pays and connects a device in a couple of taps. Keys are issued on your own [3x-ui](https://github.com/MHSanaei/3x-ui), [Marzban](https://github.com/Gozargah/Marzban) or [Remnawave](https://github.com/remnawave/panel) servers, and you run everything from a web admin panel or right from the bot.
+
+> **See it live.** Open [@Cristal_vpn_app](https://t.me/Cristal_vpn_app) and tap "Open" — it's a shop running on VPN Seller. That's what your customers see: home, plans, payment, connecting, support.
 
 ```bash
 wget -qO install.sh https://raw.githubusercontent.com/WWS909/vpn-seller/main/install.sh && sudo bash install.sh --en
 ```
 
 ![The app](docs/screenshots/app-dark.png)
+
+### How it differs from a bot with buttons
+
+| | A usual bot | VPN Seller |
+|---|---|---|
+| What the customer sees | messages and buttons | an app: screens, days and traffic left, devices, locations |
+| Connecting | a key pasted into the chat | one subscription link for every server, one tap into Happ, v2RayTun and others, a QR code |
+| Payment | usually one gateway | Telegram Stars, cards, SBP and crypto — 15 payment providers to pick from, balance and referrals |
+| Running it | bot commands | a web admin panel with charts, and the same panel inside Telegram |
+| Look | — | your colour, logo, 30 fonts, 13 icon styles, cards, backgrounds, opening screen |
+| Install and updates | by hand | one command, a guided installer, a new version from GitHub in one click |
+
+### Installing — five questions
+
+The installer asks for the bot token, your Telegram ID (it can find it itself), the address, a password and the currency. Everything else — Docker, HTTPS, the bot webhook, the "Open" button — is set up for you.
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/install-1.png" alt="Installer: questions"></td>
+<td width="50%"><img src="docs/screenshots/install-2.png" alt="Installer: done"></td>
+</tr>
+</table>
+
+After that the server has a `vpn-seller` command — a menu with the shop's state and every action: update, logs, backup, payment methods, a new address, the night auto-update. Every item has a way back. (The screenshots show the Russian installer; `--en` runs it in English.)
+
+<p align="center"><img src="docs/screenshots/server-menu.png" alt="The server menu" width="420"></p>
+
+### Your own look in a couple of minutes
+
+There are no finished themes — the look is built from parts, and the panel shows the real app next to them. Below is the same shop with different fonts and icons.
+
+<p align="center"><img src="docs/screenshots/looks-en.webp" alt="One shop, three looks"></p>
+
+![Look: fonts in groups and a live preview](docs/screenshots/admin-fonts.webp)
 
 ## Features
 
@@ -90,12 +131,17 @@ wget -qO install.sh https://raw.githubusercontent.com/WWS909/vpn-seller/main/ins
 
 Cards go through one gateway of your choice (`CARD_GATEWAY`). Users only see the methods that are configured.
 
-<details>
-<summary>More screenshots</summary>
+## Screenshots
 
-![Screens](docs/screenshots/app-more.png)
-![Light theme, English](docs/screenshots/app-light.png)
 ![Admin panel](docs/screenshots/admin-overview.png)
+
+![App screens](docs/screenshots/app-more.png)
+
+<details>
+<summary>All screens: the app and the panel</summary>
+
+![Fonts and icons](docs/screenshots/looks-en.webp)
+![Light theme, English](docs/screenshots/app-light.png)
 ![Payments: gateways and keys in the panel](docs/screenshots/admin-payments.png)
 ![Updates: a new version from GitHub in one click](docs/screenshots/admin-updates.png)
 ![User](docs/screenshots/admin-user.png)
@@ -118,12 +164,17 @@ Cards go through one gateway of your choice (`CARD_GATEWAY`). Users only see the
 
 ## How it works
 
-```
-Telegram  ── bot (webhook) ─┐
-Mini App  ── /app ──────────┤
-Admin     ── /admin ────────┼── VPN Seller (FastAPI + SQLite/PostgreSQL) ──► 3x-ui / Marzban / Remnawave panels (API)
-Gateways  ── /api/pay/* ────┤
-VPN app   ── /sub/<token> ──┘   ← one subscription built from all servers
+```mermaid
+flowchart LR
+    U["Customer<br/>in Telegram"] -->|opens| APP["Mini App<br/>/app"]
+    U -->|writes| BOT["Bot<br/>webhook"]
+    O["Owner"] --> ADM["Admin panel<br/>/admin and in the bot"]
+    APP --> VS(("VPN Seller<br/>FastAPI · SQLite/PostgreSQL"))
+    BOT --> VS
+    ADM --> VS
+    PAY["Gateways<br/>Stars · cards · SBP · crypto"] -->|payment notice| VS
+    VS -->|creates and renews clients| P["Panels<br/>3x-ui · Marzban · Remnawave"]
+    VPN["VPN app<br/>Happ, v2RayTun…"] -->|/sub/…| VS
 ```
 
 There is no separate bot process: Telegram delivers updates to the service's webhook. On start the service registers the webhook, the menu button and the `/start` command itself.
@@ -348,7 +399,7 @@ Admin → Look. On the right is **the real app in a phone frame**: every change 
 - **Lunar New Year** (Red diamond icons, Lacquer & gold cards, the Lanterns background, Yeseva One) — red lacquer and gold: a cloud pattern, two lanterns swaying at the top, cards in gold frames with fret corners. The main card is a red envelope (hongbao) with a flap and a gold coin; icons are the red-and-gold diamonds hung on doors, turning in as they appear and glinting. Titles in Yeseva One, numbers in gold, a lantern on the opening screen, a red diamond with a gold check and fireworks on a purchase. By day, rice paper: the accent turns red (gold on white cannot be read), the envelope stays red.
 - **Name and logo** — PNG, JPEG, WebP or SVG up to 2 MB. The logo shows in the app header, on the opening screen, in the panel, on the site and in the browser tab. The bot's own avatar is changed only in @BotFather (`/setuserpic`) — the logo can be downloaded right there.
 - **Colour** — any accent (picker or #code) with a dark background (black, graphite, midnight, indigo, retro, noir, winter, red lacquer). A colour that reads poorly is darkened or lightened for text, in both schemes. The colour dots under the picker are only shortcuts: they fill in the accent and the background.
-- **Font** — eleven pairs with Cyrillic, **corner roundness** (every button, field and card follows it) and **icons** (thin, regular, bold, on tiles in the theme colour).
+- **Font** — 30 pairs with Cyrillic in four groups: plain (Manrope, Montserrat, Rubik, Nunito, Onest, Geologica, PT Sans, IBM Plex Sans, Fira Sans, Ubuntu, Jost, Commissioner, system), serif (Playfair, PT Serif, Lora, Literata, Roboto Slab), with character (Unbounded, JetBrains Mono, Exo 2, Comfortaa, Oswald, Russo One, Tektur, IBM Plex Mono) and for special looks (pixel, comic, New Year). You can also type in **any family from Google Fonts** — it takes the headings and numbers, the text stays in Golos; the panel checks at once that the font exists and has Cyrillic. **Corner roundness** (every button, field and card follows it) and **icons** — thin, regular, bold, on tiles in the theme colour, **colour tiles** (a white drawing on a square of its own colour, like a phone's settings: money is green, gifts pink, help cyan), **in rings**, duotone and the special sets below.
 - **Background** — glow, aurora, grid, stars or none; always in the colour's tone.
 - **Animations** — lively (opening screen, a staged entrance, tab transitions, a menu highlight that travels, a day counter, a purchase moment), calm (soft fades only) or none. People with the system's "reduce motion" never get animation.
 - **Opening screen** — logo, name and your own line while the app loads. Seven kinds to choose from: Matches the look (Pixel, Comic, Snowy and Lacquer & gold cards have their own), Waves (circles run out of the mark), Orbit (points run round the mark), Ring (the mark in a running loader ring), Burst (the mark flies in with a flash and sparks, the letters come together), Typing (the name is typed letter by letter after a cursor) and Minimal (only the name and a thin line) — or none. Each kind takes your colours and type. In the panel every kind has a live thumbnail, and the chosen one plays in the phone at once. The screen **fits the logo**: on upload it is looked at — where the drawing is (transparent margins are cut off), its proportions, whether it has transparency, how light it is and its main colour. A wide wordmark gets a wide sign, with the waves and the ring following its shape, and Auto hides the name next to it — the logo already says it. A photo or an icon without transparency gets rounded corners; a dark logo on the dark scheme gets a light plate. A long name gets smaller to stay on one line. Choices: the sign (logo, the first letter of the name or the shield), the plate (auto, tile, circle, none), size, colour (the accent, **the logo's** or your own), background (plain, glow or **filled with the colour** — a brand screen), whether to show the name, and how long the screen stays. Put `{name}` in the line for the person's first name from Telegram ("Hi, {name}!"). **Seasonal effect** — light snow behind the cards.

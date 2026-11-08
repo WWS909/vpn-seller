@@ -159,6 +159,13 @@ h1,h2,.h{font-family:var(--font-d);font-weight:500;letter-spacing:-.01em}
 .th.opt .icons{display:flex;gap:6px;margin:2px 0 8px;color:var(--txt)}
 .th.opt .ico{display:grid;place-items:center;width:28px;height:28px}
 .th.opt .ico.bd{border-radius:8px;background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc)}
+.th.opt .ico.tl{border-radius:7px;color:#fff;background:var(--tl)}
+.th.opt .ico.rg{border-radius:50%;color:var(--acc);border:1.5px solid color-mix(in srgb,var(--acc) 55%,transparent);box-sizing:border-box}
+.fgroup{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--txt-3);margin:14px 0 8px}
+.fgroup:first-child{margin-top:0}
+.fcustom{display:flex;gap:8px;align-items:center;margin-top:8px}
+.fcustom input{flex:1;min-width:0}
+.fcustom .fs{font-size:22px;min-width:84px;text-align:center;color:var(--txt)}
 .th.opt .ico.duo{border-radius:50%;color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 35%,transparent);
   background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.16),color-mix(in srgb,var(--acc) 14%,transparent) 60%);
   box-shadow:0 4px 12px -6px var(--acc)}
@@ -774,7 +781,7 @@ ru: {
   chAdminHint:"Добавьте бота в администраторы канала — иначе Telegram не покажет, кто подписан. Если сменили тип канала (публичный ↔ приватный), привяжите его заново.",
   chCheck:"Сохранить и проверить", chOk:"Работает: «{t}»", chAdd:"Добавить канал", chEmpty:"Каналов нет — нажмите «Добавить канал». Если каналов несколько, человек должен подписаться на каждый.", chCountN:"каналов: {n}",
   brandT:"Название", brandReset:"Сбросить название и логотип", brandResetQ:"Вернуть стандартное название и щит вместо логотипа?",
-  fontT:"Шрифт", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
+  fontT:"Шрифт", fkSans:"Простые", fkSerif:"С засечками", fkChar:"С характером", fkFun:"Для особых оформлений", fkCustom:"Свой шрифт с Google Fonts", fCustomPh:"Название, например Lobster", fCustomHint:"Любое семейство с fonts.google.com для заголовков и цифр, текст останется в Golos. Выбирайте шрифт с кириллицей.", fCustomBad:"Такого шрифта нет на Google Fonts или в нём нет кириллицы", fCustomEmpty:"Впишите название шрифта", fOnlyApp:"только в приложении", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
   linksT:"Свои кнопки", linksSub:"в профиле клиента, до 6", linkAdd:"Добавить кнопку", linkRu:"Текст (RU)", linkEn:"Текст (EN)",
   linksEmpty:"Например: «Наш канал», «Чат клиентов», «Сайт».", linkBad:"Ссылка должна начинаться с https://, tg:// или mailto:",
   exExcel:"Excel", exOrdersT:"Заказы в Excel", exOrdersHint:"Таблица для учёта и налоговой: дата, клиент, что куплено, сумма, способ оплаты. Внизу — итог.",
@@ -797,7 +804,7 @@ ru: {
   taglineHint:"Пусто — «Одна подписка на все ваши устройства».", contrastNote:"Цвета текста подобраны автоматически, чтобы читались на тёмном и светлом фоне.",
   pvTitle:"Ваш доступ", pvBtn:"Подключить", pvLink:"Все тарифы",
   logoDl:"Скачать", logoWhere:"Логотип появится в шапке приложения, на заставке при открытии, в панели, на сайте и во вкладке браузера. Аватарку самого бота Telegram меняет только @BotFather → /setuserpic — скачайте логотип кнопкой выше.",
-  iconsT:"Иконки", icThin:"Тонкие", icRegular:"Обычные", icBold:"Жирные", icBadge:"В плашках", icDuo:"Переливы", ic3d:"Объёмные", icNeon:"Неон", icPixel:"Пиксели", icComic:"Наклейки", icOrnament:"Новогодние", icFortune:"Красные ромбы",
+  iconsT:"Иконки", icThin:"Тонкие", icRegular:"Обычные", icBold:"Жирные", icBadge:"В плашках", icTiles:"Цветные плашки", icRing:"В кружках", icDuo:"Переливы", ic3d:"Объёмные", icNeon:"Неон", icPixel:"Пиксели", icComic:"Наклейки", icOrnament:"Новогодние", icFortune:"Красные ромбы",
   bdT:"Фон", bdSub:"в тон цвета", bdGlow:"Сияние", bdAurora:"Переливы", bdOrbs:"Сферы", bdNight:"Ночной город", bdRetro:"Ретро-закат", bdHalftone:"Комикс-точки", bdWinter:"Зимняя ночь", bdLunar:"Фонарики", bdGrid:"Сетка", bdStars:"Звёзды", bdPlain:"Без фона",
   cardsT:"Карточки", cardsSolid:"Сплошные", cardsGlass:"Стекло", cardsNeon:"Неон", cardsPixel:"Пиксели", cardsComic:"Комикс", cardsFrost:"Снежные", cardsLacquer:"Лак и золото",
   cardsHint:"Стекло — полупрозрачные карточки, сквозь которые размыто виден фон. Лучше всего с фоном «Сферы» или «Переливы»; на фоне «Без фона» стекла не видно. На старых телефонах размытие может немного притормаживать прокрутку. Пиксели — квадратные блоки с жёсткой тенью и «аркадными» кнопками, как в старой игре. Комикс — панели с толстым контуром и точечной тенью, облачка реплик. Снежные — сугробы на карточках; лак и золото — золотые рамки и красный конверт на главной.",
@@ -1217,7 +1224,7 @@ en: {
   chAdminHint:"Make the bot an administrator of the channel — otherwise Telegram does not tell who is subscribed. If you changed the channel type (public ↔ private), bind it again.",
   chCheck:"Save and check", chOk:"Works: “{t}”", chAdd:"Add a channel", chEmpty:"No channels — press Add a channel. With several, a person must join each of them.", chCountN:"channels: {n}",
   brandT:"Name", brandReset:"Reset name and logo", brandResetQ:"Restore the standard name and the shield instead of the logo?",
-  fontT:"Font", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
+  fontT:"Font", fkSans:"Plain", fkSerif:"Serif", fkChar:"With character", fkFun:"For special looks", fkCustom:"Your own from Google Fonts", fCustomPh:"A name, like Lobster", fCustomHint:"Any family from fonts.google.com for headings and numbers; the text stays in Golos. Pick one with Cyrillic if you sell in Russian.", fCustomBad:"No such font on Google Fonts, or it has no Cyrillic", fCustomEmpty:"Type the name of the font", fOnlyApp:"app only", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
   linksT:"Own buttons", linksSub:"in the customer's profile, up to 6", linkAdd:"Add a button", linkRu:"Text (RU)", linkEn:"Text (EN)",
   linksEmpty:"For example: “Our channel”, “Customer chat”, “Website”.", linkBad:"A link must start with https://, tg:// or mailto:",
   exExcel:"Excel", exOrdersT:"Orders to Excel", exOrdersHint:"A table for bookkeeping and taxes: date, customer, what was bought, amount, payment method. A total at the bottom.",
@@ -1240,7 +1247,7 @@ en: {
   taglineHint:"Empty — “One subscription for all your devices”.", contrastNote:"Text colours are adjusted automatically to stay readable on dark and light backgrounds.",
   pvTitle:"Your access", pvBtn:"Connect", pvLink:"All plans",
   logoDl:"Download", logoWhere:"The logo shows in the app header, on the opening screen, in the panel, on the site and in the browser tab. The bot's own avatar is changed only in @BotFather → /setuserpic — download the logo with the button above.",
-  iconsT:"Icons", icThin:"Thin", icRegular:"Regular", icBold:"Bold", icBadge:"On tiles", icDuo:"Duotone", ic3d:"3D colour", icNeon:"Neon", icPixel:"Pixel", icComic:"Stickers", icOrnament:"Festive", icFortune:"Red diamonds",
+  iconsT:"Icons", icThin:"Thin", icRegular:"Regular", icBold:"Bold", icBadge:"On tiles", icTiles:"Colour tiles", icRing:"In rings", icDuo:"Duotone", ic3d:"3D colour", icNeon:"Neon", icPixel:"Pixel", icComic:"Stickers", icOrnament:"Festive", icFortune:"Red diamonds",
   bdT:"Background", bdSub:"in the colour's tone", bdGlow:"Glow", bdAurora:"Aurora", bdOrbs:"Orbs", bdNight:"Night city", bdRetro:"Retro sunset", bdHalftone:"Halftone", bdWinter:"Winter night", bdLunar:"Lanterns", bdGrid:"Grid", bdStars:"Stars", bdPlain:"None",
   cardsT:"Cards", cardsSolid:"Solid", cardsGlass:"Glass", cardsNeon:"Neon", cardsPixel:"Pixel", cardsComic:"Comic", cardsFrost:"Snowy", cardsLacquer:"Lacquer & gold",
   cardsHint:"Glass — see-through cards with the background blurred behind them. Best with the Orbs or Aurora background; on None there is nothing to see through. On old phones the blur may slow scrolling a little. Pixel — square blocks with a hard shadow and arcade buttons, like an old game. Comic — panels with a bold outline and a halftone shadow, speech balloons. Snowy — snow caps on the cards; Lacquer & gold — gold frames and a red envelope on the main card.",
@@ -3593,7 +3600,7 @@ async function pLook(){
   const lk = d.look || {};
   frameReady = false;
   LOOK = { presets:d.presets, preset:c.preset, accent:c.accent, surface:c.surface, mode:c.mode, logo:d.logo,
-           fonts, font:vals.font || "unbounded", radius:vals.radius || "normal", links,
+           fonts, font:vals.font || "unbounded", fontCustom:vals.font_custom || "", radius:vals.radius || "normal", links,
            backdrop:lk.backdrop || "glow", icons:lk.icons || "regular", motion:lk.motion || "lively",
            effect:lk.effect || "none", cards:lk.cards || "solid", splash:lk.splash !== false,
            splashKind:lk.splash_kind || "auto",
@@ -3627,7 +3634,7 @@ async function pLook(){
       <div class="hint" style="margin-top:10px">${esc(t("contrastNote"))}</div>
     </div>
     <div class="card"><h3>${esc(t("fontT"))}</h3>
-      <div class="fonts" id="fontGrid"></div>
+      <div id="fontGrid"></div>
       <div class="two" style="margin-top:14px">
         <div class="field"><label>${esc(t("radiusT"))}</label>${tabsOf("radTabs", "radius", [["square", "rSquare"], ["sharp", "rSharp"], ["normal", "rNormal"], ["round", "rRound"]])}</div>
         <div class="field"><label>${esc(t("iconsT"))}</label><div class="opts" id="iconOpts"></div></div>
@@ -3697,11 +3704,56 @@ function fontLoad(f){
   l.href = `https://fonts.googleapis.com/css2?${f.load}&display=swap`;
   document.head.appendChild(l);
 }
+const FONT_GROUPS = [["sans", "fkSans"], ["serif", "fkSerif"], ["char", "fkChar"], ["fun", "fkFun"]];
 function drawFonts(){
   LOOK.fonts.forEach(fontLoad);
-  $("fontGrid").innerHTML = LOOK.fonts.map(f => `<button class="th fnt ${LOOK.font === f.id ? "on" : ""}" onclick="LOOK.font='${f.id}';drawFonts();lookChanged()">
+  if (LOOK.fontCustom) customFontLoad(LOOK.fontCustom);
+  const tile = f => `<button class="th fnt ${LOOK.font === f.id ? "on" : ""}" onclick="LOOK.font='${f.id}';drawFonts();lookChanged()"${f.app_only ? ` title="${esc(t("fOnlyApp"))}"` : ""}>
     <span class="fs" style="font-family:'${esc(f.d)}',system-ui">Аа 365</span>
-    <b>${esc(f.name)}</b></button>`).join("");
+    <b>${esc(f.name)}</b></button>`;
+  $("fontGrid").innerHTML = FONT_GROUPS.map(([k, l]) => {
+    const list = LOOK.fonts.filter(f => (f.kind || "sans") === k);
+    return list.length ? `<div class="fgroup">${esc(t(l))}</div><div class="fonts">${list.map(tile).join("")}</div>` : "";
+  }).join("") + `<div class="fgroup">${esc(t("fkCustom"))}</div>
+    <div class="fcustom field" style="margin-bottom:0"><button class="th fnt ${LOOK.font === "custom" ? "on" : ""}" style="flex:none;padding:8px 12px" onclick="useCustomFont()">
+      <span class="fs" id="fcSample" style="margin:0;font-family:${LOOK.fontCustom ? `'${esc(LOOK.fontCustom)}',` : ""}system-ui">Аа 365</span></button>
+      <input id="fcName" maxlength="40" placeholder="${esc(t("fCustomPh"))}" value="${esc(LOOK.fontCustom)}" oninput="customFontTyped(this.value)"></div>
+    <div class="hint" id="fcHint" style="margin-top:6px">${esc(t("fCustomHint"))}</div>`;
+}
+const cfLoads = {};
+function customFontLoad(name){            // resolves once the stylesheet has come (or failed)
+  if (!name) return Promise.resolve();
+  if (cfLoads[name]) return cfLoads[name];
+  return (cfLoads[name] = new Promise(done => {
+    const l = document.createElement("link");
+    l.rel = "stylesheet"; l.dataset.cfont = name;
+    l.onload = l.onerror = () => done();
+    l.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name).replace(/%20/g, "+")}&display=swap`;
+    document.head.appendChild(l);
+  }));
+}
+let cfTimer = null;
+function customFontTyped(v){
+  LOOK.fontCustom = v.replace(/\s+/g, " ").trim();
+  clearTimeout(cfTimer);
+  cfTimer = setTimeout(async () => {
+    const name = LOOK.fontCustom, sample = $("fcSample"), hint = $("fcHint");
+    if (!sample) return;
+    hint.textContent = t("fCustomHint"); hint.style.color = "";
+    if (!/^[A-Za-z0-9][A-Za-z0-9 ]{0,39}$/.test(name)) return;
+    await customFontLoad(name);
+    if (name !== LOOK.fontCustom) return;
+    sample.style.fontFamily = `'${name}',system-ui`;
+    let ok = false;
+    try { ok = (await document.fonts.load(`22px '${name}'`, "Аа")).length > 0; } catch (e){}
+    if (name !== LOOK.fontCustom) return;
+    if (!ok){ hint.textContent = t("fCustomBad"); hint.style.color = "var(--warn, #E5A13A)"; return; }
+    if (LOOK.font === "custom") lookChanged();
+  }, 500);
+}
+function useCustomFont(){
+  if (!LOOK.fontCustom){ toast(t("fCustomEmpty"), true); $("fcName") && $("fcName").focus(); return; }
+  LOOK.font = "custom"; drawFonts(); lookChanged();
 }
 function drawLinks(){
   $("linkRows").innerHTML = LOOK.links.map((l, i) => `<div class="lrow">
@@ -3774,6 +3826,7 @@ function iconSample(kind){
   if (kind === "comic") return ["home", "globe", "wallet"].map(k => `<span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" style="display:block;overflow:visible;filter:drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff) drop-shadow(1.5px 1.5px 0 rgba(0,0,0,.5))"><g stroke-linecap="round" stroke-linejoin="round">${ICON_CX[k]}</g></svg></span>`).join("");
   if (kind === "pixel") return ["home", "globe", "wallet"].map(k => `<span class="ico"><svg viewBox="0 0 16 16" width="24" height="24" style="display:block;filter:drop-shadow(1px 1px 0 rgba(0,0,0,.45))"><g stroke="none" shape-rendering="crispEdges">${ICON_PX[k]}</g></svg></span>`).join("");
   if (kind === "3d") return ["home", "globe", "wallet"].map((k, i) => `<span class="ico"><svg viewBox="0 0 48 48" width="22" height="22" style="overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,25,70,.4))">${i ? "" : `<defs>${ICON_3D.grads}</defs>`}${ICON_3D.shapes[k]}</svg></span>`).join("");
+  if (kind === "tiles" || kind === "ring") return ICON_PATHS.map((p, i) => `<span class="ico ${kind === "tiles" ? "tl" : "rg"}" style="--tl:${["#8E8E93", "#0A84FF", "#30B158"][i]}"><svg viewBox="0 0 24 24" width="${kind === "tiles" ? 16 : 14}" height="${kind === "tiles" ? 16 : 14}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg></span>`).join("");
   const w = { thin:1.3, regular:1.7, bold:2.2, badge:1.7, duo:1.5 }[kind];
   // Duotone: a stroke from light to the accent, in a round glowing bubble.
   const duo = kind === "duo", grad = duo ? `<defs><linearGradient id="adDuo" gradientUnits="userSpaceOnUse" x1="4" y1="3" x2="20" y2="21"><stop offset="0" stop-color="#F2FBFF"/><stop offset=".75" stop-color="currentColor"/></linearGradient></defs>` : "";
@@ -3781,7 +3834,7 @@ function iconSample(kind){
 }
 function drawOpts(){
   const { rgb, ground } = curColors();
-  $("iconOpts").innerHTML = [["thin", "icThin"], ["regular", "icRegular"], ["bold", "icBold"], ["badge", "icBadge"], ["duo", "icDuo"], ["3d", "ic3d"], ["neon", "icNeon"], ["pixel", "icPixel"], ["comic", "icComic"], ["ornament", "icOrnament"], ["fortune", "icFortune"]].map(([k, l]) =>
+  $("iconOpts").innerHTML = [["thin", "icThin"], ["regular", "icRegular"], ["bold", "icBold"], ["badge", "icBadge"], ["tiles", "icTiles"], ["ring", "icRing"], ["duo", "icDuo"], ["3d", "ic3d"], ["neon", "icNeon"], ["pixel", "icPixel"], ["comic", "icComic"], ["ornament", "icOrnament"], ["fortune", "icFortune"]].map(([k, l]) =>
     `<button class="th opt ${LOOK.icons === k ? "on" : ""}" onclick="setLook('icons','${k}')" style="--acc:rgb(${rgb})">
       <span class="icons">${iconSample(k)}</span><b>${esc(t(l))}</b></button>`).join("");
   $("bdOpts").innerHTML = [["glow", "bdGlow"], ["aurora", "bdAurora"], ["orbs", "bdOrbs"], ["night", "bdNight"], ["retro", "bdRetro"], ["halftone", "bdHalftone"], ["winter", "bdWinter"], ["lunar", "bdLunar"], ["grid", "bdGrid"], ["stars", "bdStars"], ["plain", "bdPlain"]].map(([k, l]) =>
@@ -3900,7 +3953,7 @@ function pushLook(now){
   lookTimer = setTimeout(async () => {
     if (!LOOK || !$("lkFrame")) return;
     const body = { theme_preset:LOOK.preset, theme_accent:LOOK.accent, theme_surface:LOOK.surface,
-                   font:LOOK.font, radius:LOOK.radius, icons:LOOK.icons, backdrop:LOOK.backdrop,
+                   font:LOOK.font, font_custom:LOOK.fontCustom, radius:LOOK.radius, icons:LOOK.icons, backdrop:LOOK.backdrop,
                    motion:LOOK.motion, effect:LOOK.effect, cards:LOOK.cards, splash_kind:LOOK.splashKind };
     const replay = !!LOOK.replay; LOOK.replay = false;
     let pv;
@@ -3966,7 +4019,7 @@ async function saveLook(btn){
   if (links.some(l => !/^(https:\/\/|tg:\/\/|mailto:)/.test(l.url))){ btn.disabled = false; return toast(t("linkBad"), true); }
   const body = { theme_preset:LOOK.preset, theme_mode:$("lookMode").value,
                  tagline_ru:$("tagRu").value.trim(), tagline_en:$("tagEn").value.trim(),
-                 brand_name:$("lkName").value.trim() || "VPN", font:LOOK.font, radius:LOOK.radius,
+                 brand_name:$("lkName").value.trim() || "VPN", font:LOOK.font, font_custom:LOOK.fontCustom, radius:LOOK.radius,
                  links_json:JSON.stringify(links),
                  icons:LOOK.icons, backdrop:LOOK.backdrop, motion:LOOK.motion,
                  effect:LOOK.effect, cards:LOOK.cards, splash:LOOK.splash ? "1" : "0", splash_kind:LOOK.splashKind,

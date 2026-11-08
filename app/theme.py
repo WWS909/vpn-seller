@@ -87,46 +87,82 @@ LIGHT_GROUND = "#FFFFFF"
 
 # Font pairs: headings and numbers / text. All of them have Cyrillic.
 FONTS: dict[str, dict] = {
-    "unbounded":  {"name": "Unbounded + Golos", "d": "Unbounded", "b": "Golos Text",
+    "unbounded":  {"kind": "char", "name": "Unbounded + Golos", "d": "Unbounded", "b": "Golos Text",
                    "load": "family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@300;500;700"},
-    "manrope":    {"name": "Manrope", "d": "Manrope", "b": "Manrope",
+    "manrope":    {"kind": "sans", "name": "Manrope", "d": "Manrope", "b": "Manrope",
                    "load": "family=Manrope:wght@300;400;500;600;700"},
-    "montserrat": {"name": "Montserrat + Golos", "d": "Montserrat", "b": "Golos Text",
-                   "load": "family=Montserrat:wght@300;500;700"},
-    "rubik":      {"name": "Rubik", "d": "Rubik", "b": "Rubik",
+    "montserrat": {"kind": "sans", "name": "Montserrat + Golos", "d": "Montserrat", "b": "Golos Text",
+                   "load": "family=Montserrat:wght@300;500;700&family=Golos+Text:wght@400;500;600;700"},
+    "rubik":      {"kind": "sans", "name": "Rubik", "d": "Rubik", "b": "Rubik",
                    "load": "family=Rubik:wght@300;400;500;600;700"},
-    "nunito":     {"name": "Nunito", "d": "Nunito", "b": "Nunito",
+    "nunito":     {"kind": "sans", "name": "Nunito", "d": "Nunito", "b": "Nunito",
                    "load": "family=Nunito:wght@300;400;500;600;700"},
-    "mono":       {"name": "JetBrains Mono + Golos", "d": "JetBrains Mono", "b": "Golos Text",
-                   "load": "family=JetBrains+Mono:wght@300;500;700"},
-    "onest":      {"name": "Onest", "d": "Onest", "b": "Onest",
+    "mono":       {"kind": "char", "name": "JetBrains Mono + Golos", "d": "JetBrains Mono", "b": "Golos Text",
+                   "load": "family=JetBrains+Mono:wght@300;500;700&family=Golos+Text:wght@400;500;600;700"},
+    "onest":      {"kind": "sans", "name": "Onest", "d": "Onest", "b": "Onest",
                    "load": "family=Onest:wght@300;400;500;600;700"},
-    "exo":        {"name": "Exo 2", "d": "Exo 2", "b": "Exo 2",
+    "exo":        {"kind": "char", "name": "Exo 2", "d": "Exo 2", "b": "Exo 2",
                    "load": "family=Exo+2:wght@300;400;500;600;700"},
-    "comfortaa":  {"name": "Comfortaa + Golos", "d": "Comfortaa", "b": "Golos Text",
-                   "load": "family=Comfortaa:wght@300;500;700"},
-    "playfair":   {"name": "Playfair + Golos", "d": "Playfair Display", "b": "Golos Text",
-                   "load": "family=Playfair+Display:wght@400;500;600;700"},
-    "geologica":  {"name": "Geologica + Manrope", "d": "Geologica", "b": "Manrope",
+    "comfortaa":  {"kind": "char", "name": "Comfortaa + Golos", "d": "Comfortaa", "b": "Golos Text",
+                   "load": "family=Comfortaa:wght@300;500;700&family=Golos+Text:wght@400;500;600;700"},
+    "playfair":   {"kind": "serif", "name": "Playfair + Golos", "d": "Playfair Display", "b": "Golos Text",
+                   "load": "family=Playfair+Display:wght@400;500;600;700&family=Golos+Text:wght@400;500;600;700"},
+    "geologica":  {"kind": "sans", "name": "Geologica + Manrope", "d": "Geologica", "b": "Manrope",
                    "load": "family=Geologica:wght@200;300;500;600&family=Manrope:wght@400;500;600;700"},
-    "unbounded-manrope": {"name": "Unbounded + Manrope", "d": "Unbounded", "b": "Manrope",
+    "unbounded-manrope": {"kind": "char", "name": "Unbounded + Manrope", "d": "Unbounded", "b": "Manrope",
                           "load": "family=Unbounded:wght@300;500;700&family=Manrope:wght@400;500;600;700"},
+    # Plain, familiar type: the faces of Russian and English print and of
+    # good apps. All with a full Cyrillic.
+    "ptsans":     {"kind": "sans", "name": "PT Sans", "d": "PT Sans", "b": "PT Sans",
+                   "load": "family=PT+Sans:wght@400;700"},
+    "plex":       {"kind": "sans", "name": "IBM Plex Sans", "d": "IBM Plex Sans", "b": "IBM Plex Sans",
+                   "load": "family=IBM+Plex+Sans:wght@300;400;500;600;700"},
+    "fira":       {"kind": "sans", "name": "Fira Sans", "d": "Fira Sans", "b": "Fira Sans",
+                   "load": "family=Fira+Sans:wght@300;400;500;600;700"},
+    "ubuntu":     {"kind": "sans", "name": "Ubuntu", "d": "Ubuntu", "b": "Ubuntu",
+                   "load": "family=Ubuntu:wght@300;400;500;700"},
+    "jost":       {"kind": "sans", "name": "Jost", "d": "Jost", "b": "Jost",
+                   "load": "family=Jost:wght@300;400;500;600;700"},
+    "commissioner": {"kind": "sans", "name": "Commissioner", "d": "Commissioner", "b": "Commissioner",
+                     "load": "family=Commissioner:wght@300;400;500;600;700"},
+    # Serifs for the headings, a calm sans for the text.
+    "ptserif":    {"kind": "serif", "name": "PT Serif + PT Sans", "d": "PT Serif", "b": "PT Sans",
+                   "load": "family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700"},
+    "lora":       {"kind": "serif", "name": "Lora + Golos", "d": "Lora", "b": "Golos Text",
+                   "load": "family=Lora:wght@400;500;600;700&family=Golos+Text:wght@400;500;600;700"},
+    "literata":   {"kind": "serif", "name": "Literata + Golos", "d": "Literata", "b": "Golos Text",
+                   "load": "family=Literata:wght@300;400;500;600;700&family=Golos+Text:wght@400;500;600;700"},
+    "robotoslab": {"kind": "serif", "name": "Roboto Slab + Golos", "d": "Roboto Slab", "b": "Golos Text",
+                   "load": "family=Roboto+Slab:wght@300;400;500;700&family=Golos+Text:wght@400;500;600;700"},
+    # Headings with a character of their own.
+    "oswald":     {"kind": "char", "name": "Oswald + Golos", "d": "Oswald", "b": "Golos Text",
+                   "load": "family=Oswald:wght@300;400;500;700&family=Golos+Text:wght@400;500;600;700"},
+    "russo":      {"kind": "char", "name": "Russo One + Golos", "d": "Russo One", "b": "Golos Text",
+                   "load": "family=Russo+One&family=Golos+Text:wght@400;500;600;700"},
+    "tektur":     {"kind": "char", "name": "Tektur + Golos", "d": "Tektur", "b": "Golos Text",
+                   "load": "family=Tektur:wght@400;500;700&family=Golos+Text:wght@400;500;600;700"},
+    "plexmono":   {"kind": "char", "name": "IBM Plex Mono + Sans", "d": "IBM Plex Mono", "b": "IBM Plex Sans",
+                   "load": "family=IBM+Plex+Mono:wght@300;400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700"},
     # A pixel font with a clean Cyrillic (Pixelify's д and П are not usable),
     # with a terminal font for the text: a smooth sans next to pixels looks pasted on.
     # Only for the mini app: it is sharp at sizes the app sets for it, and
     # the panel keeps its own type (it takes only the colour of a style).
-    "pixel":      {"name": "Tiny5 + JetBrains Mono", "d": "Tiny5", "d2": "JetBrains Mono", "b": "JetBrains Mono",
+    "pixel":      {"kind": "fun", "name": "Tiny5 + JetBrains Mono", "d": "Tiny5", "d2": "JetBrains Mono", "b": "JetBrains Mono",
                    "load": "family=Tiny5&family=JetBrains+Mono:wght@400;500;600;700", "app_only": True},
     # Comic lettering: the heaviest italic for titles, a hand-lettered sans for the balloons.
-    "comic":      {"name": "Rubik Black Italic + Balsamiq", "d": "Rubik", "b": "Balsamiq Sans",
+    "comic":      {"kind": "fun", "name": "Rubik Black Italic + Balsamiq", "d": "Rubik", "b": "Balsamiq Sans",
                    "load": "family=Rubik:ital,wght@1,700;1,900&family=Balsamiq+Sans:wght@400;700", "app_only": True},
     # New Year: round heavy letters (white with a candy-red edge in the app), a gold display serif for the Lunar one.
-    "festive":    {"name": "Nunito Black", "d": "Nunito", "b": "Nunito",
+    "festive":    {"kind": "fun", "name": "Nunito Black", "d": "Nunito", "b": "Nunito",
                    "load": "family=Nunito:wght@400;600;700;800;900", "app_only": True},
-    "lunar":      {"name": "Yeseva One + Golos", "d": "Yeseva One", "b": "Golos Text",
-                   "load": "family=Yeseva+One", "app_only": True},
-    "system":     {"name": "System", "d": "system-ui", "b": "system-ui", "load": ""},
+    "lunar":      {"kind": "fun", "name": "Yeseva One + Golos", "d": "Yeseva One", "b": "Golos Text",
+                   "load": "family=Yeseva+One&family=Golos+Text:wght@400;500;600;700", "app_only": True},
+    "system":     {"kind": "sans", "name": "System", "d": "system-ui", "b": "system-ui", "load": ""},
 }
+# The groups of the picker in the panel, in this order. "custom" is any family
+# from Google Fonts typed in by the owner (font_custom), for the headings.
+FONT_KINDS = ("sans", "serif", "char", "fun", "custom")
+CUSTOM_FONT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 ]{0,39}$")
 # Corner roundness: (app cards, admin cards)
 RADII = {"square": (0, 6), "sharp": (8, 8), "normal": (16, 13), "round": (24, 18)}
 MODES = ("auto", "dark", "light")
@@ -134,7 +170,7 @@ MODES = ("auto", "dark", "light")
 # The background behind the cards, the icon drawing, how much moves, and
 # a seasonal effect. Each is an attribute on <html>; the pages style them.
 BACKDROPS = ("glow", "aurora", "orbs", "night", "retro", "halftone", "winter", "lunar", "grid", "stars", "plain")
-ICONS = ("thin", "regular", "bold", "badge", "duo", "3d", "neon", "pixel", "comic", "ornament", "fortune")
+ICONS = ("thin", "regular", "bold", "badge", "tiles", "ring", "duo", "3d", "neon", "pixel", "comic", "ornament", "fortune")
 MOTIONS = ("lively", "calm", "off")
 EFFECTS = ("none", "snow")
 # The kind of opening screen: "auto" follows the cards (pixel, comic, snowy and
@@ -261,7 +297,7 @@ def resolve(accent: str, surface: str, mode: str = "auto", preset: str = "custom
 
 def font_css(db: Session, page: str) -> tuple[str, str]:
     """(<link> to load the font, CSS variables) for the chosen font pair."""
-    href, vars_ = font_vars(core.get(db, "font"), core.get(db, "radius"), page)
+    href, vars_ = font_vars(core.get(db, "font"), core.get(db, "radius"), page, core.get(db, "font_custom"))
     # Not render-blocking: the opening screen shows at once in the system
     # font and the chosen one takes over as soon as it arrives.
     link = (f'<link rel="preload" as="style" href="{href}" onload="this.onload=null;this.rel=\'stylesheet\'">'
@@ -269,9 +305,20 @@ def font_css(db: Session, page: str) -> tuple[str, str]:
     return link, vars_
 
 
-def font_vars(font: str, radius_id: str, page: str) -> tuple[str, str]:
+def custom_font(name: str) -> dict | None:
+    """A family from Google Fonts typed in by the owner: it takes the headings
+    and numbers, the text stays in Golos (a decorative face is hard to read
+    in small text, and the signs it lacks, like ₽, come from Golos too)."""
+    name = " ".join(str(name or "").split())
+    if not CUSTOM_FONT.match(name):
+        return None
+    return {"kind": "custom", "name": name, "d": name, "d2": "Golos Text", "b": "Golos Text",
+            "load": f"family={name.replace(' ', '+')}&family=Golos+Text:wght@400;500;600;700"}
+
+
+def font_vars(font: str, radius_id: str, page: str, custom: str = "") -> tuple[str, str]:
     """(stylesheet URL or "", CSS variables) for a font pair and a corner size."""
-    f = FONTS.get(font) or FONTS["unbounded"]
+    f = (custom_font(custom) if font == "custom" else FONTS.get(font)) or FONTS["unbounded"]
     if page == "admin" and f.get("app_only"):
         f = FONTS["unbounded"]
     stack = "system-ui,-apple-system,sans-serif"
@@ -327,7 +374,8 @@ def preview(params: dict) -> dict:
             raise ValueError("theme_surface: " + " | ".join(SURFACES))
         preset = "custom"
     th = _hand_picked(resolve(accent, surface, "auto", preset), preset)
-    href, fvars = font_vars(str(params.get("font") or ""), str(params.get("radius") or ""), "app")
+    href, fvars = font_vars(str(params.get("font") or ""), str(params.get("radius") or ""), "app",
+                            str(params.get("font_custom") or ""))
     return {
         "css": css(th, "app") + fvars, "font_href": href,
         "attrs": {"backdrop": _pick(str(params.get("backdrop")), BACKDROPS, "glow"),

@@ -392,3 +392,53 @@ def test_settings_written_elsewhere_show_up(client, db, monkeypatch):
     core.put(db, "brand_name", "Own Write")       # this process: seen at once, whatever the keep time
     monkeypatch.setattr(core, "_TTL", 3600.0)
     assert core.get(db, "brand_name") == "Own Write"
+
+
+# ---------------------------------------------------------------- fonts and icons
+def test_fonts_are_grouped_and_all_have_cyrillic_families(client, admin):
+    from app import theme
+    fonts = client.get("/api/admin/theme/fonts", headers=admin).json()
+    assert len(fonts) >= 30 and {f["kind"] for f in fonts} <= set(theme.FONT_KINDS)
+    ids = {f["id"] for f in fonts}
+    for plain in ("ptsans", "plex", "fira", "ubuntu", "jost", "commissioner",
+                  "ptserif", "lora", "literata", "robotoslab", "oswald", "russo", "tektur", "plexmono"):
+        assert plain in ids, plain
+    assert all(f["app_only"] for f in fonts if f["kind"] == "fun")
+    # each one loads from Google Fonts and names its families in the request
+    for f in fonts:
+        if f["load"]:
+            assert f["d"].replace(" ", "+") in f["load"] and f["b"].replace(" ", "+") in f["load"], f["id"]
+    r = client.post("/api/admin/settings", headers=admin, json={"font": "ptserif"})
+    assert r.status_code == 200
+    page = client.get("/app").text
+    assert "PT+Serif" in page and '--font-d:"PT Serif"' in page and '--font-b:"PT Sans"' in page
+
+
+def test_any_google_font_for_the_headings(client, admin):
+    r = client.post("/api/admin/settings", headers=admin, json={"font": "custom", "font_custom": "  Lobster   Two "})
+    assert r.status_code == 200, r.text
+    page = client.get("/app").text
+    assert "family=Lobster+Two&family=Golos+Text" in page
+    assert '--font-d:"Lobster Two","Golos Text"' in page and '--font-b:"Golos Text"' in page
+    assert "Lobster+Two" in client.get("/admin").text               # the panel takes it too
+    # the live preview
+    pv = client.post("/api/admin/theme/preview", headers=admin, json={
+        "theme_preset": "ocean", "font": "custom", "font_custom": "Pacifico"}).json()
+    assert "Pacifico" in pv["font_href"] and '"Pacifico"' in pv["css"]
+    # names that are not a font family are refused; a bad stored one falls back
+    for bad in ('Lobster"}body{', "a/b", "x" * 41, "<script>"):
+        assert client.post("/api/admin/settings", headers=admin, json={"font_custom": bad}).status_code == 400, bad
+    from app import theme
+    assert theme.font_vars("custom", "normal", "app", "")[1].startswith(':root{--font-d:"Unbounded"')
+
+
+def test_colour_tiles_and_ring_icons(client, admin):
+    for kind in ("tiles", "ring"):
+        assert client.post("/api/admin/settings", headers=admin, json={"icons": kind}).status_code == 200
+        page = client.get("/app").text
+        assert f'data-icons="{kind}"' in re.search(r"<html[^>]*>", page).group(0)
+        assert f'[data-icons="{kind}"]' in page
+    panel = client.get("/admin").text
+    for part in ('["tiles", "icTiles"]', '["ring", "icRing"]', 'icTiles:"Цветные плашки"', "function useCustomFont(",
+                 'fkSerif:"С засечками"', "function customFontTyped("):
+        assert part in panel, part

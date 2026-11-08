@@ -3,6 +3,13 @@
 Each version is a `## X.Y.Z — date` heading with one change per "-" line.
 The shop reads this file to tell the owner what is new.
 
+## 1.5.0 — 2026-11-09
+- Fonts: 30 pairs with Cyrillic, grouped in the panel — plain, serif, with character, for special looks. New: PT Sans, PT Serif, IBM Plex Sans and Mono, Fira Sans, Ubuntu, Jost, Commissioner, Lora, Literata, Roboto Slab, Oswald, Russo One, Tektur.
+- Your own font: type in any Google Fonts family for headings and numbers; the panel checks at once that it exists and has Cyrillic.
+- Icons: two new styles — "Colour tiles" (a white drawing on a square of its own colour, like a phone's settings) and "In rings".
+- Fixed: the Montserrat, JetBrains Mono, Comfortaa, Playfair and Yeseva One pairs never loaded their text font (Golos) — the text fell back to the system font.
+- The GitHub page: the @Cristal_vpn_app demo shop, installer and server-menu screenshots, a comparison with a bot, a diagram of how it works.
+
 ## 1.4.0 — 2026-11-09
 - Mandatory subscription: several channels can be added (up to five) — a person joins each, the mini app has a button per channel.
 - Traffic top-ups became a feature of their own: Settings → Traffic top-ups, off at first. Off — when the traffic runs out, a renewal is offered.
