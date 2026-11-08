@@ -463,7 +463,7 @@ def s10_menu_tools(d: Path):
     check("s10 banner says SELLER", "S E L L E R" in out)
     check("s10 header card", "работает" in out and "сегодня" in out and "клиенты" in out and "диск" in out, out[:2500])
     check("s10 menu sections", all(x in out for x in ("Магазин", "Данные", "Настройки", "Прочее")))
-    check("s10 what's new shown", "1.2.1" in out and "•" in out)
+    check("s10 what's new shown", (ROOT / "VERSION").read_text().strip() in out and "•" in out)
     check("s10 auto-update on at 03:00", "автообновление включено, в 03:00" in out, out[-2500:])
     r = subprocess.run([sys.executable, "-m", "app.cli", "summary"], cwd=d, env=app_env_for(d), capture_output=True, text=True)
     check("s10 auto-update saved in the shop", "auto=1" in r.stdout and "hour=3" in r.stdout, r.stdout + r.stderr)
