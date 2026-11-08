@@ -8,3 +8,5 @@ python-multipart>=0.0.9
 # PostgreSQL instead of the default SQLite: DATABASE_URL=postgresql+psycopg://...
 psycopg[binary]>=3.1
 Pillow>=10
+# RSA signatures of WATA payment notices (app/payments/wata.py)
+cryptography>=42

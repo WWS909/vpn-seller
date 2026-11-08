@@ -378,6 +378,8 @@ def health_version() -> str:
 def s9_update_from_github(d: Path):
     print("\n[s9] update from GitHub (archive), the panel's request, rollback, private repo")
     stop_app()
+    # installed from a checkout (CI) the copy is a git one and would `git pull`: here the archive path is tested
+    shutil.rmtree(d / ".git", ignore_errors=True)
     envf = d / ".env"
     envf.write_text(envf.read_text() + "UPDATE_REPO=https://github.com/test/vpn-seller\n")
     env = env_for({}, VPN_SHOP_DIR=str(d), VPN_SHOP_GITHUB_API=f"file://{WORK / 'gh'}", VPN_SHOP_WAIT_TRIES="10")
