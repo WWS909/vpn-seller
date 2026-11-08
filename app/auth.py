@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import ipaddress
 import json
 import secrets
 import threading
@@ -197,14 +198,31 @@ LOCK_SECONDS = 900
 MAX_TRACKED = 5000
 
 
+def _from_proxy(host: str) -> bool:
+    """A peer that may speak for someone else: a proxy on this machine or in
+    the Docker network (Caddy, cloudflared, nginx on the host). An address
+    on the internet may not — it could write any X-Forwarded-For."""
+    try:
+        ip = ipaddress.ip_address(host)
+    except ValueError:
+        return True                      # a unix socket, the test client
+    return ip.is_private or ip.is_loopback
+
+
 def client_ip(request: Request) -> str:
     # The LAST address of X-Forwarded-For is the one our own reverse proxy
     # saw. Caddy replaces the header entirely; nginx with
     # $proxy_add_x_forwarded_for appends to what the client sent — earlier
-    # entries can be forged, the last one cannot.
+    # entries can be forged, the last one cannot. The header counts only
+    # when a proxy sent it: should the app ever be reached from the internet
+    # directly, a made-up header must not dodge the login rate limit.
+    # (uvicorn already took the address from a trusted proxy's header —
+    # Dockerfile: --forwarded-allow-ips lists the private networks only.)
+    peer = request.client.host if request.client else ""
     fwd = request.headers.get("x-forwarded-for", "")
-    last = fwd.split(",")[-1].strip() if fwd else ""
-    return last or (request.client.host if request.client else "")
+    if not fwd or not _from_proxy(peer):
+        return peer
+    return fwd.split(",")[-1].strip() or peer
 
 
 def locked(ip: str, password: bool = True) -> int:

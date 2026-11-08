@@ -21,9 +21,10 @@ services:
       DATABASE_URL: ${DATABASE_URL:-sqlite:////app/data/vpn.db}
     volumes:
       - ./data:/app/data
-    # Never published to the internet: the app trusts X-Forwarded-For from
-    # whoever talks to it, so only a proxy may reach it (the login rate
-    # limit relies on this).
+    # Never published to the internet: only a proxy reaches it. Forwarded
+    # addresses are believed only from private networks anyway (Dockerfile,
+    # app/auth.py), so the login rate limit cannot be dodged with a made-up
+    # X-Forwarded-For.
     expose:
       - "8000"
     networks:

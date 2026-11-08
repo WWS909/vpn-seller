@@ -477,6 +477,7 @@ class RedeemBody(BaseModel):
 @router.post("/gift/redeem")
 def redeem(body: RedeemBody, tg: dict = Depends(tg_user), db: Session = Depends(get_db)):
     user = current_user(db, tg)
+    _throttle(user, "code", 20)          # the same budget as the one code field
     try:
         plan = billing.redeem(db, user, body.code)
     except billing.OrderError as e:

@@ -160,11 +160,20 @@ def test_payment_on_a_cancelled_order_is_granted(client, server, admin):
 
 def test_webhook_refused_without_a_real_secret_key(client, env, monkeypatch):
     from app import notify
+    # a short SECRET_KEY is not used: the shop keeps its own random one in data/
     monkeypatch.setenv("SECRET_KEY", "short")
     env.__init__()
-    r = client.post("/api/bot/webhook", json={"message": {}},
-                    headers={"X-Telegram-Bot-Api-Secret-Token": notify.webhook_secret()})
-    assert r.status_code == 403
+    assert len(env.secret_key) == 64
+    env.secret_key = "short"
+    weak = notify.webhook_secret()
+    env.__init__()
+    hook = lambda secret: client.post("/api/bot/webhook", json={"message": {}},  # noqa: E731
+                                      headers={"X-Telegram-Bot-Api-Secret-Token": secret})
+    assert hook(weak).status_code == 403                 # what the short key would give is refused
+    assert hook(notify.webhook_secret()).status_code == 200
+    # and with no usable key at all (data/ not writable), the webhook refuses everything
+    env.secret_key = "short"
+    assert hook(notify.webhook_secret()).status_code == 403
 
 
 def test_background_sync_sends_the_latest_state(client, server, rw, db):  # noqa: F811

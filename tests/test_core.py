@@ -532,6 +532,24 @@ def test_last_forwarded_address_is_the_trusted_one(client):
     assert client_ip(req) == "10.0.0.9"
 
 
+def test_forwarded_address_is_believed_only_from_a_proxy():
+    """Reached straight from the internet, a made-up X-Forwarded-For must not
+    change who is counted by the login rate limit."""
+    from starlette.requests import Request
+    from app.auth import client_ip
+
+    def ip(peer: str, fwd: str = "") -> str:
+        headers = [(b"x-forwarded-for", fwd.encode())] if fwd else []
+        return client_ip(Request({"type": "http", "headers": headers, "client": (peer, 1)}))
+
+    assert ip("8.8.8.8", "1.2.3.4") == "8.8.8.8"          # internet peer: header ignored
+    assert ip("172.18.0.3", "77.88.8.8") == "77.88.8.8"     # Caddy / cloudflared in Docker
+    assert ip("::1", "77.88.8.8") == "77.88.8.8"
+    assert ip("8.8.8.8") == "8.8.8.8"
+    # uvicorn already took the client from a trusted proxy: what it set stands
+    assert ip("77.88.8.8", "6.6.6.6, 77.88.8.8") == "77.88.8.8"
+
+
 def test_message_with_broken_html_is_sent_as_plain_text(client):
     from app import notify
     assert notify.send(5, "panel said <oops> & failed") is True
@@ -995,3 +1013,23 @@ def test_bot_backup_command_sends_to_that_admin(client):
     Fake.calls.clear()
     _admin_msg(client, "/backup")
     assert Fake.sent("sendDocument")[-1]["chat_id"] == 999
+
+
+def test_shop_keeps_its_own_secret_when_env_has_none(monkeypatch, tmp_path):
+    """Started by hand without SECRET_KEY: a random key is made once in data/
+    and kept, not an empty (guessable) one."""
+    import os
+    from app import config
+    monkeypatch.setenv("SECRET_KEY", "")
+    monkeypatch.setenv("DATA_DIR", str(tmp_path))
+    try:
+        first = config.Settings().secret_key
+        assert len(first) == 64 and config.Settings().secret_key == first
+        assert oct(os.stat(tmp_path / "secret.key").st_mode & 0o777) == "0o600"
+        assert not [p for p in config.Settings().problems() if p["code"] == "secret"]
+        # a key in .env wins
+        monkeypatch.setenv("SECRET_KEY", "k" * 40)
+        assert config.Settings().secret_key == "k" * 40
+    finally:
+        monkeypatch.undo()
+        config.reload()

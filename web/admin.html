@@ -939,7 +939,7 @@ ru: {
   username:"Логин панели", panelPass:"Пароль панели", keep:"оставьте пустым, чтобы не менять",
   inbounds:"Инбаунды", inboundsHint:"Клиенты заводятся в выбранных инбаундах. Нажмите «Проверить», чтобы выбрать из списка.",
   subUrl:"Адрес подписки панели (для 3x-ui 2.x)", subUrlHint:"Например https://host:2096/sub/ — нужен только старым панелям, у которых нет API ссылок.",
-  verifyTls:"Проверять сертификат", test:"Проверить подключение", testOk:"Подключено: {v}, инбаундов: {n}", panelKind:"Панель", panelUrlMz:"Адрес панели Marzban",
+  verifyTls:"Проверять сертификат", tlsOff:"Проверка выключена: подменённый сервер по дороге к панели сможет прочитать её пароль. Выключайте только для своей панели с самодельным сертификатом.", test:"Проверить подключение", testOk:"Подключено: {v}, инбаундов: {n}", panelKind:"Панель", panelUrlMz:"Адрес панели Marzban",
   panelUrlHintMz:"Адрес, по которому открывается дашборд Marzban, например https://host:8000/ — логин и пароль администратора ниже.",
   inboundsHintMz:"Теги инбаундов Marzban через запятую. Нажмите «Проверить», чтобы выбрать из списка.",
   panelUrlRw:"Адрес панели Remnawave", panelUrlHintRw:"Адрес, по которому открывается панель, например https://panel.example.com/",
@@ -1380,7 +1380,7 @@ en: {
   username:"Panel login", panelPass:"Panel password", keep:"leave empty to keep",
   inbounds:"Inbounds", inboundsHint:"Clients are created in the selected inbounds. Press “Test” to pick from the list.",
   subUrl:"Panel subscription address (3x-ui 2.x)", subUrlHint:"E.g. https://host:2096/sub/ — only for old panels without the links API.",
-  verifyTls:"Verify certificate", test:"Test connection", testOk:"Connected: {v}, inbounds: {n}", panelKind:"Panel", panelUrlMz:"Marzban panel address",
+  verifyTls:"Verify certificate", tlsOff:"The check is off: a fake server on the way to the panel could read its password. Turn it off only for your own panel with a self-made certificate.", test:"Test connection", testOk:"Connected: {v}, inbounds: {n}", panelKind:"Panel", panelUrlMz:"Marzban panel address",
   panelUrlHintMz:"The address the Marzban dashboard opens at, e.g. https://host:8000/ — the admin login and password below.",
   inboundsHintMz:"Marzban inbound tags, comma-separated. Press “Test” to pick from the list.",
   panelUrlRw:"Remnawave panel address", panelUrlHintRw:"The address the panel opens at, e.g. https://panel.example.com/",
@@ -2342,7 +2342,10 @@ function serverModal(id){
       <div class="hint" style="margin-top:6px">${esc(t("tuneUndo"))}</div>
     </details>
     <div class="rowtg"><div><div class="rt">${esc(t("bypassSrv"))}</div><div class="rs">${esc(t("bypassSrvHint"))}</div></div>${tgl("sBypass", !!s.bypass)}</div>
-    <div class="rowtg"><div class="rt">${esc(t("verifyTls"))}</div>${tgl("sTls", s.verify_tls)}</div>
+    <div class="rowtg"><div><div class="rt">${esc(t("verifyTls"))}</div>
+      <div class="rs" id="tlsWarn" style="color:var(--warn)" ${s.verify_tls ? "hidden" : ""}>${esc(t("tlsOff"))}</div></div>
+      <button type="button" class="tg ${s.verify_tls ? "on" : ""}" id="sTls" aria-pressed="${!!s.verify_tls}"
+        onclick="this.classList.toggle('on');$('tlsWarn').hidden=this.classList.contains('on')"></button></div>
     <div class="rowtg"><div class="rt">${esc(t("enabled"))}</div>${tgl("sOn", s.enabled)}</div>
     <div id="sTest" style="font-size:12.5px;margin:6px 0 10px"></div>
     <div class="mf">${id ? `<button class="btn danger" onclick="deleteServer(${id})" style="margin-right:auto">${ic("i-trash", "xs")}${esc(t("delete"))}</button>` : ""}

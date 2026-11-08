@@ -9,6 +9,7 @@ are edited in the admin panel instead.
 from __future__ import annotations
 
 import os
+import secrets
 from pathlib import Path
 
 
@@ -45,6 +46,11 @@ class Settings:
         self.secret_key = _env("SECRET_KEY", "")
         self.database_url = _env("DATABASE_URL", "sqlite:///./data/vpn.db")
         self.data_dir = Path(_env("DATA_DIR", "./data"))
+        # install.sh writes a random SECRET_KEY into .env. Started by hand without
+        # one, the shop keeps its own random key in data/ rather than run on a
+        # guessable one (the admin login tokens and the bot webhook depend on it).
+        if len(self.secret_key) < 32:
+            self.secret_key = _kept_secret(self.data_dir) or self.secret_key
         self.default_lang = _env("DEFAULT_LANG", "ru").lower()[:2] or "ru"
         self.currency = _env("CURRENCY", "RUB").upper()
 
@@ -202,6 +208,27 @@ class Settings:
         if self.payments_test_mode:
             add("test_mode", "PAYMENTS_TEST_MODE is on — every order is free")
         return out
+
+
+def _kept_secret(data_dir: Path) -> str:
+    """data/secret.key: made once (64 random hex characters, readable by the
+    owner only) and read on every start; "" when data/ cannot be written."""
+    path = data_dir / "secret.key"
+    try:
+        old = path.read_text(encoding="ascii").strip()
+        if len(old) >= 64:
+            return old
+    except (OSError, UnicodeDecodeError):
+        pass
+    try:
+        data_dir.mkdir(parents=True, exist_ok=True)
+        key = secrets.token_hex(32)
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w", encoding="ascii") as f:
+            f.write(key)
+        return key
+    except OSError:
+        return ""
 
 
 settings = Settings()
