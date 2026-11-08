@@ -245,7 +245,8 @@ def test_owners_hear_how_it_ended_once(client, admin, env, db):
     updates.announce(db)
     msgs = _owner_msgs()
     assert len(msgs) == 1 and f"обновлён до {cur}" in msgs[0]["text"]
-    assert "Обновления из GitHub" in msgs[0]["text"]               # what this version brought, from CHANGELOG.md
+    first = release.notes(release.local_notes("ru"), "1.0.0", cur)[0]["items"][0]
+    assert first[:40] in msgs[0]["text"]                           # what this version brought, from CHANGELOG.md
     v = client.get("/api/admin/updates", headers=admin).json()
     assert v["fresh"] and v["fresh"][0]["version"] == cur            # the panel shows it too
     # a failed one: the reason, and that the shop is back
