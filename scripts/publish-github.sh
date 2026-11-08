@@ -95,8 +95,12 @@ if git remote get-url origin >/dev/null 2>&1; then git remote set-url origin "$R
 
 # The one-command install must point at this repository.
 # The shop looks for new versions in the same repository (app/release.py).
-if grep -q 'OWNER/vpn-seller' install.sh README.md README.en.md app/release.py 2>/dev/null && [ "$SLUG" != local/test ]; then
-  sed -i "s#OWNER/vpn-seller#$SLUG#g" install.sh README.md README.en.md app/release.py
+# (The address already written there — OWNER/vpn-seller in a fresh copy, the
+# original author's in a fork — is replaced with this one.)
+was=$(sed -n 's/^GITHUB_REPO="${VPN_SHOP_GITHUB_REPO:-\([^}]*\)}".*/\1/p' install.sh | head -1)
+[ -n "$was" ] || was=$(sed -n 's/^GITHUB_REPO="\([^"]*\)".*/\1/p' install.sh | head -1)
+if [ -n "$was" ] && [ "$was" != "$SLUG" ] && [ "$SLUG" != local/test ]; then
+  sed -i "s#$was#$SLUG#g" install.sh README.md README.en.md app/release.py
   ok "адрес $SLUG вписан в install.sh, README и app/release.py (оттуда магазин узнаёт о новых версиях)"
 fi
 

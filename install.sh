@@ -26,7 +26,7 @@
 # =============================================================================
 set -Eeuo pipefail
 
-GITHUB_REPO="WWS909/vpn-seller"                      # set by scripts/publish-github.sh
+GITHUB_REPO="${VPN_SHOP_GITHUB_REPO:-WWS909/vpn-seller}"   # set by scripts/publish-github.sh
 REPO_URL="${VPN_SHOP_REPO:-https://github.com/$GITHUB_REPO.git}"
 BRANCH="${VPN_SHOP_BRANCH:-main}"
 TG_API="${TG_API_BASE:-https://api.telegram.org}"
@@ -82,13 +82,17 @@ rule() { printf '  %s%s%s\n' "$D" "───────────────
 
 banner() {
   [ -t 1 ] && [ -z "${NO_CLEAR:-}" ] && printf '\e[2J\e[H'
+  local c1=$A c2=$A c3=$A c4=$A c5=$A c6=$A
+  if [ -n "$A" ]; then                                 # amber to orange, top to bottom
+    c1=$'\e[38;5;222m' c2=$'\e[38;5;221m' c3=$'\e[38;5;220m' c4=$'\e[38;5;214m' c5=$'\e[38;5;208m' c6=$'\e[38;5;202m'
+  fi
   printf '\n'
-  printf '%s   ██╗   ██╗██████╗ ███╗   ██╗%s\n' "$A" "$N"
-  printf '%s   ██║   ██║██╔══██╗████╗  ██║%s\n' "$A" "$N"
-  printf '%s   ██║   ██║██████╔╝██╔██╗ ██║%s   %sS H O P%s\n' "$A" "$N" "$B" "$N"
-  printf '%s   ╚██╗ ██╔╝██╔═══╝ ██║╚██╗██║%s\n' "$A" "$N"
-  printf '%s    ╚████╔╝ ██║     ██║ ╚████║%s   %s%s%s\n' "$A" "$N" "$D" "$(t "магазин VPN-подписок" "a VPN subscription shop")" "$N"
-  printf '%s     ╚═══╝  ╚═╝     ╚═╝  ╚═══╝%s   %s%s%s\n' "$A" "$N" "$D" "$(t "внутри Telegram" "inside Telegram")" "$N"
+  printf '%s   ██╗   ██╗██████╗ ███╗   ██╗%s\n' "$c1" "$N"
+  printf '%s   ██║   ██║██╔══██╗████╗  ██║%s\n' "$c2" "$N"
+  printf '%s   ██║   ██║██████╔╝██╔██╗ ██║%s   %sS E L L E R%s\n' "$c3" "$N" "$B" "$N"
+  printf '%s   ╚██╗ ██╔╝██╔═══╝ ██║╚██╗██║%s   %s───────────%s\n' "$c4" "$N" "$D" "$N"
+  printf '%s    ╚████╔╝ ██║     ██║ ╚████║%s   %s%s%s\n' "$c5" "$N" "$D" "$(t "магазин VPN-подписок" "a VPN subscription shop")" "$N"
+  printf '%s     ╚═══╝  ╚═╝     ╚═╝  ╚═══╝%s   %s%s%s\n' "$c6" "$N" "$D" "$(t "внутри Telegram" "inside Telegram")" "$N"
   printf '\n'
 }
 
@@ -139,10 +143,14 @@ choose() {  # choose var "1" "Label" "hint" "2" "Label" "hint" … (default = fi
   local _ch_var=$1 _ch_first="" _ch_keys="" _ch_k _ch_l _ch_h _ch_v; shift
   while [ $# -ge 3 ]; do
     _ch_k=$1 _ch_l=$2 _ch_h=$3; shift 3
+    if [ "$_ch_k" = "--" ]; then                       # a section heading, not a choice
+      printf '\n  %s%s%s\n' "$D" "$_ch_l" "$N" > "$OUT"
+      continue
+    fi
     [ -z "$_ch_first" ] && _ch_first=$_ch_k
     _ch_keys="$_ch_keys $_ch_k"
-    printf '    %s%s%s  %s\n' "$A" "$_ch_k" "$N" "$_ch_l" > "$OUT"
-    if [ -n "$_ch_h" ]; then printf '       %s%s%s\n' "$D" "$_ch_h" "$N" > "$OUT"; fi
+    printf '   %s%3s%s  %s\n' "$A" "$_ch_k" "$N" "$_ch_l" > "$OUT"
+    if [ -n "$_ch_h" ]; then printf '         %s%s%s\n' "$D" "$_ch_h" "$N" > "$OUT"; fi
   done
   while :; do
     ask _ch_v "$(t "Ваш выбор" "Your choice")" "$_ch_first"
@@ -1281,29 +1289,48 @@ cmd_uninstall() {
 menu() {
   while :; do
     banner
-    local c state
+    local c
     if installed; then
       load_env
-      if app_healthy; then state="$G● $(t "работает" "running")$N"; else state="$R● $(t "не отвечает" "not answering")$N"; fi
-      printf '  %s   %s%s%s%s\n\n' "$state" "$D" "$DIR" "$(v=$(code_version); [ -n "$v" ] && printf ' · %s %s' "$(t "версия" "version")" "$v")" "$N"
+      menu_head
+      local upd_hint="" auto_label
+      [ -n "$M_LATEST" ] && upd_hint="$(t "вышла версия" "version") $M_LATEST$(t "" " is out")"
+      if [ "$M_AUTO" = 1 ]; then auto_label="$(t "Автообновление ночью: включено" "Night auto-update: on") ($(printf '%02d' "${M_HOUR:-1}"):00)"
+      else auto_label="$(t "Автообновление ночью: выключено" "Night auto-update: off")"; fi
       choose c \
-        1 "$(t "Обновить до новой версии" "Update to the latest version")" "" \
+        -- "$(t "Магазин" "Shop")" "" \
+        1 "$(t "Обновить до новой версии" "Update to the latest version")" "$upd_hint" \
         2 "$(t "Состояние и проверка" "Status and checks")" "" \
         3 "$(t "Журнал (выход — Ctrl+C)" "Logs (exit — Ctrl+C)")" "" \
-        4 "$(t "Резервная копия базы" "Database backup")" "" \
-        5 "$(t "Способы оплаты (карты, крипта, Stars)" "Payment methods (cards, crypto, Stars)")" "" \
-        6 "$(t "Сменить адрес (домен / временный)" "Change address (domain / temporary)")" "" \
-        7 "$(t "Сменить токен, ID или пароль" "Change token, IDs or password")" "" \
-        8 "$(t "Удалить" "Uninstall")" "" \
-        9 "$( [ "$UI" = ru ] && echo English || echo Русский)" "" \
+        4 "$(t "Перезапустить" "Restart")" "" \
+        -- "$(t "Данные" "Data")" "" \
+        5 "$(t "Резервная копия базы" "Database backup")" "" \
+        6 "$(t "Восстановить из копии" "Restore from a backup")" "" \
+        7 "$(t "Итоги за сутки — прислать в Telegram" "The last 24 hours — send to Telegram")" "" \
+        -- "$(t "Настройки" "Settings")" "" \
+        8 "$(t "Способы оплаты (карты, крипта, Stars)" "Payment methods (cards, crypto, Stars)")" "" \
+        9 "$(t "Сменить адрес (домен / временный)" "Change address (domain / temporary)")" "" \
+        10 "$(t "Сменить токен, ID или пароль" "Change token, IDs or password")" "" \
+        11 "$auto_label" "" \
+        -- "$(t "Прочее" "Other")" "" \
+        12 "$(t "Что нового" "What's new")" "" \
+        13 "$(t "Очистить место на диске" "Free up disk space")" "" \
+        14 "$( [ "$UI" = ru ] && echo English || echo Русский)" "" \
+        15 "$(t "Удалить" "Uninstall")" "" \
         0 "$(t "Выход" "Exit")" ""
       case "$c" in
         1) cmd_update ;; 2) cmd_status ;;
         3) trap ':' INT; compose logs -f --tail 100 app || true; trap_int ;;
-        4) compose exec -T -u app app python -m app.backup make; ok "$(t "архив в $DIR/data/backups" "archive in $DIR/data/backups")" ;;
-        5) cmd_payments ;; 6) cmd_address ;; 7) cmd_settings ;;
-        8) cmd_uninstall; installed || return 0 ;;
-        9) if [ "$UI" = ru ]; then UI=en; else UI=ru; fi; continue ;;
+        4) menu_restart ;;
+        5) compose exec -T -u app app python -m app.backup make; ok "$(t "архив в $DIR/data/backups" "archive in $DIR/data/backups")" ;;
+        6) menu_restore ;;
+        7) menu_report ;;
+        8) cmd_payments ;; 9) cmd_address ;; 10) cmd_settings ;;
+        11) menu_auto ;;
+        12) menu_news ;;
+        13) menu_clean ;;
+        14) if [ "$UI" = ru ]; then UI=en; else UI=ru; fi; continue ;;
+        15) cmd_uninstall; installed || return 0 ;;
         0) printf '\n'; return 0 ;;
       esac
     else
@@ -1324,6 +1351,120 @@ menu() {
     fi
     printf '\n'; local _p; ask _p "$(t "Enter — вернуться в меню" "Enter — back to the menu")" ""
   done
+}
+
+# ------------------------------------------------------------------ menu pieces
+# The card above the menu: is it up, which version, what happened today.
+M_LATEST="" M_AUTO="" M_HOUR=""
+head_line() {  # head_line "label" "value" — the label padded by characters, not bytes
+  local l=$1 w=11; shift
+  printf '  %s│%s %s%s%*s%s %s\n' "$A" "$N" "$D" "$l" $(( w > ${#l} ? w - ${#l} : 1 )) '' "$N" "$*"
+}
+menu_head() {
+  local s v state addr free
+  s=$(compose exec -T -u app app python -m app.cli summary 2>/dev/null) || s=""
+  kv_() { printf '%s\n' "$s" | sed -n "s/^$1=//p" | head -1; }
+  M_LATEST=$(kv_ latest) M_AUTO=$(kv_ auto) M_HOUR=$(kv_ hour)
+  if [ -n "$s" ] || app_healthy; then state="$G●$N $B$(t "работает" "running")$N"
+  else state="$R●$N $B$(t "не отвечает" "not answering")$N"; fi
+  v=$(code_version)
+  printf '  %s   %s%s%s' "$state" "$D" "$(t "версия" "version") ${v:-?}" "$N"
+  [ -n "$M_LATEST" ] && printf '   %s↑ %s %s%s' "$A" "$(t "вышла" "new")" "$M_LATEST" "$N"
+  printf '\n'
+  addr=$(get_env PUBLIC_URL); [ -n "$addr" ] || addr="https://$(get_env DOMAIN)"
+  head_line "$(t "адрес" "address")" "$addr"
+  if [ -n "$s" ]; then
+    head_line "$(t "сегодня" "today")" "$(t "покупок" "purchases"): $(kv_ orders) · $(kv_ revenue) · $(t "новых" "new"): $(kv_ new)"
+    head_line "$(t "клиенты" "customers")" "$(t "всего" "in total"): $(kv_ users) · $(t "с подпиской" "subscribed"): $(kv_ active)"
+    head_line "$(t "копия базы" "backup")" "$( [ -n "$(kv_ backup)" ] && kv_ backup || t "ещё не было" "none yet")"
+  fi
+  free=$(df -Ph "$DIR" 2>/dev/null | awk 'NR==2{print $4}' | sed "s/G$/ $(t ГБ GB)/; s/M$/ $(t МБ MB)/; s/T$/ $(t ТБ TB)/")
+  [ -n "$free" ] && head_line "$(t "диск" "disk")" "$(t "свободно" "free") $free"
+  head_line "$(t "папка" "folder")" "$DIR"
+}
+
+menu_restart() {
+  if spin "$(t "Перезапускаю магазин" "Restarting the shop")" compose restart app \
+     && spin "$(t "Жду ответа" "Waiting for an answer")" wait_app; then
+    ok "$(t "магазин перезапущен и отвечает" "restarted and answering")"
+  else
+    warn "$(t "магазин не отвечает — посмотрите журнал (пункт 3)" "the shop does not answer — see the logs (item 3)")"
+  fi
+}
+
+menu_restore() {
+  local files=() args=() f c i=1
+  mapfile -t files < <(ls -1t "$DIR"/data/backups/backup-*.zip 2>/dev/null | head -8)
+  if [ ${#files[@]} -eq 0 ]; then
+    warn "$(t "копий пока нет — сначала пункт 5 «Резервная копия базы»" "no backups yet — make one first (item 5)")"
+    return 0
+  fi
+  step "·" "$(t "Из какой копии восстановить" "Which backup to restore")"
+  hint "$(t "Текущая база будет заменена. Перед этим сделайте свежую копию, если сомневаетесь." "The current database will be replaced. Make a fresh backup first if unsure.")"
+  for f in "${files[@]}"; do
+    args+=("$i" "$(date -r "$f" '+%d.%m.%Y %H:%M')" "$(basename "$f") · $(du -h "$f" | cut -f1)")
+    i=$((i + 1))
+  done
+  args+=(0 "$(t "Назад" "Back")" "")
+  choose c "${args[@]}"
+  [ "$c" = 0 ] && return 0
+  cmd_restore "${files[$((c - 1))]}"
+}
+
+menu_report() {
+  local out
+  out=$(compose exec -T -u app app python -m app.cli report 2>/dev/null || true)
+  case "$out" in
+    *sent=[1-9]*) ok "$(t "итоги за сутки отправлены вам в Telegram" "the results are sent to your Telegram")" ;;
+    *) warn "$(t "не отправилось: напишите боту /start с аккаунта владельца и попробуйте снова" "not sent: write /start to the bot from the owner's account and try again")" ;;
+  esac
+}
+
+menu_auto() {
+  local h
+  if [ ! -f "$DIR/data/updater.json" ]; then
+    install_updater
+    [ -f "$DIR/data/updater.json" ] || return 0
+  fi
+  if [ "$M_AUTO" = 1 ]; then
+    confirm "$(t "Выключить автообновление?" "Turn the auto-update off?")" y || return 0
+    compose exec -T -u app app python -m app.cli auto-update off >/dev/null 2>&1 \
+      && ok "$(t "автообновление выключено — новые версии ставятся кнопкой" "auto-update off — new versions are installed with the button")" \
+      || warn "$(t "магазин не ответил" "the shop did not answer")"
+    return 0
+  fi
+  hint "$(t "Ночью, в выбранный час, магазин сам поставит новую версию (с копией базы и откатом, если не запустится)." \
+            "At the chosen hour the shop installs a new version itself (with a backup, and a rollback if it does not start).")"
+  hint "$(t "Сейчас на сервере" "Server time now") $(date +%H:%M)"
+  while :; do
+    ask h "$(t "Час (0–23)" "Hour (0–23)")" "${M_HOUR:-1}"
+    [[ "$h" =~ ^[0-9]{1,2}$ ]] && [ "$h" -le 23 ] && break
+    warn "$(t "число от 0 до 23" "a number from 0 to 23")"
+  done
+  compose exec -T -u app app python -m app.cli auto-update on "$h" >/dev/null 2>&1 \
+    && ok "$(t "автообновление включено, в" "auto-update on, at") $(printf '%02d' "$h"):00" \
+    || warn "$(t "магазин не ответил" "the shop did not answer")"
+}
+
+menu_news() {
+  local f="$DIR/CHANGELOG.md"
+  [ "$UI" = en ] && f="$DIR/CHANGELOG.en.md"
+  [ -f "$f" ] || { warn "$(t "списка изменений нет" "no list of changes")"; return 0; }
+  printf '\n'
+  awk -v a="$A$B" -v d="$D" -v n="$N" '
+    /^## / { k++; if (k > 3) exit; sub(/^## /, ""); printf "\n  %s%s%s\n", a, $0, n; next }
+    k >= 1 && /^- / { sub(/^- /, ""); printf "    %s•%s %s\n", d, n, $0 }' "$f"
+}
+
+menu_clean() {
+  local before after
+  before=$(df -Pk "$DIR" | awk 'NR==2{print $4}')
+  spin "$(t "Удаляю старые образы и кэш сборки" "Removing old images and the build cache")" \
+    sh -c "docker image prune -af && docker builder prune -af" || true
+  find "$DIR/data/backups" -name 'backup-*.zip' -mtime +30 -delete 2>/dev/null || true
+  after=$(df -Pk "$DIR" | awk 'NR==2{print $4}')
+  ok "$(t "освобождено" "freed") $(( (${after:-0} - ${before:-0}) / 1024 )) $(t "МБ" "MB") · $(t "свободно" "free") $(df -Ph "$DIR" | awk 'NR==2{print $4}')"
+  hint "$(t "Копии базы старше 30 дней тоже удалены (свежие на месте)." "Backups older than 30 days were removed too (recent ones stay).")"
 }
 
 main() {

@@ -165,7 +165,7 @@ The shop is never exposed directly, bypassing the proxy: otherwise the admin log
 
 **The temporary Cloudflare address** (no domain) changes when the server restarts. The shop notices the new address and re-links the bot itself, but subscription links already given to customers stop updating — connect a domain for real sales: `vpn-seller` → Change address.
 
-**After the install** the `vpn-seller` command opens the same menu (on servers set up earlier, the old name `vpn-shop` works too): update (with a backup first), status and checks, logs, database backup, payment methods (CryptoBot, YooKassa, FreeKassa, Platega, Pally, Stars), change address (domain ↔ temporary), change token/IDs/password, uninstall.
+**After the install** the `vpn-seller` command opens the same menu (on servers set up earlier, the old name `vpn-shop` works too). On top is the shop's card: running or not, the version (and whether a new one is out), the address, today's purchases and revenue, customers, the last backup, free disk space. Then: update (backup first, rollback if it does not start), status and checks, logs, restart; database backup, restore from a backup (pick from the latest), the last 24 hours to Telegram; payment methods (cards, crypto, Stars), change address (domain ↔ temporary), change token/IDs/password, night auto-update; what's new, free up disk space, language, uninstall.
 
 Without the menu: `vpn-seller update | status | logs | backup | restore <zip> | payments | address | settings | uninstall`.
 Unattended: `bash install.sh install --token 123:ABC --admin-id 123456789 --domain vpn.example.com --yes` (or `--tunnel` instead of `--domain`).

@@ -63,6 +63,8 @@ def env_for(scenario: dict, **extra) -> dict:
         "NO_CLEAR": "1",
         # the "Update" button's systemd units go here, never into the real /etc/systemd
         "VPN_SELLER_SYSTEMD_DIR": str(WORK / "systemd"),
+        # updates never reach the real GitHub from here (s9 brings its own archive)
+        "VPN_SHOP_GITHUB_REPO": "OWNER/vpn-seller",
     })
     e.update(extra)
     return e
@@ -75,6 +77,16 @@ def read_env(d: Path) -> dict:
             k, v = line.split("=", 1)
             out[k] = v
     return out
+
+
+def app_env_for(d: Path) -> dict:
+    """The environment the fake container gives the app (tests/installer/bin/docker)."""
+    e = dict(os.environ)
+    e.update(read_env(d))
+    e.update(DATA_DIR=str(d / "data"), DATABASE_URL=f"sqlite:///{d}/data/vpn.db", TG_API_BASE="http://127.0.0.1:18081")
+    for k in ("HTTPS_PROXY", "https_proxy", "HTTP_PROXY", "http_proxy"):
+        e.pop(k, None)
+    return e
 
 
 def tg_calls() -> list[dict]:
@@ -216,7 +228,7 @@ def s2_curl_pipe_tunnel_interactive():
     code, out = run_pty(f"cat {ROOT / 'install.sh'} | bash", env, answers)
     save_output("s2", out)
     check("s2 exit code 0", code == 0, out[-1500:])
-    check("s2 banner + menu shown", "S H O P" in out and "Установить" in out)
+    check("s2 banner + menu shown", "S E L L E R" in out and "Установить" in out)
     check("s2 bad token rejected", "не похоже на токен" in out)
     check("s2 short password rejected", "от 10 символов" in out)
     check("s2 code came from git", (d / ".git").is_dir())
@@ -425,6 +437,37 @@ def s9_update_from_github(d: Path):
     check("s9 the shop still answers", health_version() == "9.9.0", health_version())
 
 
+def s10_menu_tools(d: Path):
+    print("\n[s10] the menu: header card, what's new, night auto-update, backup + restore list, report, restart, cleanup")
+    reset_tg()
+    back = (r"вернуться в меню", "")
+    answers = [
+        (r"Ваш выбор", "12"), back,                               # what's new
+        (r"Ваш выбор", "11"), (r"Час \(0–23\)", "3"), back,       # night auto-update at 03:00
+        (r"Ваш выбор", "5"), back,                                # a backup
+        (r"Ваш выбор", "6"), (r"Ваш выбор", "0"), back,           # the restore list, then back
+        (r"Ваш выбор", "7"), back,                                # the day's results to Telegram
+        (r"Ваш выбор", "4"), back,                                # restart
+        (r"Ваш выбор", "13"), back,                               # cleanup
+        (r"Ваш выбор", "0"),
+    ]
+    code, out = run_pty(f"bash {d / 'install.sh'}", env_for({}, VPN_SHOP_DIR=str(d)), answers)
+    save_output("s10", out)
+    check("s10 exit 0", code == 0, out[-1500:])
+    check("s10 banner says SELLER", "S E L L E R" in out)
+    check("s10 header card", "работает" in out and "сегодня" in out and "клиенты" in out and "диск" in out, out[:2500])
+    check("s10 menu sections", all(x in out for x in ("Магазин", "Данные", "Настройки", "Прочее")))
+    check("s10 what's new shown", "1.2.1" in out and "•" in out)
+    check("s10 auto-update on at 03:00", "автообновление включено, в 03:00" in out, out[-2500:])
+    r = subprocess.run([sys.executable, "-m", "app.cli", "summary"], cwd=d, env=app_env_for(d), capture_output=True, text=True)
+    check("s10 auto-update saved in the shop", "auto=1" in r.stdout and "hour=3" in r.stdout, r.stdout + r.stderr)
+    check("s10 restore list shown", "Из какой копии восстановить" in out and "backup-" in out)
+    reports = [c for c in tg_calls() if c["method"] == "sendMessage" and "Итоги за сутки" in c["body"].get("text", "")]
+    check("s10 report sent to Telegram", bool(reports) and "итоги за сутки отправлены" in out, out[-1500:])
+    check("s10 restarted", "магазин перезапущен и отвечает" in out)
+    check("s10 cleanup", "освобождено" in out)
+
+
 def s6_uninstall_restores_caddyfile(d: Path, cf: Path):
     print("\n[s6] uninstall the s3 install → other Caddyfile as it was")
     code, out = run_plain(["bash", str(d / "install.sh"), "uninstall"],
@@ -442,7 +485,7 @@ def s7_menu_switch_tunnel_to_domain(d: Path):
     print("\n[s7] installed with a tunnel; later: menu → change address → domain")
     reset_tg()
     answers = [
-        (r"Ваш выбор", "6"),
+        (r"Ваш выбор", "9"),
         (r"Ваш выбор", "1"),
         (r"Домен, например", "shop7.example.com"),
         (r"Применить\?", ""),
@@ -462,7 +505,7 @@ def s7_menu_switch_tunnel_to_domain(d: Path):
 def s8_payments_from_menu(d: Path):
     print("\n[s8] menu → payment methods → YooKassa keys")
     answers = [
-        (r"Ваш выбор", "5"),
+        (r"Ваш выбор", "8"),
         (r"Ваш выбор", "2"),
         (r"› shopId", "506751"),
         (r"› Секретный ключ", "live_SandboxSecretKey0123"),
@@ -483,7 +526,7 @@ def s8_payments_from_menu(d: Path):
 
     print("\n[s8b] menu → payment methods → «Мой налог»")
     answers = [
-        (r"Ваш выбор", "5"),
+        (r"Ваш выбор", "8"),
         (r"Ваш выбор", "11"),
         (r"› ИНН", "12345"),                  # too short: asked again
         (r"› ИНН", "500100732259"),
@@ -646,10 +689,10 @@ def guard(fn, *a):
 
 
 def main(argv: list[str]) -> int:
-    want = set(argv) or {"s1", "s2", "s3", "s3b", "s4", "s5", "s6", "s7", "s8", "s9", "e2e"}
+    want = set(argv) or {"s1", "s2", "s3", "s3b", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "e2e"}
     fakes = prepare()
     try:
-        d1 = guard(s1_clean_domain_unattended) if want & {"s1", "s5", "s8", "s9", "e2e"} else None
+        d1 = guard(s1_clean_domain_unattended) if want & {"s1", "s5", "s8", "s9", "s10", "e2e"} else None
         if "e2e" in want and d1:
             guard(e2e_owner_flow, d1)
         if "s5" in want and d1:
@@ -658,6 +701,8 @@ def main(argv: list[str]) -> int:
             guard(s8_payments_from_menu, d1)
         if "s9" in want and d1:
             guard(s9_update_from_github, d1)
+        if "s10" in want and d1:
+            guard(s10_menu_tools, d1)
         d2 = guard(s2_curl_pipe_tunnel_interactive) if want & {"s2", "s7"} else None
         if "s7" in want and d2:
             guard(s7_menu_switch_tunnel_to_domain, d2)

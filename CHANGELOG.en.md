@@ -3,6 +3,10 @@
 Each version is a `## X.Y.Z — date` heading with one change per "-" line.
 The shop reads this file to tell the owner what is new.
 
+## 1.3.0 — 2026-11-09
+- A new server menu (vpn-seller): the VPN SELLER name, a coloured logo, the shop's card on top — running or not, the version and whether a new one is out, the address, today's purchases and revenue, customers, the last backup, free space.
+- Menu items are grouped. New ones: restart, restore from a backup (pick from a list), send the last 24 hours, night auto-update, what's new, free up disk space.
+
 ## 1.2.1 — 2026-11-08
 - Security: the client address from X-Forwarded-For is taken only from our own proxy (Caddy, cloudflared, nginx), so the admin login limit cannot be dodged with a made-up header.
 - Security: without SECRET_KEY (the shop started by hand, without the installer) the shop makes its own random key in data/ and uses it instead of an empty one.
