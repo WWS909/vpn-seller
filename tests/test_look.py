@@ -165,7 +165,8 @@ def test_theme_info_lists_colours_and_parts(client, admin):
     assert [p["id"] for p in d["presets"]] == list(theme.PRESETS)
     neon = next(p for p in d["presets"] if p["id"] == "neon")
     assert neon["accent"] == "#3DFF9A" and neon["surface"] == "black" and neon["ground"] == "#000000"
-    assert set(d["options"]) == {"backdrop", "icons", "motion", "effect", "cards"}
+    assert set(d["options"]) == {"backdrop", "icons", "motion", "effect", "cards", "layout"}
+    assert d["look"]["layout"] == "classic"
     assert "winter" in d["options"]["backdrop"] and "pixel" in d["options"]["icons"] and "lacquer" in d["options"]["cards"]
     assert d["look"]["motion"] == "lively" and d["look"]["cards"] == "solid"
 
@@ -192,7 +193,7 @@ def test_live_preview_gives_the_same_css_as_the_page(client, admin):
     assert "#FF7A45" in pv["css"] and "--r:24px" in pv["css"] and "Comfortaa" in pv["css"]
     assert "family=Comfortaa" in pv["font_href"]
     assert pv["attrs"] == {"backdrop": "aurora", "icons": "badge", "motion": "lively", "effect": "none",
-                           "cards": "solid", "splash": "auto"}
+                           "cards": "solid", "layout": "classic", "splash": "auto"}
     client.post("/api/admin/settings", headers=admin, json=body)
     page = client.get("/app").text
     assert pv["css"].split("}")[0] in page          # the same variables as the real page
@@ -441,4 +442,35 @@ def test_colour_tiles_and_ring_icons(client, admin):
     panel = client.get("/admin").text
     for part in ('["tiles", "icTiles"]', '["ring", "icRing"]', 'icTiles:"Цветные плашки"', "function useCustomFont(",
                  'fkSerif:"С засечками"', "function customFontTyped("):
+        assert part in panel, part
+
+
+# ---------------------------------------------------------------- layouts
+def test_layouts_change_the_build_not_only_the_colour(client, admin):
+    from app import theme
+    assert theme.LAYOUTS == ("classic", "tg", "pass", "poster", "metro")
+    page = client.get("/app").text
+    assert 'data-layout="classic"' in re.search(r"<html[^>]*>", page).group(0)
+    for k in theme.LAYOUTS[1:]:
+        assert f'[data-layout="{k}"]' in page, k
+    # a layout of its own: the background and the card style are its own too
+    r = client.post("/api/admin/settings", headers=admin, json={
+        "layout": "pass", "backdrop": "aurora", "cards": "glass", "icons": "tiles"})
+    assert r.status_code == 200, r.text
+    tag = re.search(r"<html[^>]*>", client.get("/app").text).group(0)
+    for attr in ('data-layout="pass"', 'data-backdrop="plain"', 'data-cards="solid"', 'data-icons="tiles"'):
+        assert attr in tag, tag
+    # the saved background and cards come back with the classic layout
+    client.post("/api/admin/settings", headers=admin, json={"layout": "classic"})
+    tag = re.search(r"<html[^>]*>", client.get("/app").text).group(0)
+    assert 'data-backdrop="aurora"' in tag and 'data-cards="glass"' in tag
+    # the live preview does the same; a wrong layout is refused
+    r = client.post("/api/admin/theme/preview", headers=admin, json={
+        "theme_preset": "ocean", "font": "unbounded", "layout": "poster", "backdrop": "stars", "cards": "neon"})
+    assert r.status_code == 200, r.text
+    pv = r.json()
+    assert pv["attrs"]["layout"] == "poster" and pv["attrs"]["backdrop"] == "plain" and pv["attrs"]["cards"] == "solid"
+    assert client.post("/api/admin/settings", headers=admin, json={"layout": "bento"}).status_code == 400
+    panel = client.get("/admin").text
+    for part in ('id="layOpts"', "function layThumb(", 'layTg:"Как в Telegram"', 'layPoster:"Poster"', "layout:LOOK.layout"):
         assert part in panel, part

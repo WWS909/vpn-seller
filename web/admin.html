@@ -161,6 +161,13 @@ h1,h2,.h{font-family:var(--font-d);font-weight:500;letter-spacing:-.01em}
 .th.opt .ico.bd{border-radius:8px;background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc)}
 .th.opt .ico.tl{border-radius:7px;color:#fff;background:var(--tl)}
 .th.opt .ico.rg{border-radius:50%;color:var(--acc);border:1.5px solid color-mix(in srgb,var(--acc) 55%,transparent);box-sizing:border-box}
+.lays{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.th.lay{display:block;padding:8px 8px 10px;text-align:left;align-self:stretch}
+.lay .ph{display:block;height:128px;border-radius:9px;overflow:hidden;position:relative;margin-bottom:8px;border:1px solid var(--brd);background:#0b0b0c}
+.lay .ph i{position:absolute;display:block}
+.lay b{display:block;font-size:13px}
+.lay small{display:block;font-size:11.5px;color:var(--muted2);margin-top:2px;line-height:1.35}
+.dimmed{opacity:.45;pointer-events:none}
 .fgroup{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--txt-3);margin:14px 0 8px}
 .fgroup:first-child{margin-top:0}
 .fcustom{display:flex;gap:8px;align-items:center;margin-top:8px}
@@ -781,7 +788,7 @@ ru: {
   chAdminHint:"Добавьте бота в администраторы канала — иначе Telegram не покажет, кто подписан. Если сменили тип канала (публичный ↔ приватный), привяжите его заново.",
   chCheck:"Сохранить и проверить", chOk:"Работает: «{t}»", chAdd:"Добавить канал", chEmpty:"Каналов нет — нажмите «Добавить канал». Если каналов несколько, человек должен подписаться на каждый.", chCountN:"каналов: {n}",
   brandT:"Название", brandReset:"Сбросить название и логотип", brandResetQ:"Вернуть стандартное название и щит вместо логотипа?",
-  fontT:"Шрифт", fkSans:"Простые", fkSerif:"С засечками", fkChar:"С характером", fkFun:"Для особых оформлений", fkCustom:"Свой шрифт с Google Fonts", fCustomPh:"Название, например Lobster", fCustomHint:"Любое семейство с fonts.google.com для заголовков и цифр, текст останется в Golos. Выбирайте шрифт с кириллицей.", fCustomBad:"Такого шрифта нет на Google Fonts или в нём нет кириллицы", fCustomEmpty:"Впишите название шрифта", fOnlyApp:"только в приложении", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
+  layT:"Вид экрана", laySub:"как устроены экраны приложения", layClassic:"Классика", layClassicS:"тёмные карточки, крупные цифры", layTg:"Как в Telegram", layTgS:"списки и системный шрифт, как настройки Telegram", layPass:"Пропуск", layPassS:"подписка — карта с датой и штрихкодом", layPoster:"Плакат", layPosterS:"цветной блок и крупный жирный шрифт", layMetro:"Плитки", layMetroS:"цветные квадраты, как рабочий стол", layOwn:"В этом виде фон и карточки свои — эти настройки работают только в «Классике».", fontT:"Шрифт", fkSans:"Простые", fkSerif:"С засечками", fkChar:"С характером", fkFun:"Для особых оформлений", fkCustom:"Свой шрифт с Google Fonts", fCustomPh:"Название, например Lobster", fCustomHint:"Любое семейство с fonts.google.com для заголовков и цифр, текст останется в Golos. Выбирайте шрифт с кириллицей.", fCustomBad:"Такого шрифта нет на Google Fonts или в нём нет кириллицы", fCustomEmpty:"Впишите название шрифта", fOnlyApp:"только в приложении", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
   linksT:"Свои кнопки", linksSub:"в профиле клиента, до 6", linkAdd:"Добавить кнопку", linkRu:"Текст (RU)", linkEn:"Текст (EN)",
   linksEmpty:"Например: «Наш канал», «Чат клиентов», «Сайт».", linkBad:"Ссылка должна начинаться с https://, tg:// или mailto:",
   exExcel:"Excel", exOrdersT:"Заказы в Excel", exOrdersHint:"Таблица для учёта и налоговой: дата, клиент, что куплено, сумма, способ оплаты. Внизу — итог.",
@@ -1224,7 +1231,7 @@ en: {
   chAdminHint:"Make the bot an administrator of the channel — otherwise Telegram does not tell who is subscribed. If you changed the channel type (public ↔ private), bind it again.",
   chCheck:"Save and check", chOk:"Works: “{t}”", chAdd:"Add a channel", chEmpty:"No channels — press Add a channel. With several, a person must join each of them.", chCountN:"channels: {n}",
   brandT:"Name", brandReset:"Reset name and logo", brandResetQ:"Restore the standard name and the shield instead of the logo?",
-  fontT:"Font", fkSans:"Plain", fkSerif:"Serif", fkChar:"With character", fkFun:"For special looks", fkCustom:"Your own from Google Fonts", fCustomPh:"A name, like Lobster", fCustomHint:"Any family from fonts.google.com for headings and numbers; the text stays in Golos. Pick one with Cyrillic if you sell in Russian.", fCustomBad:"No such font on Google Fonts, or it has no Cyrillic", fCustomEmpty:"Type the name of the font", fOnlyApp:"app only", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
+  layT:"Screen layout", laySub:"how the app screens are built", layClassic:"Classic", layClassicS:"dark cards, large numbers", layTg:"Like Telegram", layTgS:"lists and the system font, like Telegram settings", layPass:"Pass", layPassS:"the subscription is a card with a date and a barcode", layPoster:"Poster", layPosterS:"a colour block and large bold type", layMetro:"Tiles", layMetroS:"colour squares, like a home screen", layOwn:"This layout has its own background and cards — these settings work only in Classic.", fontT:"Font", fkSans:"Plain", fkSerif:"Serif", fkChar:"With character", fkFun:"For special looks", fkCustom:"Your own from Google Fonts", fCustomPh:"A name, like Lobster", fCustomHint:"Any family from fonts.google.com for headings and numbers; the text stays in Golos. Pick one with Cyrillic if you sell in Russian.", fCustomBad:"No such font on Google Fonts, or it has no Cyrillic", fCustomEmpty:"Type the name of the font", fOnlyApp:"app only", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
   linksT:"Own buttons", linksSub:"in the customer's profile, up to 6", linkAdd:"Add a button", linkRu:"Text (RU)", linkEn:"Text (EN)",
   linksEmpty:"For example: “Our channel”, “Customer chat”, “Website”.", linkBad:"A link must start with https://, tg:// or mailto:",
   exExcel:"Excel", exOrdersT:"Orders to Excel", exOrdersHint:"A table for bookkeeping and taxes: date, customer, what was bought, amount, payment method. A total at the bottom.",
@@ -3601,7 +3608,7 @@ async function pLook(){
   frameReady = false;
   LOOK = { presets:d.presets, preset:c.preset, accent:c.accent, surface:c.surface, mode:c.mode, logo:d.logo,
            fonts, font:vals.font || "unbounded", fontCustom:vals.font_custom || "", radius:vals.radius || "normal", links,
-           backdrop:lk.backdrop || "glow", icons:lk.icons || "regular", motion:lk.motion || "lively",
+           backdrop:lk.backdrop || "glow", icons:lk.icons || "regular", layout:lk.layout || "classic", motion:lk.motion || "lively",
            effect:lk.effect || "none", cards:lk.cards || "solid", splash:lk.splash !== false,
            splashKind:lk.splash_kind || "auto",
            sp:Object.assign({ mark:"logo", plate:"auto", size:"m", color:"style", bg:"app", name:"auto", speed:"normal" }, lk.splash_cfg || {}),
@@ -3610,6 +3617,9 @@ async function pLook(){
     `<button class="${LOOK[key] === k ? "on" : ""}" data-v="${k}" onclick="setLook('${key}','${k}')">${esc(t(l))}</button>`).join("")}</div>`;
   $("content").innerHTML = `
     <div class="lookgrid"><div class="lookcol">
+    <div class="card"><h3>${esc(t("layT"))}<span class="mini">${esc(t("laySub"))}</span></h3>
+      <div class="lays" id="layOpts"></div>
+    </div>
     <div class="card"><h3>${esc(t("brandT"))}<span class="mini"><button class="btn ghost sm" onclick="resetBrand(this)">${esc(t("brandReset"))}</button></span></h3>
       <div class="field"><label>${esc(t("brandName"))}</label><input id="lkName" maxlength="40" value="${esc(vals.brand_name)}" oninput="pushLook();drawSplash()"></div>
       <div class="logobox"><div class="pv" id="logoPv"></div>
@@ -3640,10 +3650,11 @@ async function pLook(){
         <div class="field"><label>${esc(t("iconsT"))}</label><div class="opts" id="iconOpts"></div></div>
       </div>
     </div>
-    <div class="card"><h3>${esc(t("bdT"))}<span class="mini">${esc(t("bdSub"))}</span></h3>
-      <div class="opts wide" id="bdOpts"></div>
+    <div class="card" id="bdCard"><h3>${esc(t("bdT"))}<span class="mini">${esc(t("bdSub"))}</span></h3>
+      <div class="hint" id="bdOwn" style="margin:-4px 0 12px" hidden>${esc(t("layOwn"))}</div>
+      <div id="bdBody"><div class="opts wide" id="bdOpts"></div>
       <div class="field" style="margin-top:14px"><label>${esc(t("cardsT"))}</label>${tabsOf("cardsTabs", "cards", [["solid", "cardsSolid"], ["glass", "cardsGlass"], ["neon", "cardsNeon"], ["pixel", "cardsPixel"], ["comic", "cardsComic"], ["frost", "cardsFrost"], ["lacquer", "cardsLacquer"]])}
-        <div class="hint">${esc(t("cardsHint"))}</div></div>
+        <div class="hint">${esc(t("cardsHint"))}</div></div></div>
     </div>
     <div class="card"><h3>${esc(t("motionT"))}</h3>
       <div class="field"><label>${esc(t("motionLvl"))}</label>${tabsOf("motionTabs", "motion", [["lively", "mLively"], ["calm", "mCalm"], ["off", "mOff"]])}
@@ -3832,8 +3843,37 @@ function iconSample(kind){
   const duo = kind === "duo", grad = duo ? `<defs><linearGradient id="adDuo" gradientUnits="userSpaceOnUse" x1="4" y1="3" x2="20" y2="21"><stop offset="0" stop-color="#F2FBFF"/><stop offset=".75" stop-color="currentColor"/></linearGradient></defs>` : "";
   return ICON_PATHS.map((p, i) => `<span class="ico ${kind === "badge" ? "bd" : ""} ${duo ? "duo" : ""}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="${duo ? "url(#adDuo)" : "currentColor"}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${i ? "" : grad}${p}</svg></span>`).join("");
 }
+// Small drawings of each layout: how the home screen is built, not its colours.
+function layThumb(k, hex){
+  const on = "#111";
+  if (k === "tg") return `<span class="ph" style="background:#F2F2F7"><i style="left:8px;top:10px;width:46px;height:7px;background:#000;border-radius:2px"></i>
+    <i style="left:6px;right:6px;top:24px;height:38px;background:#fff;border-radius:6px"></i><i style="left:12px;right:12px;top:48px;height:8px;background:${hex};border-radius:3px"></i>
+    <i style="left:6px;right:6px;top:68px;height:26px;background:#fff;border-radius:6px"></i><i style="left:20px;right:6px;top:81px;height:.5px;background:#C6C6C8"></i>
+    <i style="left:6px;right:6px;top:100px;height:22px;background:#fff;border-radius:6px"></i></span>`;
+  if (k === "pass") return `<span class="ph" style="background:#E8EAED"><i style="left:8px;top:10px;width:40px;height:6px;background:#15181C;border-radius:2px"></i>
+    <i style="left:6px;right:6px;top:22px;height:64px;background:${hex};border-radius:8px"></i><i style="left:12px;top:34px;width:44px;height:7px;background:${on};opacity:.85;border-radius:2px"></i>
+    <i style="left:10px;right:10px;top:66px;border-top:1.5px dashed rgba(0,0,0,.3)"></i><i style="right:12px;top:71px;width:26px;height:10px;background:repeating-linear-gradient(90deg,${on} 0 1.5px,transparent 1.5px 3px)"></i>
+    <i style="left:6px;top:92px;width:calc(50% - 9px);height:30px;border:1px solid #C9CDD3;border-radius:6px"></i><i style="right:6px;top:92px;width:calc(50% - 9px);height:30px;border:1px solid #C9CDD3;border-radius:6px"></i></span>`;
+  if (k === "poster") return `<span class="ph" style="background:#fff"><i style="left:6px;top:8px;width:58px;height:10px;background:#000"></i>
+    <i style="left:0;right:0;top:24px;height:62px;background:${hex}"></i><i style="left:8px;top:30px;width:34px;height:34px;background:${on}"></i>
+    <i style="left:8px;right:8px;top:72px;height:9px;background:${on}"></i><i style="left:6px;top:94px;width:calc(50% - 9px);border-top:3px solid #000"></i>
+    <i style="right:6px;top:94px;width:calc(50% - 9px);border-top:3px solid #000"></i><i style="left:6px;top:101px;width:14px;height:16px;background:#000"></i></span>`;
+  if (k === "metro") return `<span class="ph" style="background:#000"><i style="left:6px;top:8px;width:50px;height:8px;background:#fff;opacity:.85"></i>
+    <i style="left:6px;right:6px;top:22px;height:36px;background:${hex}"></i><i style="left:6px;top:62px;width:calc(50% - 8px);height:28px;background:#00897B"></i>
+    <i style="right:6px;top:62px;width:calc(50% - 8px);height:28px;background:#0B78D1"></i><i style="left:6px;top:94px;width:calc(50% - 8px);height:28px;background:#D5245A"></i>
+    <i style="right:6px;top:94px;width:calc(50% - 8px);height:28px;background:#1E9E4A"></i></span>`;
+  return `<span class="ph" style="background:#000"><i style="left:8px;top:8px;width:30px;height:4px;background:#555;border-radius:2px"></i><i style="left:8px;top:16px;width:52px;height:8px;background:#eee;border-radius:2px"></i>
+    <i style="left:6px;right:6px;top:30px;height:50px;background:#0C0D0F;border:1px solid #22252B;border-radius:8px;overflow:hidden"></i>
+    <i style="right:-14px;top:50px;width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,${hex}55,transparent 68%)"></i>
+    <i style="left:12px;top:40px;width:24px;height:14px;background:#eee;border-radius:2px"></i><i style="left:12px;right:12px;top:64px;height:9px;background:${hex};border-radius:3px"></i>
+    <i style="left:6px;top:86px;width:calc(50% - 9px);height:34px;background:#0C0D0F;border:1px solid #22252B;border-radius:8px"></i><i style="right:6px;top:86px;width:calc(50% - 9px);height:34px;background:#0C0D0F;border:1px solid #22252B;border-radius:8px"></i></span>`;
+}
 function drawOpts(){
-  const { rgb, ground } = curColors();
+  const { rgb, ground, hex } = curColors();
+  $("layOpts").innerHTML = [["classic", "layClassic"], ["tg", "layTg"], ["pass", "layPass"], ["poster", "layPoster"], ["metro", "layMetro"]].map(([k, l]) =>
+    `<button class="th lay ${LOOK.layout === k ? "on" : ""}" onclick="setLook('layout','${k}')">${layThumb(k, hex)}<b>${esc(t(l))}</b><small>${esc(t(l + "S"))}</small></button>`).join("");
+  const own = LOOK.layout !== "classic";
+  $("bdOwn").hidden = !own; $("bdBody").classList.toggle("dimmed", own);
   $("iconOpts").innerHTML = [["thin", "icThin"], ["regular", "icRegular"], ["bold", "icBold"], ["badge", "icBadge"], ["tiles", "icTiles"], ["ring", "icRing"], ["duo", "icDuo"], ["3d", "ic3d"], ["neon", "icNeon"], ["pixel", "icPixel"], ["comic", "icComic"], ["ornament", "icOrnament"], ["fortune", "icFortune"]].map(([k, l]) =>
     `<button class="th opt ${LOOK.icons === k ? "on" : ""}" onclick="setLook('icons','${k}')" style="--acc:rgb(${rgb})">
       <span class="icons">${iconSample(k)}</span><b>${esc(t(l))}</b></button>`).join("");
@@ -3953,7 +3993,7 @@ function pushLook(now){
   lookTimer = setTimeout(async () => {
     if (!LOOK || !$("lkFrame")) return;
     const body = { theme_preset:LOOK.preset, theme_accent:LOOK.accent, theme_surface:LOOK.surface,
-                   font:LOOK.font, font_custom:LOOK.fontCustom, radius:LOOK.radius, icons:LOOK.icons, backdrop:LOOK.backdrop,
+                   font:LOOK.font, font_custom:LOOK.fontCustom, radius:LOOK.radius, icons:LOOK.icons, backdrop:LOOK.backdrop, layout:LOOK.layout,
                    motion:LOOK.motion, effect:LOOK.effect, cards:LOOK.cards, splash_kind:LOOK.splashKind };
     const replay = !!LOOK.replay; LOOK.replay = false;
     let pv;
@@ -4021,7 +4061,7 @@ async function saveLook(btn){
                  tagline_ru:$("tagRu").value.trim(), tagline_en:$("tagEn").value.trim(),
                  brand_name:$("lkName").value.trim() || "VPN", font:LOOK.font, font_custom:LOOK.fontCustom, radius:LOOK.radius,
                  links_json:JSON.stringify(links),
-                 icons:LOOK.icons, backdrop:LOOK.backdrop, motion:LOOK.motion,
+                 icons:LOOK.icons, backdrop:LOOK.backdrop, layout:LOOK.layout, motion:LOOK.motion,
                  effect:LOOK.effect, cards:LOOK.cards, splash:LOOK.splash ? "1" : "0", splash_kind:LOOK.splashKind,
                  splash_mark:LOOK.sp.mark, splash_plate:LOOK.sp.plate, splash_size:LOOK.sp.size, splash_color:LOOK.sp.color,
                  splash_bg:LOOK.sp.bg, splash_name:LOOK.sp.name, splash_speed:LOOK.sp.speed,

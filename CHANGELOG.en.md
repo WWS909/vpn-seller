@@ -3,6 +3,11 @@
 Each version is a `## X.Y.Z — date` heading with one change per "-" line.
 The shop reads this file to tell the owner what is new.
 
+## 1.6.0 — 2026-11-09
+- Screen layout — the new main setting of the look. Besides Classic there are four layouts that change how the screens are built, not the colour: Like Telegram (lists and the system font), Pass (the subscription is a card with a date, a tear-off line and a barcode), Poster (a colour block and very large type) and Tiles (colour squares like a phone's home screen).
+- The new layouts have no caps labels over headings, no dots after titles and no glow; they bring their own background and cards.
+- In the panel each layout has a sketch of the screen, and the chosen one shows at once in the phone on the right.
+
 ## 1.5.0 — 2026-11-09
 - Fonts: 30 pairs with Cyrillic, grouped in the panel — plain, serif, with character, for special looks. New: PT Sans, PT Serif, IBM Plex Sans and Mono, Fira Sans, Ubuntu, Jost, Commissioner, Lora, Literata, Roboto Slab, Oswald, Russo One, Tektur.
 - Your own font: type in any Google Fonts family for headings and numbers; the panel checks at once that it exists and has Cyrillic.

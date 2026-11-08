@@ -69,6 +69,7 @@ DEFAULTS: dict[str, str] = {
     "tagline_ru": "",                   # the line under "Choose your access" on home
     "tagline_en": "",
     "font": "unbounded",                # a font pair from app/theme.py FONTS
+    "layout": "classic",                # how the app screens are built: app/theme.py LAYOUTS
     "font_custom": "",                  # a Google Fonts family for the headings, when font is "custom"
     "radius": "normal",                 # sharp | normal | round
     "backdrop": "glow",                 # glow | aurora | orbs | night | grid | stars | plain

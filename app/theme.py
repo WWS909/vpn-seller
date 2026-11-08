@@ -171,6 +171,9 @@ MODES = ("auto", "dark", "light")
 # a seasonal effect. Each is an attribute on <html>; the pages style them.
 BACKDROPS = ("glow", "aurora", "orbs", "night", "retro", "halftone", "winter", "lunar", "grid", "stars", "plain")
 ICONS = ("thin", "regular", "bold", "badge", "tiles", "ring", "duo", "3d", "neon", "pixel", "comic", "ornament", "fortune")
+# How the screens are built. "classic" is the original look; the others bring
+# their own surfaces, so the background and the card style are not used there.
+LAYOUTS = ("classic", "tg", "pass", "poster", "metro")
 MOTIONS = ("lively", "calm", "off")
 EFFECTS = ("none", "snow")
 # The kind of opening screen: "auto" follows the cards (pixel, comic, snowy and
@@ -344,6 +347,7 @@ def look(db: Session) -> dict:
         "motion": _pick(core.get(db, "motion"), MOTIONS, "lively"),
         "effect": _pick(core.get(db, "effect"), EFFECTS, "none"),
         "cards": _pick(core.get(db, "cards"), CARDS, "solid"),
+        "layout": _pick(core.get(db, "layout"), LAYOUTS, "classic"),
         "splash": core.get(db, "splash") != "0",
         "splash_kind": _pick(core.get(db, "splash_kind"), SPLASHES, "auto"),
         "splash_cfg": splash_cfg(db),
@@ -353,10 +357,19 @@ def look(db: Session) -> dict:
     }
 
 
+def own_surfaces(lk: dict) -> dict:
+    """A layout other than the classic one paints its own background and cards."""
+    if lk.get("layout", "classic") != "classic":
+        lk = {**lk, "backdrop": "plain", "cards": "solid"}
+    return lk
+
+
 def html_attrs(lk: dict) -> str:
+    lk = own_surfaces(lk)
     return (f' data-backdrop="{lk["backdrop"]}" data-icons="{lk["icons"]}"'
             f' data-motion="{lk["motion"]}" data-effect="{lk["effect"]}"'
-            f' data-cards="{lk.get("cards", "solid")}" data-splash="{lk.get("splash_kind", "auto")}"')
+            f' data-cards="{lk.get("cards", "solid")}" data-splash="{lk.get("splash_kind", "auto")}"'
+            f' data-layout="{lk.get("layout", "classic")}"')
 
 
 def preview(params: dict) -> dict:
@@ -378,12 +391,14 @@ def preview(params: dict) -> dict:
                             str(params.get("font_custom") or ""))
     return {
         "css": css(th, "app") + fvars, "font_href": href,
-        "attrs": {"backdrop": _pick(str(params.get("backdrop")), BACKDROPS, "glow"),
-                  "icons": _pick(str(params.get("icons")), ICONS, "regular"),
-                  "motion": _pick(str(params.get("motion")), MOTIONS, "lively"),
-                  "effect": _pick(str(params.get("effect")), EFFECTS, "none"),
-                  "cards": _pick(str(params.get("cards")), CARDS, "solid"),
-                  "splash": _pick(str(params.get("splash_kind")), SPLASHES, "auto")},
+        "attrs": own_surfaces({
+            "backdrop": _pick(str(params.get("backdrop")), BACKDROPS, "glow"),
+            "icons": _pick(str(params.get("icons")), ICONS, "regular"),
+            "motion": _pick(str(params.get("motion")), MOTIONS, "lively"),
+            "effect": _pick(str(params.get("effect")), EFFECTS, "none"),
+            "cards": _pick(str(params.get("cards")), CARDS, "solid"),
+            "layout": _pick(str(params.get("layout")), LAYOUTS, "classic"),
+            "splash": _pick(str(params.get("splash_kind")), SPLASHES, "auto")}),
         "brand": {"ground": th["s_ground"], "fill": th["fill"], "on_fill": th["on_fill"],
                   "fill_light": th["fill_light"], "on_fill_light": th["on_fill_light"]},
     }

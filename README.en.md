@@ -33,7 +33,7 @@ wget -qO install.sh https://raw.githubusercontent.com/WWS909/vpn-seller/main/ins
 | Connecting | a key pasted into the chat | one subscription link for every server, one tap into Happ, v2RayTun and others, a QR code |
 | Payment | usually one gateway | Telegram Stars, cards, SBP and crypto — 15 payment providers to pick from, balance and referrals |
 | Running it | bot commands | a web admin panel with charts, and the same panel inside Telegram |
-| Look | — | your colour, logo, 30 fonts, 13 icon styles, cards, backgrounds, opening screen |
+| Look | — | 5 screen layouts, your colour, logo, 30 fonts, 13 icon styles, opening screen |
 | Install and updates | by hand | one command, a guided installer, a new version from GitHub in one click |
 
 ### Installing — five questions
@@ -53,11 +53,15 @@ After that the server has a `vpn-seller` command — a menu with the shop's stat
 
 ### Your own look in a couple of minutes
 
-There are no finished themes — the look is built from parts, and the panel shows the real app next to them. Below is the same shop with different fonts and icons.
+The look is built from parts, and the panel shows the real app next to them. The main part is the **screen layout**: it changes how the screens are built, not just the colour. Below is the same shop in four layouts (plus Classic).
 
-<p align="center"><img src="docs/screenshots/looks-en.webp" alt="One shop, three looks"></p>
+<p align="center"><img src="docs/screenshots/layouts-en.webp" alt="One shop, four layouts"></p>
 
-![Look: fonts in groups and a live preview](docs/screenshots/admin-fonts.webp)
+![Look: picking a layout with a live preview](docs/screenshots/admin-layouts.webp)
+
+On top of the layout: the font (30 of them or any from Google Fonts), colour, icons and logo:
+
+<p align="center"><img src="docs/screenshots/looks-en.webp" alt="Fonts and icons"></p>
 
 ## Features
 
@@ -140,7 +144,7 @@ Cards go through one gateway of your choice (`CARD_GATEWAY`). Users only see the
 <details>
 <summary>All screens: the app and the panel</summary>
 
-![Fonts and icons](docs/screenshots/looks-en.webp)
+![Fonts in groups](docs/screenshots/admin-fonts.webp)
 ![Light theme, English](docs/screenshots/app-light.png)
 ![Payments: gateways and keys in the panel](docs/screenshots/admin-payments.png)
 ![Updates: a new version from GitHub in one click](docs/screenshots/admin-updates.png)
@@ -397,6 +401,7 @@ Admin → Look. On the right is **the real app in a phone frame**: every change 
 - **Comic** (Sticker icons, Comic cards, the Halftone background, Rubik + Balsamiq) — a pop-art comic page. Panels with a bold ink outline and a shadow printed in halftone dots, tiles tilted a little like frames on a page. Section heads are yellow narration boxes; the status, support messages, fields and toasts are speech balloons with a tail. Titles and numbers are lettered in Rubik Black Italic with an ink outline and a red offset, text is Balsamiq Sans, like balloon lettering. Icons are an own set of colour stickers with a halftone shade and a white edge. The background is halftone dots from the corners and action lines behind the title. Bold-outlined buttons hit the page when pressed, the traffic meter is a red-and-yellow striped tube. A starburst lands on the opening screen, and a purchase gets a burst with a check and a “BAM!” (“БАЦ!” in Russian). Cream paper by day, a dark “noir issue” by night. Stickers, Comic panels and the Halftone background work on their own too.
 - **New Year** (Festive icons, Snowy cards, the Winter night background, Nunito Black) — for December: a winter night with the northern lights, twinkling stars, snow falling in two layers, fir trees along the bottom, a garland on top whose bulbs light in turns. Cards are frosted glass with the sky showing through; snow lies on the main card, the tiles and the menu. Icons are drawn festive things: a gingerbread house, a snow globe, a snowman, a stocking, a bullfinch, a gift, a sparkler; some come alive (the gift wiggles, the star sparkles). Titles and numbers are round heavy letters, white as snow with a candy-red edge. A red bauble swings over the aurora on the opening screen, the loading bar is a candy cane, a purchase gets a bauble with a check and fireworks. By day, a snowy morning.
 - **Lunar New Year** (Red diamond icons, Lacquer & gold cards, the Lanterns background, Yeseva One) — red lacquer and gold: a cloud pattern, two lanterns swaying at the top, cards in gold frames with fret corners. The main card is a red envelope (hongbao) with a flap and a gold coin; icons are the red-and-gold diamonds hung on doors, turning in as they appear and glinting. Titles in Yeseva One, numbers in gold, a lantern on the opening screen, a red diamond with a gold check and fireworks on a purchase. By day, rice paper: the accent turns red (gold on white cannot be read), the envelope stays red.
+- **Screen layout** — how the app is built. Classic: dark cards and large numbers. Like Telegram: grouped lists and the system font, so the app looks like a part of Telegram. Pass: the subscription is a card in the accent colour — the end date large, a tear-off line and a barcode, the connect button on the stub. Poster: a full-width colour block, very large bold numbers, thick rules instead of cards, a dark menu. Tiles: flat colour squares like a phone's home screen, each action in its own colour. The new layouts bring their own background and cards (the Background and Cards settings work in Classic), with no caps labels and no dots after titles. Font, colour, icons and logo work with every layout.
 - **Name and logo** — PNG, JPEG, WebP or SVG up to 2 MB. The logo shows in the app header, on the opening screen, in the panel, on the site and in the browser tab. The bot's own avatar is changed only in @BotFather (`/setuserpic`) — the logo can be downloaded right there.
 - **Colour** — any accent (picker or #code) with a dark background (black, graphite, midnight, indigo, retro, noir, winter, red lacquer). A colour that reads poorly is darkened or lightened for text, in both schemes. The colour dots under the picker are only shortcuts: they fill in the accent and the background.
 - **Font** — 30 pairs with Cyrillic in four groups: plain (Manrope, Montserrat, Rubik, Nunito, Onest, Geologica, PT Sans, IBM Plex Sans, Fira Sans, Ubuntu, Jost, Commissioner, system), serif (Playfair, PT Serif, Lora, Literata, Roboto Slab), with character (Unbounded, JetBrains Mono, Exo 2, Comfortaa, Oswald, Russo One, Tektur, IBM Plex Mono) and for special looks (pixel, comic, New Year). You can also type in **any family from Google Fonts** — it takes the headings and numbers, the text stays in Golos; the panel checks at once that the font exists and has Cyrillic. **Corner roundness** (every button, field and card follows it) and **icons** — thin, regular, bold, on tiles in the theme colour, **colour tiles** (a white drawing on a square of its own colour, like a phone's settings: money is green, gifts pink, help cyan), **in rings**, duotone and the special sets below.
