@@ -38,7 +38,7 @@ wget -qO install.sh https://raw.githubusercontent.com/WWS909/vpn-seller/main/ins
 - **Free trial**: days, devices and traffic — one card under Plans, or `/trial 7` in the bot.
 - **Customer warm-up**: a sale on every plan, system notices (subscription ends soon, has ended, trial ends, no purchase after the first visit, traffic runs low) and your own campaigns by segment. Everything with a discount is off until you turn it on.
 - **Referrals, your choice**: subscription days or money — a share of friends' payments on a balance. The balance is withdrawn by request (card, SBP, crypto — you set the methods and close requests in the panel or with a button in the bot) or spent on one's own subscription. A captcha against farms, a top of inviters.
-- **Mandatory channel subscription** — for the whole service or only for the free trial.
+- **Mandatory channel subscription** — one or several channels (up to five), for the whole service or only for the free trial.
 - **Support in the bot**: customer questions reach the admins with the customer's card; answer by replying in the bot or from the panel — the customer gets it from the bot.
 - **Sources**: a bot link of your own for every video, blogger or ad — see how many people came, how many paid, how much money they brought and whether the ad paid off.
 - **A check of the VPN itself**: every 2 minutes the shop checks the connection port from the keys; a server with a dead VPN is left out of subscriptions for a while and the admins are told.
@@ -61,7 +61,7 @@ wget -qO install.sh https://raw.githubusercontent.com/WWS909/vpn-seller/main/ins
 - **Automatic backups**: every day a database archive goes to the admins in Telegram; plus a button in the panel and `/backup`.
 - Whitelist-bypass servers for mobile internet: their traffic is sold by the gigabyte (in plans and as packs); without gigabytes the server is not given, when they run out only it goes off.
 - Payment gateways and their keys are set up right in the admin panel (Payments), no terminal needed; keys in .env work too.
-- Device limit by HWID (Happ, v2RayTun, Incy and other clients sending `X-HWID`), traffic limit with blocking and top-ups.
+- Device limit by HWID (Happ, v2RayTun, Incy and other clients sending `X-HWID`), traffic limit with blocking; traffic top-ups are optional (Settings → Traffic top-ups, off at first).
 - A removed device gets no subscription until the customer brings it back; unused bought traffic carries over on renewal.
 - A new link is given only if at least one server took it; on Remnawave, a reset link or a switched-off user drops open connections at once.
 - If a server is down, the purchase still goes through on the others and the missed server catches up in the background. A paid order is never lost: if every server fails, it waits and is delivered automatically.
@@ -411,7 +411,7 @@ The public page (`/` and `/legal`) shows only written documents; the app links t
 
 ## Mandatory channel subscription
 
-Admin → Settings → Mandatory channel subscription: the channel's `@username` (or a `-100…` ID and an invite link for a private one) and the mode — the whole service or only the free trial. The bot must be an administrator of the channel, or Telegram does not tell who is subscribed; "Save and check" verifies it. A non-subscriber sees "Subscribe to the channel" with "Subscribe" and "I've subscribed". If the check itself breaks (the bot was removed from the channel), customers are let through rather than locked out.
+There can be several channels (up to five): Add a channel — and a person must join each; the mini app shows a Subscribe button per channel. Admin → Settings → Mandatory channel subscription: the channel's `@username` (or a `-100…` ID and an invite link for a private one) and the mode — the whole service or only the free trial. The bot must be an administrator of the channel, or Telegram does not tell who is subscribed; "Save and check" verifies it. A non-subscriber sees "Subscribe to the channel" with "Subscribe" and "I've subscribed". If the check itself breaks (the bot was removed from the channel), customers are let through rather than locked out.
 
 ## Admin settings
 

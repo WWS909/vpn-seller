@@ -1008,6 +1008,7 @@ textarea.field{resize:none;min-height:96px}
 .gate h2 i{color:var(--sig-txt);font-style:normal}
 .gate p{color:var(--txt-2);font-size:14px;margin-bottom:22px}
 .gate .btn{margin-top:10px}
+.chlist{display:grid;gap:8px}.chlist .btn{margin-top:0;display:flex;align-items:center;justify-content:center;gap:8px}
 .banner{margin:0 var(--pad) 12px;padding:12px 14px;border-radius:var(--r-m);
         background:rgba(236,106,86,.11);border:1px solid rgba(236,106,86,.3);
         font-size:13px;display:flex;align-items:center;gap:10px}
@@ -2606,7 +2607,8 @@ ru: {
   perWeek:"за неделю", perMonth2:"за месяц", perAll:"за всё время", topEmpty:"Пока никого — вы можете быть первым",
   shareText:"Пользуюсь {brand} — быстрый VPN прямо в Telegram. Держи ссылку:",
   gateT:"Подпишитесь на канал", gateLead:"Сервис доступен подписчикам нашего канала", gateLeadT:"Сервис доступен подписчикам канала «{t}»",
-  gateTrial:"Пробный период доступен подписчикам нашего канала", subscribe:"Подписаться", subscribed:"Я подписался",
+  gateTrial:"Пробный период доступен подписчикам нашего канала", gateTMany:"Подпишитесь на каналы",
+  gateLeadMany:"Сервис доступен подписчикам наших каналов — подпишитесь на каждый", gateTrialMany:"Пробный период — для подписчиков наших каналов, подпишитесь на каждый", chN:"Канал {n}", subscribe:"Подписаться", subscribed:"Я подписался",
   thanksSub:"Спасибо за подписку!", notYet:"Подписка пока не видна — подпишитесь и нажмите ещё раз",
   trialForSubs:"для подписчиков канала — нажмите, чтобы подписаться",
   quick:"Быстрые действия", giftSub:"Подарить подписку", giftNote:"отправьте код кому угодно",
@@ -2698,7 +2700,7 @@ ru: {
   reviewSent:"Спасибо! Отзыв появится после проверки", reviewBonus:"За опубликованный отзыв — {n} подписки в подарок.", reviewCustomers:"Оставить отзыв можно после подключения — пробного или платного.", noReviews:"Отзывов пока нет", avg:"{a} из 5 · {n}",
   reviewsN2:["отзыв","отзыва","отзывов"],
   blockedLead:"Доступ заблокирован администратором. Напишите в поддержку.",
-  trafficOutLead:"Трафик по подписке закончился — докупите гигабайты.",
+  trafficOutLead:"Трафик по подписке закончился — докупите гигабайты.", trafficOutRenew:"Трафик по подписке закончился — продлите подписку.",
 },
 en: {
   refresh:"Refresh", profile:"Profile", close:"Close",
@@ -2746,7 +2748,8 @@ en: {
   perWeek:"this week", perMonth2:"this month", perAll:"all time", topEmpty:"Nobody yet — you can be the first",
   shareText:"I use {brand} — a fast VPN right in Telegram. Here's the link:",
   gateT:"Subscribe to the channel", gateLead:"The service is for subscribers of our channel", gateLeadT:"The service is for subscribers of “{t}”",
-  gateTrial:"The free trial is for subscribers of our channel", subscribe:"Subscribe", subscribed:"I've subscribed",
+  gateTrial:"The free trial is for subscribers of our channel", gateTMany:"Subscribe to the channels",
+  gateLeadMany:"The service is for subscribers of our channels — join each of them", gateTrialMany:"The free trial is for subscribers of our channels — join each of them", chN:"Channel {n}", subscribe:"Subscribe", subscribed:"I've subscribed",
   thanksSub:"Thanks for subscribing!", notYet:"No subscription yet — subscribe and tap again",
   trialForSubs:"for channel subscribers — tap to subscribe",
   quick:"Quick actions", giftSub:"Gift a subscription", giftNote:"a code not tied to your account",
@@ -2838,7 +2841,7 @@ en: {
   reviewSent:"Thank you! The review appears after moderation", reviewBonus:"For a published review — {n} of subscription as a gift.", reviewCustomers:"You can leave a review once you have been connected — on a trial or a paid plan.", noReviews:"No reviews yet", avg:"{a} of 5 · {n}",
   reviewsN2:["review","reviews"],
   blockedLead:"Access is blocked by the administrator. Contact support.",
-  trafficOutLead:"You have used all your traffic — top it up.",
+  trafficOutLead:"You have used all your traffic — top it up.", trafficOutRenew:"You have used all your traffic — renew the subscription.",
 }};
 
 const FAQ_DEFAULT = {
@@ -3280,12 +3283,15 @@ function drawHome(){
         : `<button class="btn pri wide" onclick="go('sub')">${esc(t("renew"))} ${svg("i-arr", 17, 'class="ar"')}</button>`}`;
   } else if (has){
     const left = Math.max(0, Math.ceil((ME.expires_at - Date.now() / 1000) / 86400));
-    const warn = ME.blocked ? t("blockedLead") : ME.traffic_blocked ? t("trafficOutLead") : "";
+    const warn = ME.blocked ? t("blockedLead") : ME.traffic_blocked
+      ? t((CFG.traffic_packs || []).length ? "trafficOutLead" : "trafficOutRenew") : "";
     body = `<div class="days"><b data-count="${left}">${left}</b><span>${esc(pl(left, "daysLeft"))}</span></div>
       <div class="sub">${ME.plan ? esc(planName(ME.plan)) + " · " : ""}${esc(t("until", { d:dateStr(ME.expires_at) }))}${
         warn ? "<br><span style='color:var(--bad)'>" + esc(warn) + "</span>" : ""}</div>
       ${ME.traffic_blocked
-        ? `<button class="btn pri wide" onclick="sheetTraffic()">${esc(t("topUp"))}</button>`
+        ? ((CFG.traffic_packs || []).length
+          ? `<button class="btn pri wide" onclick="sheetTraffic()">${esc(t("topUp"))}</button>`
+          : `<button class="btn pri wide" onclick="go('sub')">${esc(t("renew"))}</button>`)
         : `<button class="btn pri wide" onclick="sheetConnect()">${esc(t("connectDevice"))}</button>`}`;
   } else {
     body = `<h2>${t("chooseAccess")}<i>.</i></h2>
@@ -3814,6 +3820,7 @@ function sheetDevices(){
 }
 function sheetTraffic(){
   if (!ME || !ME.has_subscription) return needSub();
+  if (!(CFG.traffic_packs || []).length) return go("sub");     // top-ups are off: renew instead
   if (!ME.traffic_limit){ return toast(t("trafUnl")); }
   const rows = (CFG.traffic_packs || []).map(g => `
     <button class="row" onclick="order({kind:'traffic',gb:${Number(g.gb)}}, '${esc(t("gbPack", { n:g.gb }))}')">
@@ -4152,16 +4159,26 @@ function drawGate(){
   let el = $("gate");
   if (!g){ if (el) el.remove(); return; }
   if (!el){ el = document.createElement("div"); el.id = "gate"; el.className = "gate"; document.body.appendChild(el); }
+  const list = chList(g);
   el.innerHTML = `<div class="ic">${svg("i-send", 28)}</div>
-    <h2>${esc(t("gateT"))}<i>.</i></h2>
-    <p>${esc(g.title ? t("gateLeadT", { t:g.title }) : t("gateLead"))}</p>
-    <button class="btn pri wide" onclick="openOut('${jsq(g.link)}')">${esc(t("subscribe"))}</button>
+    <h2>${esc(t(list.length > 1 ? "gateTMany" : "gateT"))}<i>.</i></h2>
+    <p>${esc(list.length > 1 ? t("gateLeadMany") : g.title ? t("gateLeadT", { t:g.title }) : t("gateLead"))}</p>
+    ${chButtons(list)}
     <button class="btn gho wide" onclick="checkChannel(this)">${esc(t("subscribed"))}</button>`;
 }
+// One channel: one big button. Several: a button per channel with its name.
+const chList = g => (g.channels && g.channels.length ? g.channels : [{ link:g.link, title:g.title }]).filter(c => c.link);
+function chButtons(list){
+  if (list.length <= 1) return list.map(c => `<button class="btn pri wide" onclick="openOut('${jsq(c.link)}')">${esc(t("subscribe"))}</button>`).join("");
+  return `<div class="chlist">${list.map((c, i) => `<button class="btn pri wide" onclick="openOut('${jsq(c.link)}')">
+    ${svg("i-send", 16)} ${esc(c.title || t("chN", { n:i + 1 }))}</button>`).join("")}</div>`;
+}
 function sheetChannel(g, forTrial){
-  openSheet(`<h3>${esc(t("gateT"))}<i>.</i></h3>
-    <p class="lead">${esc(forTrial ? t("gateTrial") : t("gateLead"))}${g.title ? " — «" + esc(g.title) + "»" : ""}</p>
-    <button class="btn pri wide" onclick="openOut('${jsq(g.link)}')">${esc(t("subscribe"))}</button>
+  const list = chList(g);
+  openSheet(`<h3>${esc(t(list.length > 1 ? "gateTMany" : "gateT"))}<i>.</i></h3>
+    <p class="lead">${esc(forTrial ? t(list.length > 1 ? "gateTrialMany" : "gateTrial") : t(list.length > 1 ? "gateLeadMany" : "gateLead"))}${
+      list.length === 1 && g.title ? " — «" + esc(g.title) + "»" : ""}</p>
+    ${chButtons(list)}
     <button class="btn gho wide" style="margin-top:8px" onclick="checkChannel(this, true)">${esc(t("subscribed"))}</button>`);
 }
 async function checkChannel(btn, inSheet){

@@ -7,6 +7,7 @@ import time
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from .. import access, billing, channel, clients, core, emergency, legal, marketing, payments, referral, support, support_ai, theme
@@ -539,10 +540,17 @@ class ReviewBody(BaseModel):
 
 @router.get("/reviews")
 def reviews(db: Session = Depends(get_db)):
+    if core.get(db, "reviews_enabled") != "1":
+        return {"average": 0, "count": 0, "items": []}
+    return _reviews_summary(db)
+
+
+def _reviews_summary(db: Session, limit: int = 50) -> dict:
     rows = (db.query(Review).filter(Review.status == "published")
-            .order_by(Review.id.desc()).limit(50).all())
-    avg = round(sum(r.stars for r in rows) / len(rows), 1) if rows else 0
-    return {"average": avg, "count": len(rows),
+            .order_by(Review.id.desc()).limit(limit).all())
+    total = db.query(Review).filter(Review.status == "published").count()
+    stars = db.query(func.avg(Review.stars)).filter(Review.status == "published").scalar()
+    return {"average": round(float(stars), 1) if stars else 0, "count": total,
             "items": [{"name": (r.user.first_name or r.user.username or "—")[:32],
                        "stars": r.stars, "text": r.text, "at": r.created_at} for r in rows]}
 

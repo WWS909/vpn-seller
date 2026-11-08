@@ -46,6 +46,8 @@ def _traffic_plan(db, gb=50):
 
 # ---------------------------------------------------------------- traffic packs
 def test_unused_bought_traffic_moves_to_the_next_period(client, db, server):
+    from app import core
+    core.put(db, "traffic_topup", "1")            # extra traffic is a feature the owner turns on
     client.get("/api/app/me", headers=tg(9101))
     plan = _traffic_plan(db)
     u = _order(db, 9101, plan=plan)

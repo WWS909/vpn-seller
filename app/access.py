@@ -595,7 +595,7 @@ def subscription(db: Session, user: User, headers: dict) -> tuple[str, dict]:
     elif until <= now():
         problem = "sub_expired"
     elif user.traffic_blocked:
-        problem = "sub_traffic"
+        problem = "sub_traffic" if core.get(db, "traffic_topup") == "1" else "sub_traffic_renew"
     else:
         problem = register_device(db, user, headers)
 

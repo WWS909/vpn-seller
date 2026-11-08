@@ -186,8 +186,8 @@ TRIGGERS: dict[str, dict] = {
     },
     "traffic": {
         "on": True, "param": 80, "percent": 0, "valid": 3, "button": "open",
-        "ru": "Израсходовано {used}% трафика. Докупите пакет в приложении, чтобы не остаться без интернета.",
-        "en": "You have used {used}% of your traffic. Top it up in the app so you don't run out.",
+        "ru": "Израсходовано {used}% трафика. Загляните в приложение, чтобы не остаться без интернета.",
+        "en": "You have used {used}% of your traffic. Have a look in the app so you don't run out.",
     },
 }
 PARAM_LIMITS = {"expiring": (1, 30), "trial_end": (1, 7), "expired": (0, 60), "winback": (3, 180),

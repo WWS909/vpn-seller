@@ -3,6 +3,12 @@
 Each version is a `## X.Y.Z — date` heading with one change per "-" line.
 The shop reads this file to tell the owner what is new.
 
+## 1.4.0 — 2026-11-09
+- Mandatory subscription: several channels can be added (up to five) — a person joins each, the mini app has a button per channel.
+- Traffic top-ups became a feature of their own: Settings → Traffic top-ups, off at first. Off — when the traffic runs out, a renewal is offered.
+- Admin overview: until the first sales, the revenue and plan charts show a pale example with a note instead of being empty.
+- Server menu: the previous logo; every item has a way back (a Yes / Back choice, 0 while entering keys cancels with nothing changed).
+
 ## 1.3.0 — 2026-11-09
 - A new server menu (vpn-seller): the VPN SELLER name, a coloured logo, the shop's card on top — running or not, the version and whether a new one is out, the address, today's purchases and revenue, customers, the last backup, free space.
 - Menu items are grouped. New ones: restart, restore from a backup (pick from a list), send the last 24 hours, night auto-update, what's new, free up disk space.

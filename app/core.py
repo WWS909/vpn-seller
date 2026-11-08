@@ -34,6 +34,7 @@ DEFAULTS: dict[str, str] = {
     "device_price": "50",              # one extra device for the rest of the term
     "max_devices": "10",
     "traffic_packs": "[[10, 99], [50, 299], [100, 499]]",   # [[GB, price], ...]
+    "traffic_topup": "0",               # sell those packs (plans with a traffic limit); off until the owner turns it on
     "bypass_packs": "[]",              # [[GB, price], ...] for the whitelist-bypass servers
     "stars_rate": "1.6",               # currency units per 1 Telegram Star
     "require_hwid": "0",               # refuse VPN clients that do not send a device id
@@ -116,6 +117,7 @@ DEFAULTS: dict[str, str] = {
     "channel_link": "",                 # invite link (for a private channel)
     "channel_mode": "off",              # off | trial (only for the free trial) | all
     "channel_title": "",
+    "channels_json": "",                # several channels: [{"id", "link", "title"}]; app/channel.py
     # The day's results to the owners in Telegram (app/report.py), at this server hour
     "report_on": "1",
     "report_hour": "18",
@@ -449,11 +451,14 @@ TEXTS: dict[str, dict[str, str]] = {
     "subscribe": {"ru": "Подписаться", "en": "Subscribe"},
     "traffic_out": {"ru": "Трафик по подписке закончился. Докупите гигабайты в приложении.",
                     "en": "You have used all your traffic. Top it up in the app."},
+    "traffic_out_renew": {"ru": "Трафик по подписке закончился. Продлите подписку или выберите тариф побольше в приложении.",
+                          "en": "You have used all your traffic. Renew or pick a bigger plan in the app."},
 
     # --- notices inside the subscription (shown by the VPN client as a server name) ---
     "sub_expired": {"ru": "Подписка закончилась — продлите в боте", "en": "Subscription ended — renew in the bot"},
     "sub_blocked": {"ru": "Доступ заблокирован", "en": "Access blocked"},
     "sub_traffic": {"ru": "Трафик закончился — докупите в боте", "en": "Traffic used up — top up in the bot"},
+    "sub_traffic_renew": {"ru": "Трафик закончился — продлите в боте", "en": "Traffic used up — renew in the bot"},
     "sub_devices": {"ru": "Лимит устройств — отвяжите лишнее в боте",
                     "en": "Device limit reached — remove one in the bot"},
     "sub_device_removed": {"ru": "Это устройство отвязано — верните его в боте",

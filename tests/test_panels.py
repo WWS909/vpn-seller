@@ -164,6 +164,7 @@ def test_buying_extra_devices(client, servers, test_mode, uid):
 
 
 def test_traffic_limit_blocks_and_top_up_unblocks(client, admin, servers, test_mode, uid, db):
+    client.post("/api/admin/settings", headers=admin, json={"traffic_topup": "1"})   # off by default
     plans = client.get("/api/admin/plans", headers=admin).json()
     body = {k: plans[0][k] for k in ("name", "name_en", "days", "price", "devices")}
     plan = client.post("/api/admin/plans", headers=admin,

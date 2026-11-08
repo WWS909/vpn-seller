@@ -1522,6 +1522,12 @@ def save_settings(data: dict, db: Session = Depends(get_db), admin=A):
             value = value.strip()
             if value and not re.fullmatch(r"@[A-Za-z0-9_]{4,64}|-100\d{5,20}", value):
                 raise HTTPException(400, "channel_id: @username or -100…")
+        if key == "channels_json":
+            from .. import channel
+            try:
+                value = json.dumps(channel.clean(json.loads(value or "[]")), ensure_ascii=False)
+            except ValueError as e:
+                raise HTTPException(400, str(e))
         if key == "grace_days":
             value = value.strip() or "0"
             if not (value.isdigit() and 0 <= int(value) <= access.GRACE_MAX):

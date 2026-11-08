@@ -441,14 +441,20 @@ def s10_menu_tools(d: Path):
     print("\n[s10] the menu: header card, what's new, night auto-update, backup + restore list, report, restart, cleanup")
     reset_tg()
     back = (r"вернуться в меню", "")
+    env_before = (d / ".env").read_text()
     answers = [
         (r"Ваш выбор", "12"), back,                               # what's new
-        (r"Ваш выбор", "11"), (r"Час \(0–23\)", "3"), back,       # night auto-update at 03:00
+        (r"Ваш выбор", "11"), (r"Ваш выбор", "1"), (r"Час \(0–23\)", "3"), back,   # night auto-update at 03:00
         (r"Ваш выбор", "5"), back,                                # a backup
         (r"Ваш выбор", "6"), (r"Ваш выбор", "0"), back,           # the restore list, then back
         (r"Ваш выбор", "7"), back,                                # the day's results to Telegram
-        (r"Ваш выбор", "4"), back,                                # restart
-        (r"Ваш выбор", "13"), back,                               # cleanup
+        (r"Ваш выбор", "4"), (r"Ваш выбор", "1"), back,           # restart
+        (r"Ваш выбор", "13"), (r"Ваш выбор", "1"), back,          # cleanup
+        # a way back everywhere
+        (r"Ваш выбор", "1"), (r"Ваш выбор", "0"), back,           # update → back
+        (r"Ваш выбор", "8"), (r"Ваш выбор", "2"), (r"› shopId", "0"), back,   # YooKassa → back at the first key
+        (r"Ваш выбор", "9"), (r"Ваш выбор", "0"), back,           # change address → back
+        (r"Ваш выбор", "10"), (r"Ваш выбор", "0"), back,          # token/ID/password → back
         (r"Ваш выбор", "0"),
     ]
     code, out = run_pty(f"bash {d / 'install.sh'}", env_for({}, VPN_SHOP_DIR=str(d)), answers)
@@ -466,6 +472,10 @@ def s10_menu_tools(d: Path):
     check("s10 report sent to Telegram", bool(reports) and "итоги за сутки отправлены" in out, out[-1500:])
     check("s10 restarted", "магазин перезапущен и отвечает" in out)
     check("s10 cleanup", "освобождено" in out)
+    check("s10 back from a payment key changes nothing", "назад — ничего не поменялось" in out
+          and (d / ".env").read_text() == env_before and not (d / ".env.menu").exists())
+    check("s10 back from update and address: nothing ran", "только пересобираю" not in out and "Скачиваю" not in out
+          and "Как магазин будет доступен" not in out and "Что поменять?" in out)
 
 
 def s6_uninstall_restores_caddyfile(d: Path, cf: Path):

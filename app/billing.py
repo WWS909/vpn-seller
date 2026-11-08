@@ -51,6 +51,10 @@ def device_cost(db: Session, days: float, qty: int = 1) -> float:
 
 
 def traffic_packs(db: Session) -> list[dict]:
+    """Extra gigabytes for plans with a traffic limit. A feature the owner
+    turns on (traffic_topup); off, nothing is offered or sold."""
+    if core.get(db, "traffic_topup") != "1":
+        return []
     packs = core.get_json(db, "traffic_packs", [])
     out = []
     for row in packs if isinstance(packs, list) else []:

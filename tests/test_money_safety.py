@@ -343,7 +343,8 @@ def test_second_charge_while_the_order_waits_for_servers_is_given_back(client, a
 def test_traffic_job_does_not_undo_a_pack_bought_meanwhile(client, admin, db, server, monkeypatch):
     """The traffic job blocks somebody over the limit; at that moment they
     buy more. The job must push what is true now, not its old copy."""
-    from app import access, billing
+    from app import access, billing, core
+    core.put(db, "traffic_topup", "1")            # extra traffic is a feature the owner turns on
     from app.config import settings as env
     from app.db import SessionLocal
     from app.models import GB, Plan, Transaction

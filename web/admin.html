@@ -229,6 +229,12 @@ ol.how .keybox{margin-top:6px}
 .btn.ghost{background:var(--surface2);border:1px solid var(--brd);color:var(--txt)}
 .btn.ghost:hover{background:var(--surface3);filter:none}
 .btn.sm{padding:6px 10px;font-size:12px}
+.chrow{display:flex;gap:10px;align-items:flex-start;padding-top:4px}
+.chrow .chn{width:22px;height:22px;flex:none;border-radius:50%;background:var(--surface2);border:1px solid var(--brd);
+  display:grid;place-items:center;font-size:11px;color:var(--muted);margin-top:26px}
+.iconbtn{flex:none;width:34px;height:34px;margin-top:22px;border-radius:9px;border:1px solid var(--brd);background:transparent;
+  color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.iconbtn:hover{color:var(--danger);border-color:var(--danger)}
 .btn.danger{background:var(--danger-weak);color:var(--danger)}
 .btn.danger:hover{background:var(--danger);color:#fff;filter:none}
 .btn.ok{background:var(--ok-weak);color:var(--ok)}
@@ -396,6 +402,11 @@ a.alert{color:var(--txt);text-decoration:none}a.alert:hover{border-color:var(--a
 .area .gl{stroke:var(--brd);stroke-width:1;stroke-dasharray:3 5;vector-effect:non-scaling-stroke}
 .area .pt{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:var(--accent);
   box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
+.area.ghost svg,.area.ghost .pt,.ghostwrap .donut{opacity:.32;filter:grayscale(.6)}
+.ghostwrap{position:relative}.ghostwrap .mid{visibility:hidden}
+.ghostwrap .ghostnote{position:static;display:block;margin-top:14px;text-align:left;padding:0;font-weight:400;color:var(--muted);text-shadow:none}
+.ghostnote{position:absolute;inset:0;display:grid;place-items:center;text-align:center;z-index:2;padding:0 20px;
+  font-size:13px;color:var(--txt);font-weight:500;text-shadow:0 1px 8px var(--bg)}
 .area .hits{position:absolute;inset:0;display:flex}.area .hits span{flex:1}
 .area .hits span:hover{background:linear-gradient(transparent,color-mix(in srgb,var(--accent) 10%,transparent))}
 .donut{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
@@ -761,7 +772,7 @@ ru: {
   chTrial:"Только для пробного периода", chAll:"Для всего сервиса", chId:"Канал", chIdHint:"@username или ID вида -1001234567890",
   chLink:"Ссылка-приглашение", chLinkHint:"для приватного канала; для публичного не нужна",
   chAdminHint:"Добавьте бота в администраторы канала — иначе Telegram не покажет, кто подписан. Если сменили тип канала (публичный ↔ приватный), привяжите его заново.",
-  chCheck:"Сохранить и проверить", chOk:"Работает: «{t}»",
+  chCheck:"Сохранить и проверить", chOk:"Работает: «{t}»", chAdd:"Добавить канал", chEmpty:"Каналов нет — нажмите «Добавить канал». Если каналов несколько, человек должен подписаться на каждый.", chCountN:"каналов: {n}",
   brandT:"Название", brandReset:"Сбросить название и логотип", brandResetQ:"Вернуть стандартное название и щит вместо логотипа?",
   fontT:"Шрифт", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
   linksT:"Свои кнопки", linksSub:"в профиле клиента, до 6", linkAdd:"Добавить кнопку", linkRu:"Текст (RU)", linkEn:"Текст (EN)",
@@ -889,7 +900,8 @@ ru: {
   kAvg:"средний чек", kTrafficAll:"трафик клиентов", kTrialConv:"пробный → оплата", kChurn:"отток за 30 дней", kActiveShort:"активных",
   dNew:"новое", todayN:"сегодня {m}", recentSales:"Последние продажи", allOrders:"все заказы", noSales:"Продаж пока нет",
   otherPlans:"Другие", saleDev:"+{n} устр.", saleGb:"+{n} ГБ", saleGift:"подарок · {p}", saleDevs:"{n} устр.", down:"не работает", newToday:"+{n} сегодня",
-  revenue:"Выручка по дням", last30:"30 дней", byPlan:"Активные по тарифам", noActive:"Активных подписок пока нет",
+  revenue:"Выручка по дням", last30:"30 дней", byPlan:"Активные по тарифам", noActive:"После первых покупок здесь будет разбивка по тарифам",
+  ghostRevenue:"Здесь появится выручка по дням — после первой продажи", ghostPlan:"{n} мес.",
   health:"Серверы", noServers:"Серверов нет — продавать нечего. Добавьте панель 3x-ui, Marzban или Remnawave.", addServer:"Добавить сервер",
   stuck:"{n} заказ(ов) оплачены, но доступ ещё не выдан — сервис повторит сам, либо выдайте вручную в «Заказах».",
   syncErr:"{n} клиент(ов) не удалось обновить на части серверов — повторяется автоматически.",
@@ -965,6 +977,7 @@ ru: {
   bypassPacks:"Пакеты ГБ обхода белых списков", bypassPacksHint:"По строке: гигабайты и цена, например «10 150». Пусто — не продаются (только то, что в тарифе).",
   byUsed:"Обход белых списков", bySet:"Задать ГБ обхода", bySetQ:"Сколько ГБ обхода оставить клиенту с этого момента? 0 — отключить.",
   stPrices:"Цены", devicePrice:"Цена доп. устройства в месяц", maxDevices:"Максимум устройств",
+  tpOn:"Докупка трафика", tpOnHint:"Для тарифов с лимитом трафика: клиент может докупить гигабайты пакетами ниже. Выключено — когда трафик кончился, клиенту предлагается продлить подписку.",
   packs:"Пакеты трафика", packsHint:"По строке на пакет: «ГБ цена», например «50 299». Показываются только при тарифе с лимитом.",
   starsRate:"Курс Stars", starsRateHint:"Сколько единиц валюты стоит одна звезда. Цена в звёздах округляется вверх.",
   stBehavior:"Поведение", requireHwid:"Требовать ID устройства",
@@ -1202,7 +1215,7 @@ en: {
   chTrial:"Only for the free trial", chAll:"The whole service", chId:"Channel", chIdHint:"@username or an ID like -1001234567890",
   chLink:"Invite link", chLinkHint:"for a private channel; not needed for a public one",
   chAdminHint:"Make the bot an administrator of the channel — otherwise Telegram does not tell who is subscribed. If you changed the channel type (public ↔ private), bind it again.",
-  chCheck:"Save and check", chOk:"Works: “{t}”",
+  chCheck:"Save and check", chOk:"Works: “{t}”", chAdd:"Add a channel", chEmpty:"No channels — press Add a channel. With several, a person must join each of them.", chCountN:"channels: {n}",
   brandT:"Name", brandReset:"Reset name and logo", brandResetQ:"Restore the standard name and the shield instead of the logo?",
   fontT:"Font", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
   linksT:"Own buttons", linksSub:"in the customer's profile, up to 6", linkAdd:"Add a button", linkRu:"Text (RU)", linkEn:"Text (EN)",
@@ -1330,7 +1343,8 @@ en: {
   kAvg:"average order", kTrafficAll:"client traffic", kTrialConv:"trial → paid", kChurn:"churn, 30 days", kActiveShort:"active",
   dNew:"new", todayN:"today {m}", recentSales:"Recent sales", allOrders:"all orders", noSales:"No sales yet",
   otherPlans:"Other", saleDev:"+{n} devices", saleGb:"+{n} GB", saleGift:"gift · {p}", saleDevs:"{n} devices", down:"down", newToday:"+{n} today",
-  revenue:"Revenue by day", last30:"30 days", byPlan:"Active by plan", noActive:"No active subscriptions yet",
+  revenue:"Revenue by day", last30:"30 days", byPlan:"Active by plan", noActive:"After the first purchases the split by plan appears here",
+  ghostRevenue:"Revenue by day appears here after the first sale", ghostPlan:"{n} mo",
   health:"Servers", noServers:"No servers — nothing to sell. Add a 3x-ui, Marzban or Remnawave panel.", addServer:"Add server",
   stuck:"{n} order(s) are paid but access is not granted yet — it retries by itself, or grant manually in Orders.",
   syncErr:"{n} client(s) could not be updated on some servers — retried automatically.",
@@ -1406,6 +1420,7 @@ en: {
   bypassPacks:"Whitelist-bypass GB packs", bypassPacksHint:"One per line: gigabytes and price, e.g. “10 150”. Empty — not sold (only what plans include).",
   byUsed:"Whitelist bypass", bySet:"Set bypass GB", bySetQ:"How many bypass GB should the customer have from now on? 0 — turn off.",
   stPrices:"Prices", devicePrice:"Extra device price a month", maxDevices:"Max devices",
+  tpOn:"Traffic top-ups", tpOnHint:"For plans with a traffic limit: customers can buy extra gigabytes in the packs below. Off — when the traffic runs out, they are offered a renewal.",
   packs:"Traffic packs", packsHint:"One pack per line: “GB price”, e.g. “50 299”. Shown only on plans with a limit.",
   starsRate:"Stars rate", starsRateHint:"How many currency units one Star is worth. Star prices round up.",
   stBehavior:"Behaviour", requireHwid:"Require a device ID",
@@ -1719,7 +1734,8 @@ async function pDash(){
       </div>
       <div class="card"><h3>${esc(t("byPlan"))}</h3>
         ${d.plans.length ? donut(d.plans.sort((a, b) => b.count - a.count), totalPlans)
-          : `<div class="empty" style="padding:24px">${esc(t("noActive"))}</div>`}
+          : `<div class="ghostwrap">${donut([{ name:t("ghostPlan", { n:1 }), count:5 }, { name:t("ghostPlan", { n:3 }), count:3 },
+              { name:t("ghostPlan", { n:12 }), count:2 }], 10)}<div class="ghostnote">${esc(t("noActive"))}</div></div>`}
       </div>
     </div>
     <div class="grid dash-b" style="margin-top:14px">
@@ -1739,6 +1755,9 @@ async function pDash(){
 /* Revenue by day as a smooth area: the line, a soft fill under it, a dot on
    the last day; every day can be hovered for its sum. */
 function areaChart(days){
+  // No sales yet: a pale sample curve with a note, so the card shows what will be there.
+  const empty = !days.some(x => x.amount > 0);
+  if (empty) days = days.map((x, i) => ({ day:x.day, amount:40 + 28 * Math.sin(i / 3.1) + 18 * Math.sin(i / 1.7 + 1) + i * 2.2 }));
   const W = 600, H = 190, P = 6, n = days.length, max = Math.max(1, ...days.map(x => x.amount));
   const X = i => P + i * (W - 2 * P) / Math.max(1, n - 1), Y = v => H - P - v / max * (H - 2 * P - 10);
   const pts = days.map((x, i) => [X(i), Y(x.amount)]);
@@ -1749,14 +1768,14 @@ function areaChart(days){
   }
   const area = `${line} L${pts[n - 1][0]},${H} L${pts[0][0]},${H} Z`;
   const last = pts[n - 1];
-  return `<div class="area"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${esc(t("revenue"))}">
+  return `<div class="area${empty ? " ghost" : ""}">${empty ? `<div class="ghostnote">${esc(t("ghostRevenue"))}</div>` : ""}<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${esc(t("revenue"))}">
       <defs><linearGradient id="arF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".34"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
       ${[0.25, 0.5, 0.75].map(f => `<line x1="0" x2="${W}" y1="${(H * f).toFixed(1)}" y2="${(H * f).toFixed(1)}" class="gl"/>`).join("")}
       <path d="${area}" fill="url(#arF)"/>
       <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.4" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
     </svg>
     <i class="pt" style="left:${(last[0] / W * 100).toFixed(2)}%;top:${(last[1] / H * 100).toFixed(2)}%"></i>
-    <div class="hits">${days.map(x => `<span title="${esc(x.day)}: ${esc(money(x.amount))}"></span>`).join("")}</div></div>
+    ${empty ? "" : `<div class="hits">${days.map(x => `<span title="${esc(x.day)}: ${esc(money(x.amount))}"></span>`).join("")}</div>`}</div>
     <div class="chart-x"><span>${esc(days[0].day.slice(5))}</span><span>${esc(days[Math.floor(n / 2)].day.slice(5))}</span><span>${esc(days[n - 1].day.slice(5))}</span></div>`;
 }
 /* Active subscriptions by plan: a ring with the total in the middle. */
@@ -2874,18 +2893,20 @@ async function pSettings(){
       <div class="three">${f("device_price", t("devicePrice"), "", "number", 'min="0" step="0.01"')}
         ${f("max_devices", t("maxDevices"), "", "number", 'min="1"')}
         ${f("stars_rate", t("starsRate"), t("starsRateHint"), "number", 'min="0.0001" step="0.0001"')}</div>
-      <div class="field"><label>${esc(t("packs"))}</label><textarea id="packs" class="mono">${esc(packs.map(p => p.join(" ")).join("\n"))}</textarea>
+      ${sw("traffic_topup", t("tpOn"), t("tpOnHint"))}
+      <div class="field" style="margin-top:10px"><label>${esc(t("packs"))}</label><textarea id="packs" class="mono">${esc(packs.map(p => p.join(" ")).join("\n"))}</textarea>
         <div class="hint">${esc(t("packsHint"))}</div></div>
       <div class="field"><label>${esc(t("bypassPacks"))}</label><textarea id="bpacks" class="mono">${esc(bpacks.map(p => p.join(" ")).join("\n"))}</textarea>
         <div class="hint">${esc(t("bypassPacksHint"))}</div></div>
     </div>
-    <div class="card"><h3>${esc(t("chT"))}<span class="mini">${esc(v.channel_title || t("chNone"))}</span></h3>
+    <div class="card"><h3>${esc(t("chT"))}<span class="mini" id="chCount"></span></h3>
       <div class="field"><label>${esc(t("chMode"))}</label><select data-k="channel_mode">${[["off", "chOff"], ["trial", "chTrial"], ["all", "chAll"]].map(([k, l]) =>
         `<option value="${k}" ${v.channel_mode === k ? "selected" : ""}>${esc(t(l))}</option>`).join("")}</select></div>
-      <div class="two">${f("channel_id", t("chId"), t("chIdHint"))}${f("channel_link", t("chLink"), t("chLinkHint"))}</div>
+      <div id="chRows"></div>
+      <button class="btn ghost sm" id="chAdd" onclick="chAdd()" style="margin-bottom:12px">${ic("i-plus", "xs")}${esc(t("chAdd"))}</button>
       <div class="hint" style="margin-bottom:10px">${esc(t("chAdminHint"))}</div>
       <button class="btn ghost sm" onclick="checkChannel(this)">${ic("i-check2", "xs")}${esc(t("chCheck"))}</button>
-      <span id="chRes" class="usub" style="margin-left:8px"></span></div>
+      <div id="chRes" class="usub" style="margin-top:8px"></div></div>
     <div class="card"><h3>${esc(t("bkT"))}<span class="mini" id="bkLast"></span></h3>
       ${sw("backup_enabled", t("bkOn"), t("bkOnHint"))}
       <div style="margin-top:10px">${f("backup_hour", t("bkHour"), t("bkHourHint"), "number", 'min="0" max="23"')}</div>
@@ -2949,7 +2970,7 @@ async function pSettings(){
       ${e.nalog.on ? `<button class="btn ghost sm" onclick="checkNalog(this)">${ic("i-check2", "xs")}${esc(t("rcCheck"))}</button>
         <span id="rcRes" class="usub" style="margin-left:8px"></span>` : ""}
     </div></div></div>`;
-  APPS_ALL = d.apps || []; drawApps(); loadBackups(); loadBlacklist();
+  APPS_ALL = d.apps || []; drawApps(); chLoad(v); loadBackups(); loadBlacklist();
 }
 async function loadBlacklist(){
   let d; try { d = await api("/blacklist"); } catch (e){ return; }
@@ -3025,6 +3046,7 @@ async function saveSettings(){
     (labels[m] = labels[m] || {})[part] = el.value.trim();
   });
   body.pay_labels = JSON.stringify(labels);
+  if ($("chRows")) chBody(body);
   try { await api("/settings", { method:"POST", body }); toast(t("saved")); loadBrand(); }
   catch (e){ fail(e); }
 }
@@ -3059,13 +3081,52 @@ async function downloadBackup(name, btn){
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   } catch (e){ fail(e); } finally { btn.disabled = false; }
 }
+/* ---- mandatory channels: one or several (up to 5), each with an optional invite link */
+let CHANNELS = [];
+function chLoad(v){
+  try { CHANNELS = JSON.parse(v.channels_json || "null"); } catch (x) { CHANNELS = null; }
+  if (!Array.isArray(CHANNELS)) CHANNELS = v.channel_id ? [{ id:v.channel_id, link:v.channel_link || "", title:v.channel_title || "" }] : [];
+  chDraw();
+}
+function chRead(){
+  document.querySelectorAll("#chRows .chrow").forEach((r, i) => {
+    if (!CHANNELS[i]) return;
+    CHANNELS[i].id = r.querySelector(".chid").value.trim();
+    CHANNELS[i].link = r.querySelector(".chlink").value.trim();
+  });
+}
+function chDraw(){
+  if (!$("chRows")) return;
+  $("chRows").innerHTML = CHANNELS.map((c, i) => `<div class="chrow">
+      <div class="chn">${i + 1}</div>
+      <div class="two" style="flex:1">
+        <div class="field"><label>${esc(t("chId"))}${c.title ? ` · <span style="color:var(--txt)">${esc(c.title)}</span>` : ""}</label>
+          <input class="chid" value="${esc(c.id)}" placeholder="@channel" oninput="chRead()"></div>
+        <div class="field"><label>${esc(t("chLink"))}</label>
+          <input class="chlink" value="${esc(c.link)}" placeholder="https://t.me/+…" oninput="chRead()"></div>
+      </div>
+      <button class="iconbtn" onclick="chDel(${i})" aria-label="${esc(t("delete"))}" title="${esc(t("delete"))}">${ic("i-trash", "xs")}</button>
+    </div>`).join("") || `<div class="hint" style="margin:0 0 12px">${esc(t("chEmpty"))}</div>`;
+  $("chAdd").hidden = CHANNELS.length >= 5;
+  $("chCount").textContent = CHANNELS.length ? t("chCountN", { n:CHANNELS.length }) : t("chNone");
+}
+function chAdd(){ chRead(); CHANNELS.push({ id:"", link:"", title:"" }); chDraw(); const r = document.querySelectorAll("#chRows .chid"); r[r.length - 1].focus(); }
+function chDel(i){ chRead(); CHANNELS.splice(i, 1); chDraw(); }
+function chBody(body){
+  chRead();
+  body.channels_json = JSON.stringify(CHANNELS.filter(c => c.id).map(c => ({ id:c.id, link:c.link, title:c.title || "" })));
+  body.channel_id = ""; body.channel_link = ""; body.channel_title = "";     // the older single field
+}
 async function checkChannel(btn){
   btn.disabled = true;
   try {
     await saveSettingsQuiet();
     const r = await api("/channel/check", { method:"POST" });
-    $("chRes").textContent = r.ok ? t("chOk", { t:r.title }) : r.error;
-    $("chRes").style.color = r.ok ? "var(--ok)" : "var(--danger)";
+    const list = r.channels || [];
+    list.forEach((x, i) => { if (CHANNELS[i] && x.title) CHANNELS[i].title = x.title; if (CHANNELS[i] && !CHANNELS[i].link && x.link) CHANNELS[i].link = x.link; });
+    chDraw();
+    $("chRes").innerHTML = list.length ? list.map(x => `<div style="color:${x.ok ? "var(--ok)" : "var(--danger)"}">${x.ok ? "✓" : "✗"} ${esc(x.id)} — ${esc(x.ok ? t("chOk", { t:x.title }) : x.error)}</div>`).join("")
+      : `<div style="color:var(--danger)">${esc(r.error || t("chNone"))}</div>`;
   } catch (e){ fail(e); } finally { btn.disabled = false; }
 }
 async function saveSettingsQuiet(){
@@ -3073,6 +3134,7 @@ async function saveSettingsQuiet(){
   document.querySelectorAll("[data-k]").forEach(el => body[el.dataset.k] = el.value);
   document.querySelectorAll("[data-sw]").forEach(el => body[el.dataset.sw] = el.classList.contains("on") ? "1" : "0");
   delete body.traffic_packs; delete body.bypass_packs;
+  if ($("chRows")) chBody(body);
   await api("/settings", { method:"POST", body });
 }
 async function setupBot(btn){

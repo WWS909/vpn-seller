@@ -83,9 +83,6 @@ rule() { printf '  %s%s%s\n' "$D" "───────────────
 banner() {
   [ -t 1 ] && [ -z "${NO_CLEAR:-}" ] && printf '\e[2J\e[H'
   local c1=$A c2=$A c3=$A c4=$A c5=$A c6=$A
-  if [ -n "$A" ]; then                                 # amber to orange, top to bottom
-    c1=$'\e[38;5;222m' c2=$'\e[38;5;221m' c3=$'\e[38;5;220m' c4=$'\e[38;5;214m' c5=$'\e[38;5;208m' c6=$'\e[38;5;202m'
-  fi
   printf '\n'
   printf '%s   ██╗   ██╗██████╗ ███╗   ██╗%s\n' "$c1" "$N"
   printf '%s   ██║   ██║██╔══██╗████╗  ██║%s\n' "$c2" "$N"
@@ -377,9 +374,17 @@ q_address() {
   if [ -z "$ADDR" ]; then
     if [ -n "$DOMAIN" ]; then ADDR=domain
     else
-      choose ADDR \
-        1 "$(t "У меня есть домен" "I have a domain")" "$(t "постоянный адрес — для настоящих продаж" "a permanent address — for real sales")" \
-        2 "$(t "Домена пока нет" "No domain yet")" "$(t "временный адрес Cloudflare — чтобы попробовать; домен подключите потом" "a temporary Cloudflare address to try it out; add a domain later")"
+      if [ "${ADDR_BACK:-0}" = 1 ]; then                # from the menu: a way back
+        choose ADDR \
+          1 "$(t "У меня есть домен" "I have a domain")" "$(t "постоянный адрес — для настоящих продаж" "a permanent address — for real sales")" \
+          2 "$(t "Домена пока нет" "No domain yet")" "$(t "временный адрес Cloudflare — чтобы попробовать; домен подключите потом" "a temporary Cloudflare address to try it out; add a domain later")" \
+          0 "$(t "Назад" "Back")" ""
+      else
+        choose ADDR \
+          1 "$(t "У меня есть домен" "I have a domain")" "$(t "постоянный адрес — для настоящих продаж" "a permanent address — for real sales")" \
+          2 "$(t "Домена пока нет" "No domain yet")" "$(t "временный адрес Cloudflare — чтобы попробовать; домен подключите потом" "a temporary Cloudflare address to try it out; add a domain later")"
+      fi
+      [ "$ADDR" = 0 ] && return
       [ "$ADDR" = 1 ] && ADDR=domain || ADDR=tunnel
     fi
   fi
@@ -864,7 +869,8 @@ cmd_address() {  # switch domain <-> tunnel, or change the domain
   load_env
   local old_mode=$MODE old_ctr=$PROXY_CTR old_cfg=$CADDY_CFG old_file=$CADDY_HOSTFILE
   ADDR="" DOMAIN=""
-  q_address
+  ADDR_BACK=1 q_address
+  if [ "$ADDR" = 0 ]; then load_env; return 0; fi      # back: nothing changes
   step "·" "$(t "Как магазин будет доступен" "How the shop will be reached")"
   PROXY_CTR="" PROXY_NET="" PROXY_KIND="" PROXY_NOTE=""
   decide_mode
@@ -905,9 +911,11 @@ cmd_settings() {  # change the token, admin IDs or the password
   ok "$(t "готово" "done")"
 }
 
-ask_key() {  # ask_key ENV_NAME "Label" [secret] — keeps the old value on Enter
+ask_key() {  # ask_key ENV_NAME "Label" [secret] — keeps the old value on Enter; 0 — back
   local key=$1 label=$2 cur v bad
+  [ "${KEY_CANCEL:-0}" = 1 ] && return 0              # already went back: ask nothing more
   cur=$(get_env "$key")
+  label="$label $(t "(0 — назад)" "(0 — back)")"
   bad=$(printf '[[:space:]$"\\\\%s%s]' "'" '`')
   while :; do
     if [ "${3:-}" = secret ]; then
@@ -915,6 +923,7 @@ ask_key() {  # ask_key ENV_NAME "Label" [secret] — keeps the old value on Ente
     else
       ask v "$label" "$cur"
     fi
+    if [ "$v" = 0 ]; then KEY_CANCEL=1; return 0; fi
     v=${v:-$cur}
     if [ -z "$v" ]; then warn "$(t "нужно заполнить" "required")"; continue; fi
     if [[ "$v" =~ $bad ]]; then warn "$(t "в ключе не бывает пробелов, кавычек и \$ — скопируйте ещё раз" "keys have no spaces, quotes or \$ — copy it again")"; continue; fi
@@ -954,6 +963,9 @@ cmd_payments() {  # payment gateways: asked like the install, written to .env
     6 "$(t "Выключить оплату картой" "Turn card payments off")" "" \
     7 "$(t "Stars: включить / выключить" "Stars: on / off")" "" \
     0 "$(t "Назад" "Back")" ""
+  [ "$c" = 0 ] && return 0
+  KEY_CANCEL=0
+  (umask 077; cp -p "$DIR/.env" "$DIR/.env.menu")
   case "$c" in
     1) ask_key CRYPTOBOT_TOKEN "$(t "Токен Crypto Pay" "Crypto Pay token")" secret
        hint "$(t "В @CryptoBot → Crypto Pay → ваше приложение → Webhooks включите и вставьте:" "In @CryptoBot → Crypto Pay → your app → Webhooks, enable and paste:")"
@@ -993,11 +1005,12 @@ cmd_payments() {  # payment gateways: asked like the install, written to .env
     11) hint "$(t "ИНН и пароль — те же, что для входа на lknpd.nalog.ru. Если в пароле есть пробел, кавычки или \$, смените его там на пароль без них." "The INN and password you use on lknpd.nalog.ru. If the password has spaces, quotes or \$, change it there first.")"
        local inn
        while :; do
-         ask inn "$(t "ИНН (12 цифр)" "INN (12 digits)")" "$(get_env NALOG_INN)"
+         ask inn "$(t "ИНН (12 цифр, 0 — назад)" "INN (12 digits, 0 — back)")" "$(get_env NALOG_INN)"
+         [ "$inn" = 0 ] && { KEY_CANCEL=1; break; }
          [[ "$inn" =~ ^[0-9]{12}$ ]] && break
          warn "$(t "ИНН самозанятого — ровно 12 цифр" "a personal INN is exactly 12 digits")"
        done
-       set_env NALOG_INN "$inn"
+       [ "${KEY_CANCEL:-0}" = 1 ] || set_env NALOG_INN "$inn"
        ask_key NALOG_PASSWORD "$(t "Пароль от «Мой налог»" "«Мой налог» password")" secret
        hint "$(t "Чеки создаются для оплат через FreeKassa, Platega, Pally, Lava и WATA. ЮKassa для самозанятых отправляет чеки сама. Проверить вход: админка → Настройки → «Чеки «Мой налог»»." "Receipts are made for FreeKassa, Platega, Pally, Lava and WATA payments (YooKassa sends its own). Check: admin → Settings.")" ;;
     12) set_env NALOG_INN ""; set_env NALOG_PASSWORD "" ;;
@@ -1033,8 +1046,14 @@ cmd_payments() {  # payment gateways: asked like the install, written to .env
        say "    $base/api/pay/lavepay" ;;
     6) set_env CARD_GATEWAY "" ;;
     7) if [ "$(get_env STARS_ENABLED)" = false ]; then set_env STARS_ENABLED true; else set_env STARS_ENABLED false; fi ;;
-    *) return 0 ;;
+    *) rm -f "$DIR/.env.menu"; return 0 ;;
   esac
+  if [ "$KEY_CANCEL" = 1 ]; then
+    mv -f "$DIR/.env.menu" "$DIR/.env"
+    info "$(t "назад — ничего не поменялось" "back — nothing changed")"
+    return 0
+  fi
+  rm -f "$DIR/.env.menu"
   spin "$(t "Перезапускаю магазин с новыми настройками" "Restarting with the new settings")" compose up -d --force-recreate app \
     && spin "$(t "Жду ответа" "Waiting")" wait_app \
     && ok "$(t "готово — проверьте оплату в мини-приложении; кассы настраиваются и в админке → «Оплата»" "done — try a payment in the mini app; gateways are also set up in admin → Payments")" \
@@ -1319,16 +1338,17 @@ menu() {
         15 "$(t "Удалить" "Uninstall")" "" \
         0 "$(t "Выход" "Exit")" ""
       case "$c" in
-        1) cmd_update ;; 2) cmd_status ;;
+        1) menu_sure "$(t "Обновить магазин сейчас? Сначала будет копия базы, перерыв 1–2 минуты." "Update the shop now? A backup comes first, 1–2 minutes of downtime.")" && cmd_update ;;
+        2) cmd_status ;;
         3) trap ':' INT; compose logs -f --tail 100 app || true; trap_int ;;
-        4) menu_restart ;;
+        4) menu_sure "$(t "Перезапустить магазин? Перерыв — несколько секунд." "Restart the shop? A few seconds of downtime.")" && menu_restart ;;
         5) compose exec -T -u app app python -m app.backup make; ok "$(t "архив в $DIR/data/backups" "archive in $DIR/data/backups")" ;;
         6) menu_restore ;;
         7) menu_report ;;
         8) cmd_payments ;; 9) cmd_address ;; 10) cmd_settings ;;
         11) menu_auto ;;
         12) menu_news ;;
-        13) menu_clean ;;
+        13) menu_sure "$(t "Удалить старые образы Docker и копии базы старше 30 дней?" "Remove old Docker images and backups older than 30 days?")" && menu_clean ;;
         14) if [ "$UI" = ru ]; then UI=en; else UI=ru; fi; continue ;;
         15) cmd_uninstall; installed || return 0 ;;
         0) printf '\n'; return 0 ;;
@@ -1383,6 +1403,13 @@ menu_head() {
   head_line "$(t "папка" "folder")" "$DIR"
 }
 
+# "Go ahead?" with Back as the answer on Enter — every menu item can be left.
+menu_sure() {
+  local _c
+  choose _c 1 "$(t "Да" "Yes")" "$1" 0 "$(t "Назад" "Back")" ""
+  [ "$_c" = 1 ]
+}
+
 menu_restart() {
   if spin "$(t "Перезапускаю магазин" "Restarting the shop")" compose restart app \
      && spin "$(t "Жду ответа" "Waiting for an answer")" wait_app; then
@@ -1427,7 +1454,7 @@ menu_auto() {
     [ -f "$DIR/data/updater.json" ] || return 0
   fi
   if [ "$M_AUTO" = 1 ]; then
-    confirm "$(t "Выключить автообновление?" "Turn the auto-update off?")" y || return 0
+    menu_sure "$(t "Выключить автообновление?" "Turn the auto-update off?")" || return 0
     compose exec -T -u app app python -m app.cli auto-update off >/dev/null 2>&1 \
       && ok "$(t "автообновление выключено — новые версии ставятся кнопкой" "auto-update off — new versions are installed with the button")" \
       || warn "$(t "магазин не ответил" "the shop did not answer")"
@@ -1435,6 +1462,7 @@ menu_auto() {
   fi
   hint "$(t "Ночью, в выбранный час, магазин сам поставит новую версию (с копией базы и откатом, если не запустится)." \
             "At the chosen hour the shop installs a new version itself (with a backup, and a rollback if it does not start).")"
+  menu_sure "$(t "Включить автообновление?" "Turn the auto-update on?")" || return 0
   hint "$(t "Сейчас на сервере" "Server time now") $(date +%H:%M)"
   while :; do
     ask h "$(t "Час (0–23)" "Hour (0–23)")" "${M_HOUR:-1}"

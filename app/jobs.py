@@ -93,7 +93,8 @@ def job_traffic(db: Session) -> None:
     for tg_id in res.get("over", []):
         user = db.query(User).filter(User.tg_id == tg_id).first()
         if user and not user.bot_blocked:
-            notify.send_safe(db, user, core.t(user.lang or "ru", "traffic_out"))
+            key = "traffic_out" if core.get(db, "traffic_topup") == "1" else "traffic_out_renew"
+            notify.send_safe(db, user, core.t(user.lang or "ru", key))
 
 
 def job_retry_paid(db: Session) -> None:
