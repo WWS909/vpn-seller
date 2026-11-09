@@ -3,6 +3,20 @@
 Each version is a `## X.Y.Z — date` heading with one change per "-" line.
 The shop reads this file to tell the owner what is new.
 
+## 1.7.0 — 2026-11-09
+- The look constructor is rebuilt around two main parts: Home screen and Style. The Pass, Poster and Tiles layouts of 1.6.0 are gone (shops that chose them get Classic back).
+- Three new home screens: Answer (“Works until Dec 26”, one button and a short list), Term (a calendar to the end of the subscription with renewal right there) and Devices (connected devices, free places, “Connect one more”). The words and the main button change when the subscription is ending, has ended or the traffic is used up.
+- A new Clean style: light like Telegram’s lists, dark when Telegram is dark; the shop’s colour only on buttons. Choosing it sets the heading font to Golos.
+- A new font: Golos (one face for headings and text).
+- Devices get their own drawing: a phone, a laptop or a TV — from what the VPN app reports.
+- Lines like “iOS 18 · Happ · today” now use commas; “Total for 1 year” instead of “Total · 1 year”.
+- The “Connect a device” sheet in the Clean style: “Phone and computer / TV” is a segmented switch like on an iPhone; “Reset the link” is a quiet button, not a second big one.
+- On the new home screens someone without a subscription is offered the free trial, when the shop has one.
+- The panel’s preview shows two more states: Ending and Ended.
+- Fixed: the older single “channel” field works again when it is set on its own after the channel list was saved.
+- Three more styles: Soft (after Material, like Android: surfaces tinted with your colour, pill buttons, a pill behind the chosen tab), Brand (your colour across the top like a bank’s app; Telegram paints its header the same) and Large (larger text, high contrast, big buttons and clear outlines — easy to read). All work with any home screen, light and dark.
+- A Cosmos style, like VPN sites: a night ground lit by your colour, glass cards with a thin coloured edge, large gradient prices, the main button in a gradient to pink, pill captions with a lit dot. The best-value plan wears a “Best choice” ribbon. There is a light version.
+
 ## 1.6.0 — 2026-11-09
 - Screen layout — the new main setting of the look. Besides Classic there are four layouts that change how the screens are built, not the colour: Like Telegram (lists and the system font), Pass (the subscription is a card with a date, a tear-off line and a barcode), Poster (a colour block and very large type) and Tiles (colour squares like a phone's home screen).
 - The new layouts have no caps labels over headings, no dots after titles and no glow; they bring their own background and cards.

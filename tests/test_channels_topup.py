@@ -134,3 +134,14 @@ def test_traffic_out_texts_follow_the_switch(client, db):
     finally:
         access.collect_traffic = original
     assert u.id
+
+
+def test_the_single_channel_field_still_works_after_the_list_was_saved(client, admin, db):
+    from app import channel
+    assert client.post("/api/admin/settings", headers=admin, json={"channels_json": "[]"}).status_code == 200
+    assert channel.channels(db) == []
+    r = client.post("/api/admin/settings", headers=admin, json={"channel_id": "@orbit_news", "channel_mode": "all"})
+    assert r.status_code == 200
+    db.expire_all()
+    import time; time.sleep(3.2)
+    assert [c["id"] for c in channel.channels(db)] == ["@orbit_news"]

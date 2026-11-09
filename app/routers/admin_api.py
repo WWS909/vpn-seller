@@ -1500,7 +1500,7 @@ def save_settings(data: dict, db: Session = Depends(get_db), admin=A):
             raise HTTPException(400, "radius: " + " | ".join(theme.RADII))
         for opt, allowed in (("backdrop", theme.BACKDROPS), ("icons", theme.ICONS),
                              ("motion", theme.MOTIONS), ("effect", theme.EFFECTS),
-                             ("cards", theme.CARDS), ("layout", theme.LAYOUTS), ("splash", ("0", "1")),
+                             ("cards", theme.CARDS), ("layout", theme.LAYOUTS), ("home", theme.HOMES), ("splash", ("0", "1")),
                              ("splash_kind", theme.SPLASHES), *theme.SPLASH_OPTS.items()):
             if key == opt and value not in allowed:
                 raise HTTPException(400, f"{opt}: " + " | ".join(allowed))
@@ -1595,6 +1595,11 @@ def save_settings(data: dict, db: Session = Depends(get_db), admin=A):
         if core.get(db, key) != value:
             core.put(db, key, value[:20000])
             changed.append(key)
+    # The older single-channel fields set on their own (scripts, an old panel
+    # page): the list gives way to them, so they count again (app/channel.py).
+    if any(k in data for k in ("channel_id", "channel_link")) and "channels_json" not in data and core.get(db, "channels_json"):
+        core.put(db, "channels_json", "")
+        changed.append("channels_json")
     bot = {}
     if any(k.startswith(("bot_about_", "bot_desc_")) for k in changed):
         bot = notify.set_descriptions(db)
@@ -1770,7 +1775,7 @@ def theme_info(db: Session = Depends(get_db), _=A):
     return {"presets": presets, "surfaces": {k: v["card"] for k, v in theme.SURFACES.items()},
             "current": theme.current(db), "logo": theme.logo_url(db),
             "look": theme.look(db),
-            "options": {"backdrop": theme.BACKDROPS, "icons": theme.ICONS, "layout": theme.LAYOUTS,
+            "options": {"backdrop": theme.BACKDROPS, "icons": theme.ICONS, "layout": theme.LAYOUTS, "home": theme.HOMES,
                         "motion": theme.MOTIONS, "effect": theme.EFFECTS,
                         "cards": theme.CARDS}}
 

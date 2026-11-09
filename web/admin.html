@@ -83,6 +83,8 @@ h1,h2,.h{font-family:var(--font-d);font-weight:500;letter-spacing:-.01em}
   border:1px solid var(--brd2);box-shadow:0 40px 90px -40px rgba(0,0,0,.9),inset 0 0 0 2px #17191d}
 .phone iframe{width:100%;height:100%;border:0;border-radius:36px;background:#000;display:block}
 .pvbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.pvbar .tabs{max-width:100%;flex-wrap:wrap;justify-content:center}
+@media (max-width:520px){.pvbar .tabs button{padding:7px 9px}}
 @media (max-width:1240px){.lookgrid{grid-template-columns:1fr}.phonecol{position:static;order:-1;margin-bottom:14px}
   .phone{height:640px}}
 .dots{display:flex;flex-wrap:wrap;gap:10px}
@@ -162,7 +164,8 @@ h1,h2,.h{font-family:var(--font-d);font-weight:500;letter-spacing:-.01em}
 .th.opt .ico.tl{border-radius:7px;color:#fff;background:var(--tl)}
 .th.opt .ico.rg{border-radius:50%;color:var(--acc);border:1.5px solid color-mix(in srgb,var(--acc) 55%,transparent);box-sizing:border-box}
 .lays{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
-.th.lay{display:block;padding:8px 8px 10px;text-align:left;align-self:stretch}
+.lays.two-l{grid-template-columns:repeat(auto-fill,minmax(112px,1fr))}
+.th.lay{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;padding:8px 8px 10px;text-align:left;align-self:stretch}
 .lay .ph{display:block;height:128px;border-radius:9px;overflow:hidden;position:relative;margin-bottom:8px;border:1px solid var(--brd);background:#0b0b0c}
 .lay .ph i{position:absolute;display:block}
 .lay b{display:block;font-size:13px}
@@ -788,7 +791,7 @@ ru: {
   chAdminHint:"Добавьте бота в администраторы канала — иначе Telegram не покажет, кто подписан. Если сменили тип канала (публичный ↔ приватный), привяжите его заново.",
   chCheck:"Сохранить и проверить", chOk:"Работает: «{t}»", chAdd:"Добавить канал", chEmpty:"Каналов нет — нажмите «Добавить канал». Если каналов несколько, человек должен подписаться на каждый.", chCountN:"каналов: {n}",
   brandT:"Название", brandReset:"Сбросить название и логотип", brandResetQ:"Вернуть стандартное название и щит вместо логотипа?",
-  layT:"Вид экрана", laySub:"как устроены экраны приложения", layClassic:"Классика", layClassicS:"тёмные карточки, крупные цифры", layTg:"Как в Telegram", layTgS:"списки и системный шрифт, как настройки Telegram", layPass:"Пропуск", layPassS:"подписка — карта с датой и штрихкодом", layPoster:"Плакат", layPosterS:"цветной блок и крупный жирный шрифт", layMetro:"Плитки", layMetroS:"цветные квадраты, как рабочий стол", layOwn:"В этом виде фон и карточки свои — эти настройки работают только в «Классике».", fontT:"Шрифт", fkSans:"Простые", fkSerif:"С засечками", fkChar:"С характером", fkFun:"Для особых оформлений", fkCustom:"Свой шрифт с Google Fonts", fCustomPh:"Название, например Lobster", fCustomHint:"Любое семейство с fonts.google.com для заголовков и цифр, текст останется в Golos. Выбирайте шрифт с кириллицей.", fCustomBad:"Такого шрифта нет на Google Fonts или в нём нет кириллицы", fCustomEmpty:"Впишите название шрифта", fOnlyApp:"только в приложении", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
+cleanFont:"Для этого стиля поставил шрифт Golos — его можно сменить ниже", hmT:"Главный экран", hmSub:"с чего начинается приложение", hmAnswer:"Ответ", hmAnswerS:"«Работает до 26 декабря», кнопка и короткий список", hmTerm:"Срок", hmTermS:"календарь до конца подписки и продление сразу", hmDevices:"Устройства", hmDevicesS:"подключённые устройства и свободные места", hmClassic:"Классика", hmClassicS:"карточка с днями и две плитки", layT:"Стиль", laySub:"фон, карточки, шрифт заголовков", layClean:"Чистый", layCleanS:"светлый, как списки Telegram; тёмный, если Telegram тёмный", layTonal:"Мягкий", layTonalS:"фон в оттенке цвета магазина, круглые кнопки — как в Android", layBrand:"Фирменный", layBrandS:"цветная шапка в цвет магазина — как в приложениях банков", layLarge:"Крупный", layLargeS:"крупный текст, контраст и большие кнопки — легко читать", layCosmos:"Космос", layCosmosS:"ночной фон с подсветкой, стеклянные карточки и цены-градиенты — как на сайтах VPN", layClassic:"Тёмная классика", layClassicS:"тёмные карточки, свои фоны и особые наборы", layOwn:"В этом стиле фон и карточки свои — эти настройки работают в «Тёмной классике».", fontT:"Шрифт", fkSans:"Простые", fkSerif:"С засечками", fkChar:"С характером", fkFun:"Для особых оформлений", fkCustom:"Свой шрифт с Google Fonts", fCustomPh:"Название, например Lobster", fCustomHint:"Любое семейство с fonts.google.com для заголовков и цифр, текст останется в Golos. Выбирайте шрифт с кириллицей.", fCustomBad:"Такого шрифта нет на Google Fonts или в нём нет кириллицы", fCustomEmpty:"Впишите название шрифта", fOnlyApp:"только в приложении", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
   linksT:"Свои кнопки", linksSub:"в профиле клиента, до 6", linkAdd:"Добавить кнопку", linkRu:"Текст (RU)", linkEn:"Текст (EN)",
   linksEmpty:"Например: «Наш канал», «Чат клиентов», «Сайт».", linkBad:"Ссылка должна начинаться с https://, tg:// или mailto:",
   exExcel:"Excel", exOrdersT:"Заказы в Excel", exOrdersHint:"Таблица для учёта и налоговой: дата, клиент, что куплено, сумма, способ оплаты. Внизу — итог.",
@@ -856,7 +859,7 @@ ru: {
   botAbout:"Короткое описание", botAboutHint:"До 120 знаков: в профиле бота и когда им делятся.",
   botDesc:"Описание", botDescHint:"До 512 знаков: «Что умеет этот бот?» в пустом чате. Пусто — как в @BotFather.",
   botTextsFail:"Сохранено, но Telegram не принял описание бота — проверьте токен", pvSplash:"Заставка", pvDone:"Покупка",
-  modeDarkS:"Тёмная", modeLightS:"Светлая", pvActive:"С подпиской", pvNew:"Новый клиент",
+  modeDarkS:"Тёмная", modeLightS:"Светлая", pvActive:"С подпиской", pvSoon:"Скоро конец", pvEnded:"Закончилась", pvNew:"Новый клиент",
   pvHint:"Это настоящее приложение: изменения видны сразу, сохранятся по кнопке «Сохранить».",
   secSales:"Продажи", secPeople:"Люди", secSystem:"Система",
   dashSub:"продажи и состояние серверов", usersSub:"все, кто открывал приложение", ordersSub:"оплаченные заказы; неоплаченные — отдельной вкладкой", oPaidTab:"оплаченные", oUnpaidTab:"не оплачены",
@@ -1231,7 +1234,7 @@ en: {
   chAdminHint:"Make the bot an administrator of the channel — otherwise Telegram does not tell who is subscribed. If you changed the channel type (public ↔ private), bind it again.",
   chCheck:"Save and check", chOk:"Works: “{t}”", chAdd:"Add a channel", chEmpty:"No channels — press Add a channel. With several, a person must join each of them.", chCountN:"channels: {n}",
   brandT:"Name", brandReset:"Reset name and logo", brandResetQ:"Restore the standard name and the shield instead of the logo?",
-  layT:"Screen layout", laySub:"how the app screens are built", layClassic:"Classic", layClassicS:"dark cards, large numbers", layTg:"Like Telegram", layTgS:"lists and the system font, like Telegram settings", layPass:"Pass", layPassS:"the subscription is a card with a date and a barcode", layPoster:"Poster", layPosterS:"a colour block and large bold type", layMetro:"Tiles", layMetroS:"colour squares, like a home screen", layOwn:"This layout has its own background and cards — these settings work only in Classic.", fontT:"Font", fkSans:"Plain", fkSerif:"Serif", fkChar:"With character", fkFun:"For special looks", fkCustom:"Your own from Google Fonts", fCustomPh:"A name, like Lobster", fCustomHint:"Any family from fonts.google.com for headings and numbers; the text stays in Golos. Pick one with Cyrillic if you sell in Russian.", fCustomBad:"No such font on Google Fonts, or it has no Cyrillic", fCustomEmpty:"Type the name of the font", fOnlyApp:"app only", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
+cleanFont:"Golos is set for this style — you can change it below", hmT:"Home screen", hmSub:"what the app opens with", hmAnswer:"Answer", hmAnswerS:"“Works until Dec 26”, a button and a short list", hmTerm:"Term", hmTermS:"a calendar to the end of the subscription, renewal right there", hmDevices:"Devices", hmDevicesS:"connected devices and free places", hmClassic:"Classic", hmClassicS:"a card with the days and two tiles", layT:"Style", laySub:"background, cards, heading font", layClean:"Clean", layCleanS:"light like Telegram’s lists; dark when Telegram is dark", layTonal:"Soft", layTonalS:"surfaces tinted with your colour, pill buttons — like Android", layBrand:"Brand", layBrandS:"your colour across the top — like a bank’s app", layLarge:"Large", layLargeS:"larger text, contrast and big buttons — easy to read", layCosmos:"Cosmos", layCosmosS:"a night ground lit by your colour, glass cards, gradient prices — like VPN sites", layClassic:"Dark classic", layClassicS:"dark cards, own backgrounds and special sets", layOwn:"This style has its own background and cards — these settings work in Dark classic.", fontT:"Font", fkSans:"Plain", fkSerif:"Serif", fkChar:"With character", fkFun:"For special looks", fkCustom:"Your own from Google Fonts", fCustomPh:"A name, like Lobster", fCustomHint:"Any family from fonts.google.com for headings and numbers; the text stays in Golos. Pick one with Cyrillic if you sell in Russian.", fCustomBad:"No such font on Google Fonts, or it has no Cyrillic", fCustomEmpty:"Type the name of the font", fOnlyApp:"app only", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
   linksT:"Own buttons", linksSub:"in the customer's profile, up to 6", linkAdd:"Add a button", linkRu:"Text (RU)", linkEn:"Text (EN)",
   linksEmpty:"For example: “Our channel”, “Customer chat”, “Website”.", linkBad:"A link must start with https://, tg:// or mailto:",
   exExcel:"Excel", exOrdersT:"Orders to Excel", exOrdersHint:"A table for bookkeeping and taxes: date, customer, what was bought, amount, payment method. A total at the bottom.",
@@ -1299,7 +1302,7 @@ en: {
   botAbout:"Short description", botAboutHint:"Up to 120 characters: in the bot's profile and when it is shared.",
   botDesc:"Description", botDescHint:"Up to 512 characters: “What can this bot do?” in an empty chat. Empty — as set in @BotFather.",
   botTextsFail:"Saved, but Telegram refused the bot texts — check the token", pvSplash:"Opening", pvDone:"Purchase",
-  modeDarkS:"Dark", modeLightS:"Light", pvActive:"Subscribed", pvNew:"New customer",
+  modeDarkS:"Dark", modeLightS:"Light", pvActive:"Subscribed", pvSoon:"Ending", pvEnded:"Ended", pvNew:"New customer",
   pvHint:"This is the real app: changes show at once and are kept with Save.",
   secSales:"Sales", secPeople:"People", secSystem:"System",
   dashSub:"sales and server health", usersSub:"everyone who opened the app", ordersSub:"paid orders; unpaid ones on their own tab", oPaidTab:"paid", oUnpaidTab:"unpaid",
@@ -3608,7 +3611,7 @@ async function pLook(){
   frameReady = false;
   LOOK = { presets:d.presets, preset:c.preset, accent:c.accent, surface:c.surface, mode:c.mode, logo:d.logo,
            fonts, font:vals.font || "unbounded", fontCustom:vals.font_custom || "", radius:vals.radius || "normal", links,
-           backdrop:lk.backdrop || "glow", icons:lk.icons || "regular", layout:lk.layout || "classic", motion:lk.motion || "lively",
+           backdrop:lk.backdrop || "glow", icons:lk.icons || "regular", layout:lk.layout || "classic", home:lk.home || "classic", motion:lk.motion || "lively",
            effect:lk.effect || "none", cards:lk.cards || "solid", splash:lk.splash !== false,
            splashKind:lk.splash_kind || "auto",
            sp:Object.assign({ mark:"logo", plate:"auto", size:"m", color:"style", bg:"app", name:"auto", speed:"normal" }, lk.splash_cfg || {}),
@@ -3617,8 +3620,11 @@ async function pLook(){
     `<button class="${LOOK[key] === k ? "on" : ""}" data-v="${k}" onclick="setLook('${key}','${k}')">${esc(t(l))}</button>`).join("")}</div>`;
   $("content").innerHTML = `
     <div class="lookgrid"><div class="lookcol">
+    <div class="card"><h3>${esc(t("hmT"))}<span class="mini">${esc(t("hmSub"))}</span></h3>
+      <div class="lays" id="homeOpts"></div>
+    </div>
     <div class="card"><h3>${esc(t("layT"))}<span class="mini">${esc(t("laySub"))}</span></h3>
-      <div class="lays" id="layOpts"></div>
+      <div class="lays two-l" id="layOpts"></div>
     </div>
     <div class="card"><h3>${esc(t("brandT"))}<span class="mini"><button class="btn ghost sm" onclick="resetBrand(this)">${esc(t("brandReset"))}</button></span></h3>
       <div class="field"><label>${esc(t("brandName"))}</label><input id="lkName" maxlength="40" value="${esc(vals.brand_name)}" oninput="pushLook();drawSplash()"></div>
@@ -3701,7 +3707,7 @@ async function pLook(){
       <div class="pvbar">
         <div class="tabs" id="pvScheme">${[["dark", "modeDarkS"], ["light", "modeLightS"]].map(([k, l], i) =>
           `<button class="${i ? "" : "on"}" data-v="${k}" onclick="pvPick('pvScheme',this);frameSay({type:'kv-scheme',value:'${k}'})">${esc(t(l))}</button>`).join("")}</div>
-        <div class="tabs" id="pvState">${[["active", "pvActive"], ["new", "pvNew"]].map(([k, l], i) =>
+        <div class="tabs" id="pvState">${[["active", "pvActive"], ["soon", "pvSoon"], ["ended", "pvEnded"], ["new", "pvNew"]].map(([k, l], i) =>
           `<button class="${i ? "" : "on"}" data-v="${k}" onclick="pvPick('pvState',this);frameSay({type:'kv-state',value:'${k}'})">${esc(t(l))}</button>`).join("")}</div>
       </div>
       <div class="hint" style="text-align:center;margin-top:8px">${esc(t("pvHint"))}</div>
@@ -3813,6 +3819,11 @@ function curColors(){
 }
 function setLook(key, v){
   LOOK[key] = v;
+  // The clean style is quiet; the wide default heading font fights it, so it
+  // starts with Golos (one face for all). Any other font chosen stays.
+  if (key === "layout" && v !== "classic" && (LOOK.font === "unbounded" || LOOK.font === "unbounded-manrope")){
+    LOOK.font = "golos"; drawFonts(); toast(t("cleanFont"));
+  }
   const box = { radius:"radTabs", motion:"motionTabs", effect:"effectTabs", cards:"cardsTabs" }[key];
   if (box) document.querySelectorAll(`#${box} button`).forEach(b => b.classList.toggle("on", b.dataset.v === v));
   drawOpts();
@@ -3843,35 +3854,74 @@ function iconSample(kind){
   const duo = kind === "duo", grad = duo ? `<defs><linearGradient id="adDuo" gradientUnits="userSpaceOnUse" x1="4" y1="3" x2="20" y2="21"><stop offset="0" stop-color="#F2FBFF"/><stop offset=".75" stop-color="currentColor"/></linearGradient></defs>` : "";
   return ICON_PATHS.map((p, i) => `<span class="ico ${kind === "badge" ? "bd" : ""} ${duo ? "duo" : ""}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="${duo ? "url(#adDuo)" : "currentColor"}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${i ? "" : grad}${p}</svg></span>`).join("");
 }
-// Small drawings of each layout: how the home screen is built, not its colours.
-function layThumb(k, hex){
-  const on = "#111";
-  if (k === "tg") return `<span class="ph" style="background:#F2F2F7"><i style="left:8px;top:10px;width:46px;height:7px;background:#000;border-radius:2px"></i>
-    <i style="left:6px;right:6px;top:24px;height:38px;background:#fff;border-radius:6px"></i><i style="left:12px;right:12px;top:48px;height:8px;background:${hex};border-radius:3px"></i>
-    <i style="left:6px;right:6px;top:68px;height:26px;background:#fff;border-radius:6px"></i><i style="left:20px;right:6px;top:81px;height:.5px;background:#C6C6C8"></i>
-    <i style="left:6px;right:6px;top:100px;height:22px;background:#fff;border-radius:6px"></i></span>`;
-  if (k === "pass") return `<span class="ph" style="background:#E8EAED"><i style="left:8px;top:10px;width:40px;height:6px;background:#15181C;border-radius:2px"></i>
-    <i style="left:6px;right:6px;top:22px;height:64px;background:${hex};border-radius:8px"></i><i style="left:12px;top:34px;width:44px;height:7px;background:${on};opacity:.85;border-radius:2px"></i>
-    <i style="left:10px;right:10px;top:66px;border-top:1.5px dashed rgba(0,0,0,.3)"></i><i style="right:12px;top:71px;width:26px;height:10px;background:repeating-linear-gradient(90deg,${on} 0 1.5px,transparent 1.5px 3px)"></i>
-    <i style="left:6px;top:92px;width:calc(50% - 9px);height:30px;border:1px solid #C9CDD3;border-radius:6px"></i><i style="right:6px;top:92px;width:calc(50% - 9px);height:30px;border:1px solid #C9CDD3;border-radius:6px"></i></span>`;
-  if (k === "poster") return `<span class="ph" style="background:#fff"><i style="left:6px;top:8px;width:58px;height:10px;background:#000"></i>
-    <i style="left:0;right:0;top:24px;height:62px;background:${hex}"></i><i style="left:8px;top:30px;width:34px;height:34px;background:${on}"></i>
-    <i style="left:8px;right:8px;top:72px;height:9px;background:${on}"></i><i style="left:6px;top:94px;width:calc(50% - 9px);border-top:3px solid #000"></i>
-    <i style="right:6px;top:94px;width:calc(50% - 9px);border-top:3px solid #000"></i><i style="left:6px;top:101px;width:14px;height:16px;background:#000"></i></span>`;
-  if (k === "metro") return `<span class="ph" style="background:#000"><i style="left:6px;top:8px;width:50px;height:8px;background:#fff;opacity:.85"></i>
-    <i style="left:6px;right:6px;top:22px;height:36px;background:${hex}"></i><i style="left:6px;top:62px;width:calc(50% - 8px);height:28px;background:#00897B"></i>
-    <i style="right:6px;top:62px;width:calc(50% - 8px);height:28px;background:#0B78D1"></i><i style="left:6px;top:94px;width:calc(50% - 8px);height:28px;background:#D5245A"></i>
-    <i style="right:6px;top:94px;width:calc(50% - 8px);height:28px;background:#1E9E4A"></i></span>`;
-  return `<span class="ph" style="background:#000"><i style="left:8px;top:8px;width:30px;height:4px;background:#555;border-radius:2px"></i><i style="left:8px;top:16px;width:52px;height:8px;background:#eee;border-radius:2px"></i>
-    <i style="left:6px;right:6px;top:30px;height:50px;background:#0C0D0F;border:1px solid #22252B;border-radius:8px;overflow:hidden"></i>
-    <i style="right:-14px;top:50px;width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,${hex}55,transparent 68%)"></i>
-    <i style="left:12px;top:40px;width:24px;height:14px;background:#eee;border-radius:2px"></i><i style="left:12px;right:12px;top:64px;height:9px;background:${hex};border-radius:3px"></i>
-    <i style="left:6px;top:86px;width:calc(50% - 9px);height:34px;background:#0C0D0F;border:1px solid #22252B;border-radius:8px"></i><i style="right:6px;top:86px;width:calc(50% - 9px);height:34px;background:#0C0D0F;border:1px solid #22252B;border-radius:8px"></i></span>`;
+// Small drawings: how the home screen is built (in the chosen style's colours),
+// and what each style's surfaces look like.
+function homeThumb(k, hex){
+  const c = LOOK.layout !== "classic"
+    ? { g:"#F2F3F5", s:"#FFFFFF", i:"#121417", m:"#AEB3BB", l:"#E4E6EA" }
+    : { g:"#000000", s:"#111316", i:"#E9EBEF", m:"#4A4F58", l:"#22252B" };
+  const box = inner => `<span class="ph" style="background:${c.g}">${inner}</span>`;
+  const bar = (x, y, w, h, col, r = 2) => `<i style="left:${x}px;top:${y}px;width:${w};height:${h}px;background:${col};border-radius:${r}px"></i>`;
+  const grp = (y, h) => `<i style="left:6px;right:6px;top:${y}px;height:${h}px;background:${c.s};border-radius:6px;${LOOK.layout !== "classic" ? "" : "border:1px solid " + c.l}"></i>`;
+  if (k === "answer") return box(bar(8, 12, "70px", 8, c.i) + bar(8, 24, "52px", 8, c.i) + bar(8, 38, "64px", 4, c.m)
+    + `<i style="left:6px;right:6px;top:50px;height:14px;background:${hex};border-radius:4px"></i>` + grp(72, 50)
+    + [80, 96, 112].map(y => bar(14, y, "44px", 4, c.m) + bar(0, y, "0", 0, c.m)).join(""));
+  if (k === "term"){
+    let cells = "";
+    for (let r = 0; r < 4; r++) for (let q = 0; q < 7; q++){
+      const n = r * 7 + q, x = 12 + q * 12, y = 14 + r * 11;
+      cells += `<i style="left:${x}px;top:${y}px;width:9px;height:8px;border-radius:2px;background:${n === 23 ? hex : n < 23 ? hex + "33" : c.l}"></i>`;
+    }
+    return box(grp(6, 58) + cells + [0, 1, 2].map(q => `<i style="left:${6 + q * 33}px;top:70px;width:30px;height:26px;background:${c.s};border-radius:4px;${q === 1 ? "box-shadow:inset 0 0 0 1.5px " + hex : ""}"></i>`).join("")
+      + `<i style="left:6px;right:6px;top:102px;height:14px;background:${hex};border-radius:4px"></i>`);
+  }
+  if (k === "devices") return box(bar(8, 10, "40px", 4, c.m) + bar(8, 19, "62px", 8, c.i) + grp(34, 52)
+    + [40, 57].map(y => `<i style="left:12px;top:${y}px;width:12px;height:12px;border-radius:3px;background:${c.l}"></i>` + bar(30, y + 2, "40px", 5, c.i) + bar(30, y + 9, "28px", 3, c.m)).join("")
+    + `<i style="left:12px;top:72px;width:12px;height:12px;border-radius:3px;background:${hex}44"></i>` + bar(30, 76, "46px", 5, hex)
+    + [0, 1, 2].map(q => `<i style="left:${6 + q * 33}px;top:94px;width:30px;height:12px;background:${c.s};border-radius:3px"></i>`).join("")
+    + `<i style="left:6px;right:6px;top:112px;height:12px;background:${hex};border-radius:4px"></i>`);
+  return box(bar(8, 8, "30px", 4, c.m) + bar(8, 16, "52px", 8, c.i) + grp(30, 50)
+    + (LOOK.layout !== "classic" ? "" : `<i style="right:-14px;top:50px;width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,${hex}55,transparent 68%)"></i>`)
+    + bar(12, 40, "24px", 14, c.i) + `<i style="left:12px;right:12px;top:64px;height:9px;background:${hex};border-radius:3px"></i>`
+    + `<i style="left:6px;top:86px;width:calc(50% - 9px);height:34px;background:${c.s};border-radius:6px"></i><i style="right:6px;top:86px;width:calc(50% - 9px);height:34px;background:${c.s};border-radius:6px"></i>`);
+}
+function styleThumb(k, hex){
+  if (k === "cosmos") return `<span class="ph" style="background:radial-gradient(90% 55% at 50% 0%,${hex}77,transparent 65%),radial-gradient(70% 40% at 0% 100%,#EC489944,transparent 60%),#0A0513">
+    <i style="left:8px;top:10px;width:62px;height:9px;background:#fff;border-radius:2px"></i>
+    <i style="left:6px;right:6px;top:26px;height:50px;border-radius:10px;border:1px solid ${hex}55;background:linear-gradient(160deg,${hex}44,#140C26DD);overflow:hidden"></i>
+    <i style="left:6px;right:6px;top:26px;height:10px;border-radius:10px 10px 0 0;background:linear-gradient(135deg,${hex},#EC4899)"></i>
+    <i style="left:12px;top:44px;width:34px;height:16px;border-radius:3px;background:linear-gradient(135deg,#fff,#E9D5FF)"></i>
+    <i style="left:6px;right:6px;top:84px;height:16px;border-radius:5px;background:linear-gradient(135deg,${hex},#EC4899);box-shadow:0 4px 10px -3px #EC4899"></i>
+    <i style="left:6px;right:6px;top:106px;height:18px;border-radius:8px;border:1px solid ${hex}44;background:#ffffff0d"></i></span>`;
+  if (k === "tonal") return `<span class="ph" style="background:color-mix(in srgb,${hex} 7%,#FCFCFF)"><i style="left:8px;top:10px;width:56px;height:8px;background:#1B1B1F;border-radius:2px"></i>
+    <i style="left:6px;right:6px;top:26px;height:42px;background:color-mix(in srgb,${hex} 13%,#fff);border-radius:12px"></i>
+    <i style="left:12px;right:40px;top:76px;height:16px;background:${hex};border-radius:99px"></i>
+    <i style="left:6px;right:6px;top:100px;height:24px;background:color-mix(in srgb,${hex} 13%,#fff);border-radius:12px"></i>
+    <i style="left:22px;top:110px;width:24px;height:9px;background:color-mix(in srgb,${hex} 35%,#fff);border-radius:99px"></i></span>`;
+  if (k === "brand") return `<span class="ph" style="background:#F2F3F5"><i style="left:0;right:0;top:0;height:60px;background:${hex};border-radius:0 0 10px 10px"></i>
+    <i style="left:8px;top:18px;width:58px;height:9px;background:rgba(255,255,255,.92);border-radius:2px"></i><i style="left:8px;top:33px;width:40px;height:5px;background:rgba(255,255,255,.7);border-radius:2px"></i>
+    <i style="left:6px;right:6px;top:68px;height:14px;background:${hex};border-radius:4px"></i>
+    <i style="left:6px;right:6px;top:90px;height:32px;background:#fff;border-radius:6px"></i></span>`;
+  if (k === "large") return `<span class="ph" style="background:#fff"><i style="left:8px;top:10px;width:76px;height:12px;background:#000;border-radius:2px"></i>
+    <i style="left:6px;right:6px;top:30px;height:50px;border:2px solid #767676;border-radius:8px;box-sizing:border-box"></i><i style="left:6px;right:6px;top:54px;height:2px;background:#767676"></i>
+    <i style="left:14px;top:38px;width:50px;height:8px;background:#000;border-radius:2px"></i><i style="left:14px;top:63px;width:42px;height:8px;background:#000;border-radius:2px"></i>
+    <i style="left:6px;right:6px;top:88px;height:20px;background:${hex};border-radius:6px"></i></span>`;
+  if (k === "clean") return `<span class="ph" style="background:#F2F3F5"><i style="left:8px;top:10px;width:56px;height:8px;background:#121417;border-radius:2px"></i>
+    <i style="left:6px;right:6px;top:26px;height:40px;background:#fff;border-radius:6px"></i><i style="left:20px;right:6px;top:46px;height:1px;background:#E4E6EA"></i>
+    <i style="left:6px;right:6px;top:74px;height:14px;background:${hex};border-radius:4px"></i>
+    <i style="left:6px;right:6px;top:96px;height:26px;background:#fff;border-radius:6px"></i></span>`;
+  return `<span class="ph" style="background:#000"><i style="left:8px;top:10px;width:56px;height:8px;background:#E9EBEF;border-radius:2px"></i>
+    <i style="left:6px;right:6px;top:26px;height:62px;background:#0C0D0F;border:1px solid #22252B;border-radius:8px;overflow:hidden"></i>
+    <i style="right:-14px;top:44px;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle,${hex}55,transparent 68%)"></i>
+    <i style="left:12px;right:12px;top:70px;height:10px;background:${hex};border-radius:3px"></i>
+    <i style="left:6px;top:96px;width:calc(50% - 9px);height:26px;background:#0C0D0F;border:1px solid #22252B;border-radius:8px"></i><i style="right:6px;top:96px;width:calc(50% - 9px);height:26px;background:#0C0D0F;border:1px solid #22252B;border-radius:8px"></i></span>`;
 }
 function drawOpts(){
   const { rgb, ground, hex } = curColors();
-  $("layOpts").innerHTML = [["classic", "layClassic"], ["tg", "layTg"], ["pass", "layPass"], ["poster", "layPoster"], ["metro", "layMetro"]].map(([k, l]) =>
-    `<button class="th lay ${LOOK.layout === k ? "on" : ""}" onclick="setLook('layout','${k}')">${layThumb(k, hex)}<b>${esc(t(l))}</b><small>${esc(t(l + "S"))}</small></button>`).join("");
+  $("homeOpts").innerHTML = [["answer", "hmAnswer"], ["term", "hmTerm"], ["devices", "hmDevices"], ["classic", "hmClassic"]].map(([k, l]) =>
+    `<button class="th lay ${LOOK.home === k ? "on" : ""}" onclick="setLook('home','${k}')">${homeThumb(k, hex)}<b>${esc(t(l))}</b><small>${esc(t(l + "S"))}</small></button>`).join("");
+  $("layOpts").innerHTML = [["clean", "layClean"], ["tonal", "layTonal"], ["brand", "layBrand"], ["large", "layLarge"], ["cosmos", "layCosmos"], ["classic", "layClassic"]].map(([k, l]) =>
+    `<button class="th lay ${LOOK.layout === k ? "on" : ""}" onclick="setLook('layout','${k}')">${styleThumb(k, hex)}<b>${esc(t(l))}</b><small>${esc(t(l + "S"))}</small></button>`).join("");
   const own = LOOK.layout !== "classic";
   $("bdOwn").hidden = !own; $("bdBody").classList.toggle("dimmed", own);
   $("iconOpts").innerHTML = [["thin", "icThin"], ["regular", "icRegular"], ["bold", "icBold"], ["badge", "icBadge"], ["tiles", "icTiles"], ["ring", "icRing"], ["duo", "icDuo"], ["3d", "ic3d"], ["neon", "icNeon"], ["pixel", "icPixel"], ["comic", "icComic"], ["ornament", "icOrnament"], ["fortune", "icFortune"]].map(([k, l]) =>
@@ -3993,7 +4043,7 @@ function pushLook(now){
   lookTimer = setTimeout(async () => {
     if (!LOOK || !$("lkFrame")) return;
     const body = { theme_preset:LOOK.preset, theme_accent:LOOK.accent, theme_surface:LOOK.surface,
-                   font:LOOK.font, font_custom:LOOK.fontCustom, radius:LOOK.radius, icons:LOOK.icons, backdrop:LOOK.backdrop, layout:LOOK.layout,
+                   font:LOOK.font, font_custom:LOOK.fontCustom, radius:LOOK.radius, icons:LOOK.icons, backdrop:LOOK.backdrop, layout:LOOK.layout, home:LOOK.home,
                    motion:LOOK.motion, effect:LOOK.effect, cards:LOOK.cards, splash_kind:LOOK.splashKind };
     const replay = !!LOOK.replay; LOOK.replay = false;
     let pv;
@@ -4061,7 +4111,7 @@ async function saveLook(btn){
                  tagline_ru:$("tagRu").value.trim(), tagline_en:$("tagEn").value.trim(),
                  brand_name:$("lkName").value.trim() || "VPN", font:LOOK.font, font_custom:LOOK.fontCustom, radius:LOOK.radius,
                  links_json:JSON.stringify(links),
-                 icons:LOOK.icons, backdrop:LOOK.backdrop, layout:LOOK.layout, motion:LOOK.motion,
+                 icons:LOOK.icons, backdrop:LOOK.backdrop, layout:LOOK.layout, home:LOOK.home, motion:LOOK.motion,
                  effect:LOOK.effect, cards:LOOK.cards, splash:LOOK.splash ? "1" : "0", splash_kind:LOOK.splashKind,
                  splash_mark:LOOK.sp.mark, splash_plate:LOOK.sp.plate, splash_size:LOOK.sp.size, splash_color:LOOK.sp.color,
                  splash_bg:LOOK.sp.bg, splash_name:LOOK.sp.name, splash_speed:LOOK.sp.speed,

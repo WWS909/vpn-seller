@@ -457,6 +457,7 @@ body{
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 a{color:var(--sig-txt);text-decoration:none}
 :focus-visible{outline:2px solid var(--sig);outline-offset:2px;border-radius:8px}
+#sheet:focus,#sheet:focus-visible{outline:none}
 /* Motion, chosen in the panel: lively (the default), calm (fades only) or
    off. The system's "reduce motion" always means off. */
 @media (prefers-reduced-motion:reduce){
@@ -2090,249 +2091,384 @@ body.resolve .screen.on #quickRows>.row:nth-child(n+3){animation-delay:.22s}
 :root[data-motion="off"] :is(.row.row-in,.screen .card.hero.answer){animation:none}
 
 /* ============================================================
-   Screen layouts (data-layout, chosen in the panel). "classic" is the
-   look above. The others change how the screens are built, not only the
-   colours: Telegram-style grouped lists, an access pass, a poster, tiles.
-   They share one rule set: no caps labels over headings, no dot after a
-   title, no glow; the background and the card style are their own.
+   The new styles (every data-layout but "classic") share the rules below;
+   each then sets its own colours and a few shapes further down.
+   Style "clean": light grey ground and white groups,
+   like Telegram's own lists; dark when Telegram is dark. One accent, only on
+   actions and the selected item. No caps labels, no dot after a title, no
+   glow; the background and the card style are its own.
    ============================================================ */
 .hero .sub .pn::after{content:" · "}
-:root[data-layout]:not([data-layout="classic"]) :is(.brand i,.head .over,.head h1 i,.hero h2 i,.sheet h3 i,.bill h2 i,#done h2 i,.hero .glow,.hero .lbl){display:none}
-:root[data-layout]:not([data-layout="classic"]) .hero .sub .pn::after{content:", "}
-:root[data-layout]:not([data-layout="classic"]) :is(.sec h3,.sheet h4,.bill .over){text-transform:none;letter-spacing:0}
-:root[data-layout]:not([data-layout="classic"]) .sec h3 span[style]{text-transform:none !important;letter-spacing:0 !important;font-size:inherit !important}
-
-/* ---------------- Telegram: grouped lists, system type ---------------- */
-:root[data-layout="tg"]{
+:root[data-layout="clean"]{
   --ground:#000000;--card:#1C1C1E;--card-2:#2C2C2E;--line:#38383A;--line-soft:#2C2C2E;
-  --txt:#FFFFFF;--txt-2:#AEAEB2;--txt-3:#8D8D93;
-  --font-d:-apple-system,"SF Pro Display",system-ui,Roboto,"Segoe UI",sans-serif;
-  --font-b:-apple-system,"SF Pro Text",system-ui,Roboto,"Segoe UI",sans-serif;--r:12px}
-:root[data-layout="tg"][data-theme="light"]{
-  --ground:#F2F2F7;--card:#FFFFFF;--card-2:#F2F2F7;--line:#C6C6C8;--line-soft:#E5E5EA;
-  --txt:#000000;--txt-2:#3C3C43;--txt-3:#6D6D72}
-[data-layout="tg"] body{font-feature-settings:normal}
-[data-layout="tg"] .head{padding:4px 0 14px}
-[data-layout="tg"] .head h1{font-weight:700;font-size:32px;letter-spacing:-.01em}
-[data-layout="tg"] .head p{font-size:15px;color:var(--txt-3)}
-[data-layout="tg"] .brand{font-weight:600;font-size:17px}
-[data-layout="tg"] .tool{border:0;background:var(--card);border-radius:50%;width:36px;height:36px}
-[data-layout="tg"] :is(.card,.tile,.plan,.pay,.search,.trial,.deal){border:0;border-radius:12px;box-shadow:none}
-[data-layout="tg"] .hero{padding:14px 16px 16px}
-[data-layout="tg"] .hero .row1{margin-bottom:10px}
-[data-layout="tg"] .state{border:0;background:none;padding:0;font-size:15px;color:var(--txt-3);gap:8px}
-[data-layout="tg"] .state .d{width:8px;height:8px}
-[data-layout="tg"] .days{gap:6px;margin-bottom:2px}
-[data-layout="tg"] .days b{font-family:var(--font-b);font-weight:700;font-size:28px;letter-spacing:-.01em}
-[data-layout="tg"] .days span{font-size:17px;color:var(--txt);font-weight:600}
-[data-layout="tg"] .hero h2{font-family:var(--font-b);font-weight:700;font-size:24px}
-[data-layout="tg"] .hero .sub{font-size:15px;color:var(--txt-3);margin-bottom:14px}
-[data-layout="tg"] .btn{border-radius:10px;font-size:16px;padding:14px 18px}
-[data-layout="tg"] .btn .ar{display:none}
-/* the two tiles become two rows of one group */
-[data-layout="tg"] .tiles{grid-template-columns:1fr;gap:0;margin-top:20px;background:var(--card);border-radius:12px;overflow:hidden}
-[data-layout="tg"] .tile{flex-direction:row;align-items:center;border-radius:0;padding:12px 16px;gap:10px;background:none;position:relative}
-[data-layout="tg"] .tile + .tile::before{content:"";position:absolute;left:56px;right:0;top:0;height:.5px;background:var(--line)}
-[data-layout="tg"] .tile .t{flex:1;margin:0;color:var(--txt);font-size:16px;gap:12px;order:0}
-[data-layout="tg"] .tile .t .ch{display:none}
-[data-layout="tg"] .tile .v{order:1;font-family:var(--font-b);font-weight:400;font-size:16px;color:var(--txt-3);letter-spacing:0}
-[data-layout="tg"] .tile .v small{font-size:16px;font-weight:400}
-[data-layout="tg"] .tile .n{display:none}
-[data-layout="tg"] .tile::after{content:"";order:2;width:8px;height:8px;border:solid var(--txt-3);border-width:2px 2px 0 0;transform:rotate(45deg);opacity:.6;margin-left:4px}
-[data-layout="tg"] .sec{margin-top:24px}
-[data-layout="tg"] .sec h3{font-size:13px;font-weight:500;color:var(--txt-3);padding:0 16px;margin-bottom:7px}
-[data-layout="tg"] :is(.rows,#locList,#devList){background:var(--card);border-radius:12px;overflow:hidden}
-[data-layout="tg"] :is(.row,.loc){padding:11px 16px;border-bottom:0;position:relative}
-[data-layout="tg"] :is(.row,.loc) + :is(.row,.loc)::before{content:"";position:absolute;left:56px;right:0;top:0;height:.5px;background:var(--line)}
-[data-layout="tg"] .row .t b{font-weight:400;font-size:16px}
-[data-layout="tg"] .row .t span{font-size:13.5px}
-[data-layout="tg"] .loc .fl{border:0;background:none}
-[data-layout="tg"] .meter{height:6px;border-radius:3px;background:var(--card-2)}
-[data-layout="tg"] .nav{background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:.5px solid var(--line)}
-[data-layout="tg"] .nav .pill{display:none}
-[data-layout="tg"] .nav button{font-size:10.5px;font-weight:500}
-[data-layout="tg"] .sheet{border:0;border-radius:12px 12px 0 0;background:var(--ground)}
-[data-layout="tg"] .sheet h3{font-family:var(--font-b);font-weight:700;font-size:20px}
-[data-layout="tg"] .sheet h4{font-size:13px;font-weight:500;color:var(--txt-3);padding:0 16px}
-[data-layout="tg"] .field{border-radius:10px;background:var(--card);border-color:var(--line-soft)}
-[data-layout="tg"] .plan .t b{font-weight:600}
-[data-layout="tg"] .plan .t b em{text-transform:none;letter-spacing:0;font-size:12px}
+  --txt:#F5F5F7;--txt-2:#AEAEB2;--txt-3:#8E8E93;--r:14px;--r-m:12px;--r-s:10px;--r-l:16px}
+:root[data-layout="clean"][data-theme="light"]{
+  --ground:#F2F3F5;--card:#FFFFFF;--card-2:#F2F3F5;--line:#E4E6EA;--line-soft:#E4E6EA;
+  --txt:#121417;--txt-2:#5B616B;--txt-3:#666C76}
+[data-layout]:not([data-layout="classic"]) :is(.brand i,.head .over,.head h1 i,.hero h2 i,.sheet h3 i,.bill h2 i,#done h2 i,.hero .glow,.hero .lbl,.bill .over){display:none}
+[data-layout]:not([data-layout="classic"]) .hero .sub .pn::after{content:", "}
+[data-layout]:not([data-layout="classic"]) body{font-feature-settings:"tnum" 1}
+[data-layout]:not([data-layout="classic"]) :is(h1,h2,h3){text-wrap:balance}
+[data-layout]:not([data-layout="classic"]) :is(p,.sub,.lead){text-wrap:pretty}
+[data-layout]:not([data-layout="classic"]) .top{background:var(--ground);backdrop-filter:none;-webkit-backdrop-filter:none}
+[data-layout]:not([data-layout="classic"]) .brand{font-family:var(--font-b);font-weight:600;font-size:16px;letter-spacing:0}
+[data-layout]:not([data-layout="classic"]) .tool{border:0;background:var(--card);border-radius:50%;width:36px;height:36px;color:var(--txt-2)}
+[data-layout]:not([data-layout="classic"]) .head{padding:6px 2px 14px}
+[data-layout]:not([data-layout="classic"]) .head h1{font-weight:600;font-size:28px;line-height:1.15;letter-spacing:-.01em}
+[data-layout]:not([data-layout="classic"]) .head p{font-size:15px;color:var(--txt-2)}
+[data-layout]:not([data-layout="classic"]) :is(.card,.tile,.plan,.pay,.search,.trial,.deal,.emb){border:0;box-shadow:none}
+[data-layout]:not([data-layout="classic"]) .card,[data-layout]:not([data-layout="classic"]) .tile{border-radius:14px}
+[data-layout]:not([data-layout="classic"]) .state{border:0;background:none;padding:0;font-size:15px;color:var(--txt-2);gap:8px}
+[data-layout]:not([data-layout="classic"]) .state .d{width:8px;height:8px}
+[data-layout]:not([data-layout="classic"]) .days b{font-family:var(--font-b);font-weight:600;font-size:28px;letter-spacing:-.01em}
+[data-layout]:not([data-layout="classic"]) .days span{font-size:17px;color:var(--txt);font-weight:500}
+[data-layout]:not([data-layout="classic"]) .tile .v{font-family:var(--font-b);font-weight:600;font-size:24px}
+[data-layout]:not([data-layout="classic"]) .hero h2{font-family:var(--font-b);font-weight:600;font-size:24px}
+[data-layout]:not([data-layout="classic"]) .hero .sub{font-size:15px;color:var(--txt-2)}
+[data-layout]:not([data-layout="classic"]) .btn{border-radius:12px;font-size:16px;padding:15px 18px}
+[data-layout]:not([data-layout="classic"]) .btn .ar{display:none}
+[data-layout]:not([data-layout="classic"]) .btn.gho{border:0;background:var(--card);color:var(--sig-txt)}
+[data-layout]:not([data-layout="classic"]) .sec{margin-top:22px}
+[data-layout]:not([data-layout="classic"]) .sec h3{text-transform:none;letter-spacing:0;font-size:13px;font-weight:400;color:var(--txt-2);padding:0 16px;margin-bottom:8px}
+[data-layout]:not([data-layout="classic"]) .sec h3 span[style]{text-transform:none !important;letter-spacing:0 !important;font-size:inherit !important}
+[data-layout]:not([data-layout="classic"]) :is(.rows,#locList,#devList,#devRemoved){background:var(--card);border-radius:14px;overflow:hidden}
+[data-layout]:not([data-layout="classic"]) :is(.rows,#locList,#devList) .empty{background:var(--ground)}
+[data-layout]:not([data-layout="classic"]) :is(.row,.loc){padding:12px 16px;border-bottom:0;position:relative;min-height:52px}
+[data-layout]:not([data-layout="classic"]) :is(.row,.loc) + :is(.row,.loc)::before{content:"";position:absolute;left:52px;right:0;top:0;height:1px;background:var(--line);transform:scaleY(.6)}
+[data-layout]:not([data-layout="classic"]) .row .t b{font-weight:400;font-size:16px}
+[data-layout]:not([data-layout="classic"]) .row .t span{font-size:13px;color:var(--txt-2)}
+[data-layout]:not([data-layout="classic"]) .row .ic{color:var(--txt-2)}
+[data-layout]:not([data-layout="classic"]) .loc .fl{border:0;background:none;width:28px;font-size:22px}
+[data-layout]:not([data-layout="classic"]) .loc .t b{font-weight:400;font-size:16px}
+[data-layout]:not([data-layout="classic"]) .meter{height:6px;border-radius:3px;background:var(--card-2)}
+[data-layout]:not([data-layout="classic"]) .nav{background:var(--card);border-top:1px solid var(--line-soft)}
+[data-layout]:not([data-layout="classic"]) .nav .pill{display:none}
+[data-layout]:not([data-layout="classic"]) .nav button{font-size:11px;font-weight:500}
+[data-layout]:not([data-layout="classic"]) .sheet{border:0;border-radius:16px 16px 0 0;background:var(--ground)}
+[data-layout]:not([data-layout="classic"]) .sheet h3{font-family:var(--font-b);font-weight:600;font-size:21px;letter-spacing:-.01em}
+[data-layout]:not([data-layout="classic"]) .sheet h4{text-transform:none;letter-spacing:0;font-size:13px;font-weight:400;color:var(--txt-2);padding:0 4px}
+[data-layout]:not([data-layout="classic"]) .field{border-radius:12px;background:var(--card);border-color:var(--line)}
+[data-layout]:not([data-layout="classic"]) .code{background:var(--card);border-color:var(--line)}
+[data-layout]:not([data-layout="classic"]) .plan{border:1.5px solid transparent;border-radius:14px}
+[data-layout]:not([data-layout="classic"]) .plan.on{border-color:var(--sig);background:var(--card)}
+[data-layout]:not([data-layout="classic"]) .plan .t b{font-weight:600}
+[data-layout]:not([data-layout="classic"]) .plan .t b em{text-transform:none;letter-spacing:0;font-size:12px;font-weight:600}
+[data-layout]:not([data-layout="classic"]) .pay{border:1.5px solid transparent}
+[data-layout]:not([data-layout="classic"]) .pay.on{border-color:var(--sig);background:var(--card)}
+[data-layout]:not([data-layout="classic"]) .chip{border:0;background:var(--card);color:var(--txt);padding:9px 14px}
+[data-layout]:not([data-layout="classic"]) .chip.on{background:rgba(var(--sig-rgb),.14);color:var(--sig-txt);box-shadow:none;font-weight:600}
+/* two or three tabs: a segmented control, like iOS */
+[data-layout]:not([data-layout="classic"]) .chips.seg{flex-wrap:nowrap;gap:2px;padding:3px;background:var(--card-2);border-radius:11px}
+[data-layout]:not([data-layout="classic"])[data-theme="light"] .chips.seg{background:#E4E6EA}
+[data-layout]:not([data-layout="classic"]) .chips.seg .chip{flex:1;border-radius:9px;background:none;color:var(--txt);font-weight:500;padding:8px 10px}
+[data-layout]:not([data-layout="classic"]) .chips.seg .chip.on{background:var(--card);color:var(--txt);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+[data-layout]:not([data-layout="classic"])[data-theme="dark"] .chips.seg .chip.on{background:#3A3A3C}
+/* a rare action that undoes something: words, not a big button */
+[data-layout]:not([data-layout="classic"]) .trial{background:var(--card);border-radius:14px;padding:14px 16px}
+[data-layout]:not([data-layout="classic"]) .trial b{font-size:16px;color:var(--sig-txt)}
+[data-layout]:not([data-layout="classic"]) .trial span{font-size:13px;color:var(--txt-2)}
+[data-layout]:not([data-layout="classic"]) .btn.quiet{background:none;color:var(--txt-2);font-weight:500;padding:10px}
+[data-layout]:not([data-layout="classic"]) .total b{font-family:var(--font-b);font-weight:600}
+[data-layout]:not([data-layout="classic"]) .bill .amt{font-family:var(--font-b);font-weight:600}
+[data-layout]:not([data-layout="classic"]) .loc .by{text-transform:none;letter-spacing:0;font-weight:600}
+[data-layout]:not([data-layout="classic"]) :is(.lbl,.over,.card .lbl){text-transform:none;letter-spacing:0;font-size:13px;font-weight:400;color:var(--txt-2)}
+[data-layout]:not([data-layout="classic"]) #s-devs .card .days b{font-size:28px}
+[data-layout]:not([data-layout="classic"]) :is(.row,.ha-row,.hc-dev,.loc):focus-visible{outline:2px solid var(--sig);outline-offset:-2px;border-radius:inherit}
 
-/* ---------------- Pass: the subscription is a card you hold ---------------- */
-:root[data-layout="pass"]{
-  --ground:#121417;--card:#1B1E22;--card-2:#23272C;--line:#33383F;--line-soft:#272B31;
-  --txt:#EEF0F2;--txt-2:#B3B8C0;--txt-3:#8C929B;--r:14px}
-:root[data-layout="pass"][data-theme="light"]{
-  --ground:#E8EAED;--card:#F7F8F9;--card-2:#EEF0F2;--line:#C9CDD3;--line-soft:#D9DCE1;
-  --txt:#15181C;--txt-2:#3D434B;--txt-3:#5B626B}
-[data-layout="pass"] .head h1{font-family:var(--font-b);font-weight:700;font-size:26px;letter-spacing:-.01em}
-[data-layout="pass"] .hero{background:var(--sig);color:var(--on-sig);border:0;border-radius:18px;
-  padding:20px 20px 0;
-  -webkit-mask:radial-gradient(circle 11px at 0 calc(100% - 92px),#0000 98%,#000) left/51% 100% no-repeat,
-               radial-gradient(circle 11px at 100% calc(100% - 92px),#0000 98%,#000) right/51% 100% no-repeat;
-          mask:radial-gradient(circle 11px at 0 calc(100% - 92px),#0000 98%,#000) left/51% 100% no-repeat,
-               radial-gradient(circle 11px at 100% calc(100% - 92px),#0000 98%,#000) right/51% 100% no-repeat}
-[data-layout="pass"] .hero .row1{margin-bottom:26px}
-[data-layout="pass"] .hero .row1::before{content:attr(data-brand);font-family:var(--font-d);font-weight:700;font-size:15px;letter-spacing:.01em}
-[data-layout="pass"] .state{background:color-mix(in srgb,var(--on-sig) 12%,transparent);border:0;color:var(--on-sig);font-weight:600}
-[data-layout="pass"] .state.ok .d{background:var(--on-sig)}
-[data-layout="pass"] #heroBody{display:flex;flex-direction:column}
-[data-layout="pass"] #heroBody>.sub{order:0}
-[data-layout="pass"] #heroBody>.days{order:1;margin:8px 0 0;gap:5px}
-[data-layout="pass"] #heroBody>.btn{order:2}
-[data-layout="pass"] .days :is(b,span){font-family:var(--font-b);font-size:14px;font-weight:600;letter-spacing:0;line-height:1.3;
-  color:color-mix(in srgb,var(--on-sig) 75%,transparent)}
-[data-layout="pass"] .hero .sub{color:var(--on-sig);margin-bottom:0;display:flex;flex-direction:column-reverse;gap:4px}
-[data-layout="pass"] .hero .sub .pn{font-size:14px;font-weight:600;color:color-mix(in srgb,var(--on-sig) 75%,transparent)}
-[data-layout="pass"] .hero .sub .pn::after{content:none !important}
-[data-layout="pass"] .hero .sub .pu{font-family:var(--font-d);font-weight:700;font-size:30px;line-height:1.1;letter-spacing:-.02em}
-[data-layout="pass"] .hero .sub>span[style]{order:-1}
-[data-layout="pass"] .hero h2{font-family:var(--font-d);font-weight:700;font-size:28px;color:var(--on-sig)}
-[data-layout="pass"] .hero h2 + .sub{font-size:14px;opacity:.8;display:block}
-/* the stub under the perforation: the button and a barcode */
-[data-layout="pass"] .hero .btn.pri{margin:46px -20px 0;width:calc(100% + 40px);border-radius:0;padding:0 20px;height:92px;
-  justify-content:space-between;text-align:left;gap:14px;background:none;color:var(--on-sig);font-size:16px;font-weight:700;
-  border-top:2px dashed color-mix(in srgb,var(--on-sig) 30%,transparent)}
-[data-layout="pass"] .hero .btn.pri::after{content:"";width:min(92px,24%);height:34px;flex:none;opacity:.85;
-  background:repeating-linear-gradient(90deg,var(--on-sig) 0 2px,transparent 2px 4px,var(--on-sig) 4px 5px,transparent 5px 8px,var(--on-sig) 8px 11px,transparent 11px 13px)}
-[data-layout="pass"] .hero .btn.pri .ar{display:none}
-[data-layout="pass"] .hero .sub + .sub{margin-top:8px}
-[data-layout="pass"] .tiles{gap:0;margin-top:14px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
-[data-layout="pass"] .tile{background:none;border:0;border-radius:0;padding:14px 16px}
-[data-layout="pass"] .tile + .tile{border-left:1px solid var(--line)}
-[data-layout="pass"] .tile .t{color:var(--txt-3);margin-bottom:10px}
-[data-layout="pass"] .tile .v{font-family:var(--font-b);font-weight:700;font-size:26px}
-[data-layout="pass"] .tile .v small{font-weight:500}
-[data-layout="pass"] .sec h3{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:4px}
-[data-layout="pass"] :is(.card:not(.hero),.plan,.pay,.search,.trial,.deal){background:var(--card);border:1px solid var(--line-soft);box-shadow:none}
-[data-layout="pass"] .plan.on{border-color:var(--txt);border-width:1.5px}
-[data-layout="pass"] .plan.on .mark{border-color:var(--txt)}
-[data-layout="pass"] .plan.on .mark::after{background:var(--txt)}
-[data-layout="pass"] .nav .pill i{background:none;border-bottom:2px solid var(--txt);border-radius:0;width:22px;height:30px}
-[data-layout="pass"] .nav button.on{color:var(--txt);font-weight:600}
-[data-layout="pass"] .sheet{border:0;background:var(--ground)}
-[data-layout="pass"] .sheet h3{font-family:var(--font-b);font-weight:700}
-[data-layout="pass"] .btn{border-radius:12px}
+/* ============================================================
+   The home screen (data-home): "classic" is the card above. The others are
+   built in #homeAlt by drawHomeAlt() and work in both styles.
+   ============================================================ */
+#homeAlt{display:none}
+:root[data-home]:not([data-home="classic"]) #s-home :is(.head,.hero,.tiles,#secTraffic){display:none}
+:root[data-home]:not([data-home="classic"]) #homeAlt{display:block}
+:root[data-home]:not([data-home="classic"]) #s-home .sec h3{text-transform:none;letter-spacing:0;font-size:13px;color:var(--txt-2);padding:0 4px}
+.ha-grp{background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden}
+[data-layout]:not([data-layout="classic"]) .ha-grp{border:0}
+.ha-cap{font-size:13px;color:var(--txt-2);margin:22px 4px 8px}
+.ha-row{display:flex;align-items:center;gap:14px;min-height:52px;padding:10px 16px;width:100%;text-align:left;position:relative;color:var(--txt)}
+.ha-row + .ha-row::before{content:"";position:absolute;left:52px;right:0;top:0;height:1px;background:var(--line);transform:scaleY(.6)}
+.ha-row>svg:first-child{color:var(--txt-2);flex:none}
+.ha-row .t{flex:1;min-width:0;font-size:16px}
+.ha-row .t small{display:block;font-size:13px;color:var(--txt-2);margin-top:1px}
+.ha-row .v{color:var(--txt-2);font-size:15px;white-space:nowrap}
+.ha-row .ch{color:var(--txt-3);opacity:.7;flex:none}
+.ha-flags{font-size:19px;letter-spacing:3px;line-height:1}
+/* A — the answer */
+.ha-ans{padding:12px 4px 20px}
+.ha-ans h1{font-family:var(--font-d);font-weight:600;font-size:30px;line-height:1.12;letter-spacing:-.015em;text-wrap:balance}
+.ha-ans p{color:var(--txt-2);font-size:15px;margin-top:8px;text-wrap:pretty}
+.ha-ans p .warn{color:var(--bad)}
+.ha-acts{display:grid;gap:8px}
+/* B — the term */
+.hb-cal{padding:16px}
+.hb-cal .hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+.hb-cal .hd b{font-weight:600;font-size:21px;letter-spacing:-.01em;text-transform:capitalize}
+.hb-cal .hd span{font-size:14px;font-weight:500;color:var(--ok)}
+.hb-cal .hd span.warn{color:var(--bad)}
+.hb-grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:4px;text-align:center}
+.hb-grid .dw{font-size:12px;color:var(--txt-2);padding-bottom:6px}
+.hb-grid i{font-style:normal;font-size:15px;height:36px;display:grid;place-items:center;position:relative}
+.hb-grid i.in{background:rgba(var(--sig-rgb),.14)}
+.hb-grid i.s{border-radius:10px 0 0 10px}
+.hb-grid i.e{border-radius:0 10px 10px 0}
+.hb-grid i.s.e{border-radius:10px}
+.hb-grid i.end{background:var(--sig);color:var(--on-sig);font-weight:600;border-radius:10px}
+.hb-grid i.out{color:var(--txt-3);opacity:.6}
+.hb-grid i.today::after{content:"";position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%;background:currentColor}
+.hb-cal .note{margin-top:12px;font-size:14px;color:var(--txt-2);text-wrap:pretty}
+.hb-cal .note b{color:var(--txt);font-weight:600}
+.hb-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+.hb-pick button{background:var(--card);border:1.5px solid var(--line-soft);border-radius:var(--r-m);padding:12px 10px 11px;text-align:left;color:var(--txt);min-width:0}
+[data-layout]:not([data-layout="classic"]) .hb-pick button{border-color:transparent}
+.hb-pick button b{display:block;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb-pick button span{display:block;font-size:13px;color:var(--txt-2);margin-top:2px}
+.hb-pick button em{display:block;font-style:normal;font-weight:600;font-size:17px;margin-top:10px;white-space:nowrap}
+.hb-pick button.on{border-color:var(--sig)}
+.hb-go{margin-top:10px}
+/* C — the devices */
+.hc-st{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--txt-2);padding:6px 4px 0}
+.hc-st i{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+.hc-st.warn i{background:var(--bad)}
+.hc-st b{color:var(--txt);font-weight:500}
+.hc-h1{font-family:var(--font-d);font-weight:600;font-size:28px;line-height:1.15;letter-spacing:-.01em;margin:12px 4px 4px}
+.hc-lead{color:var(--txt-2);font-size:15px;margin:0 4px 14px;text-wrap:pretty}
+.hc-dev{display:flex;align-items:center;gap:14px;min-height:66px;padding:10px 16px;position:relative;width:100%;text-align:left;color:var(--txt)}
+.hc-dev + .hc-dev::before{content:"";position:absolute;left:68px;right:0;top:0;height:1px;background:var(--line);transform:scaleY(.6)}
+.hc-dev .ic{width:38px;height:38px;border-radius:var(--r-s);background:var(--card-2);display:grid;place-items:center;flex:none;color:var(--txt)}
+.hc-dev .t{flex:1;min-width:0}
+.hc-dev .t b{display:block;font-weight:500;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hc-dev .t span{display:block;font-size:13px;color:var(--txt-2);margin-top:1px}
+.hc-dev .on{font-size:13px;color:var(--ok);flex:none}
+.hc-dev.free .ic{background:rgba(var(--sig-rgb),.14);color:var(--sig-txt)}
+.hc-dev.free b{color:var(--sig-txt)}
+.hc-more{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;color:var(--txt-2);padding:12px 4px 0}
+.hc-more{flex-wrap:wrap;row-gap:4px}
+.hc-more button{color:var(--sig-txt);font-weight:500;text-align:right;white-space:nowrap}
+.hc-cs{display:flex;gap:8px;flex-wrap:wrap}
+.hc-cs span{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r-s);padding:8px 12px;font-size:14px}
+[data-layout]:not([data-layout="classic"]) .hc-cs span{border:0}
+.hc-cs span i{font-style:normal;font-size:18px;line-height:1}
+.hc-renew{margin-top:22px;padding:14px 16px 16px}
+.hc-renew .r{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px;font-size:15px;color:var(--txt-2)}
+.hc-renew .r b{color:var(--txt);font-weight:600;font-size:17px;white-space:nowrap}
 
-/* ---------------- Poster: one colour block, heavy type ---------------- */
-:root[data-layout="poster"]{
-  --ground:#000000;--card:#111111;--card-2:#1C1C1C;--line:#FFFFFF;--line-soft:#333333;
-  --txt:#FFFFFF;--txt-2:#D0D0D0;--txt-3:#A0A0A0;--r:0px}
-:root[data-layout="poster"][data-theme="light"]{
-  --ground:#FFFFFF;--card:#F3F3F3;--card-2:#E8E8E8;--line:#000000;--line-soft:#D6D6D6;
-  --txt:#000000;--txt-2:#2A2A2A;--txt-3:#555555}
-[data-layout="poster"] .top{background:var(--ground);backdrop-filter:none;-webkit-backdrop-filter:none}
-[data-layout="poster"] .brand{font-weight:800;font-size:18px;letter-spacing:-.02em}
-[data-layout="poster"] .brand .m{border-radius:0}
-[data-layout="poster"] .tool{border:2px solid var(--txt);border-radius:0;color:var(--txt)}
-[data-layout="poster"] .head h1{font-weight:800;font-size:40px;line-height:.95;letter-spacing:-.04em}
-[data-layout="poster"] .hero{margin:0 calc(-1 * var(--pad));border:0;border-radius:0;background:var(--sig);color:var(--on-sig);padding:20px var(--pad) var(--pad)}
-[data-layout="poster"] .state{border:0;background:var(--on-sig);color:var(--sig);border-radius:0;font-weight:700;padding:5px 10px}
-[data-layout="poster"] .state .d{background:var(--sig) !important}
-[data-layout="poster"] .hero .row1{justify-content:flex-start}
-[data-layout="poster"] .days{display:block;margin:8px 0 14px}
-[data-layout="poster"] .days b{display:block;font-weight:800;font-size:132px;line-height:.8;letter-spacing:-.06em;margin-left:-6px}
-[data-layout="poster"] .days span{display:block;margin-top:10px;font-family:var(--font-d);font-weight:800;font-size:30px;line-height:1;letter-spacing:-.03em;color:var(--on-sig)}
-[data-layout="poster"] .hero h2{font-weight:800;font-size:44px;line-height:.95;letter-spacing:-.04em;color:var(--on-sig);margin:6px 0 12px}
-[data-layout="poster"] .hero .sub{color:var(--on-sig);font-size:15px;font-weight:600;margin-bottom:20px;opacity:.85}
-[data-layout="poster"] .hero .btn.pri{background:var(--on-sig);color:var(--sig);border-radius:0;font-weight:800;font-size:16px;padding:18px}
-[data-layout="poster"] .btn{border-radius:0;font-weight:800}
-[data-layout="poster"] .btn.gho{border:2px solid var(--txt)}
-[data-layout="poster"] .tiles{margin-top:24px;gap:16px}
-[data-layout="poster"] .tile{background:none;border:0;border-top:4px solid var(--txt);border-radius:0;padding:10px 0 0}
-[data-layout="poster"] .tile .t{color:var(--txt);font-weight:700;font-size:14px;margin-bottom:6px}
-[data-layout="poster"] .tile .v{font-weight:800;font-size:56px;line-height:.9;letter-spacing:-.05em}
-[data-layout="poster"] .tile .v small{font-size:22px;font-weight:800;color:var(--txt-3)}
-[data-layout="poster"] .tile .n{font-size:13px;font-weight:600;color:var(--txt-2)}
-[data-layout="poster"] .sec h3{font-family:var(--font-d);font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--txt);
-  border-top:4px solid var(--txt);padding-top:10px;margin-bottom:4px}
-[data-layout="poster"] .sec h3 span{font-size:14px;font-weight:700}
-[data-layout="poster"] :is(.row,.loc){border-bottom:2px solid var(--line-soft);padding:16px 0}
-[data-layout="poster"] .row .t b{font-weight:700;font-size:16px}
-[data-layout="poster"] .row .ic{color:var(--txt)}
-[data-layout="poster"] :is(.card:not(.hero),.plan,.pay,.search,.trial,.deal){border:2px solid var(--txt);border-radius:0;background:none}
-[data-layout="poster"] .plan.on{background:var(--sig);color:var(--on-sig);border-color:var(--sig)}
-[data-layout="poster"] .plan.on :is(.t span,.pr span,.pr s){color:var(--on-sig) !important}
-[data-layout="poster"] .plan.on .mark{border-color:var(--on-sig)}
-[data-layout="poster"] .plan.on .mark::after{background:var(--on-sig)}
-[data-layout="poster"] .plan .mark{border-radius:0;border-width:2px}
-[data-layout="poster"] .plan .mark::after{border-radius:0}
-[data-layout="poster"] .meter{height:12px;border-radius:0;background:var(--card-2)}
-[data-layout="poster"] .meter i{border-radius:0}
-[data-layout="poster"] .nav{background:var(--txt);border:0}
-[data-layout="poster"] .nav button{color:color-mix(in srgb,var(--ground) 62%,var(--txt));font-weight:700}
-[data-layout="poster"] .nav button.on{color:var(--ground)}
-[data-layout="poster"] .nav .pill{top:0;height:4px}
-[data-layout="poster"] .nav .pill i{background:var(--sig);border-radius:0;height:4px;width:100%}
-[data-layout="poster"] .sheet{border:0;border-top:4px solid var(--txt);border-radius:0;background:var(--ground)}
-[data-layout="poster"] .sheet h3{font-weight:800;font-size:28px;letter-spacing:-.03em}
-[data-layout="poster"] .field{border:2px solid var(--txt);border-radius:0}
-[data-layout="poster"] :is(.chip,.state,.loc .fl,.me .av,.plan .t b em){border-radius:0}
+/* ============================================================
+   Style "tonal" — after Material 3 (Android): the surfaces are tinted with
+   the shop's colour, lists sit in rounded containers without dividers,
+   buttons are full pills, the tab bar has a pill behind the chosen icon.
+   ============================================================ */
+:root[data-layout="tonal"]{
+  --ground:color-mix(in srgb,var(--sig) 7%,#121316);--card:color-mix(in srgb,var(--sig) 13%,#1A1B1F);
+  --card-2:color-mix(in srgb,var(--sig) 20%,#1A1B1F);--line:color-mix(in srgb,var(--sig) 22%,#2A2B30);
+  --line-soft:color-mix(in srgb,var(--sig) 16%,#24252A);
+  --txt:#E5E2E8;--txt-2:#C6C4CC;--txt-3:#A9A7AF;--r:24px;--r-m:18px;--r-s:14px;--r-l:28px}
+:root[data-layout="tonal"][data-theme="light"]{
+  --ground:color-mix(in srgb,var(--sig) 6%,#FCFCFF);--card:color-mix(in srgb,var(--sig) 11%,#FFFFFF);
+  --card-2:color-mix(in srgb,var(--sig) 18%,#FFFFFF);--line:color-mix(in srgb,var(--sig) 22%,#FFFFFF);
+  --line-soft:color-mix(in srgb,var(--sig) 15%,#FFFFFF);
+  --txt:#1B1B1F;--txt-2:#45464F;--txt-3:#5D5E67}
+:root[data-layout="tonal"] :is(.head h1,.ha-ans h1,.hc-h1){font-weight:500;letter-spacing:-.005em}
+:root[data-layout="tonal"] :is(.card,.tile,.ha-grp,.rows,#locList,#devList,#devRemoved,.hb-cal){border-radius:24px}
+:root[data-layout="tonal"] :is(.plan,.pay,.trial,.hb-pick button,.field,.code){border-radius:20px}
+:root[data-layout="tonal"] :is(.btn,.chip){border-radius:999px}
+:root[data-layout="tonal"] .btn{padding:15px 22px}
+:root[data-layout="tonal"] .btn.gho{background:color-mix(in srgb,var(--sig) 22%,var(--card));color:var(--txt)}
+:root[data-layout="tonal"] .btn.quiet{background:none}
+:root[data-layout="tonal"] :is(.rows,.ha-grp,#locList,#devList){padding:6px}
+:root[data-layout="tonal"] :is(.row,.ha-row,.loc,.hc-dev){border-radius:18px}
+:root[data-layout="tonal"] :is(.row,.loc,.ha-row,.hc-dev) + :is(.row,.loc,.ha-row,.hc-dev)::before{display:none}
+:root[data-layout="tonal"] .hc-dev .ic{border-radius:14px;background:color-mix(in srgb,var(--sig) 22%,var(--card))}
+:root[data-layout="tonal"] .hb-grid i.in{background:color-mix(in srgb,var(--sig) 26%,transparent)}
+:root[data-layout="tonal"] .hb-grid i.s{border-radius:999px 0 0 999px}
+:root[data-layout="tonal"] .hb-grid i.e{border-radius:0 999px 999px 0}
+:root[data-layout="tonal"] .hb-grid i.s.e,:root[data-layout="tonal"] .hb-grid i.end{border-radius:999px}
+:root[data-layout="tonal"] .chips.seg{border-radius:999px;background:var(--card)}
+:root[data-layout="tonal"] .chips.seg .chip{border-radius:999px}
+:root[data-layout="tonal"] .chips.seg .chip.on{background:color-mix(in srgb,var(--sig) 30%,var(--card));box-shadow:none}
+:root[data-layout="tonal"] .nav{background:var(--card);border-top:0}
+:root[data-layout="tonal"] .nav .pill{display:grid;top:calc((var(--nav) - 50px) / 2);height:32px}
+:root[data-layout="tonal"] .nav .pill i{width:60px;height:32px;border-radius:999px;background:color-mix(in srgb,var(--sig) 30%,transparent)}
+:root[data-layout="tonal"] .nav button.on{color:var(--txt);font-weight:600}
+:root[data-layout="tonal"] .sheet{border-radius:28px 28px 0 0;background:var(--ground)}
+:root[data-layout="tonal"] .tool{background:var(--card)}
+:root[data-layout="tonal"] .plan:not(.on) .mark{border-color:var(--txt-3)}
+:root[data-layout="tonal"] .meter{background:var(--card-2)}
 
-/* ---------------- Tiles: a launcher of flat colour squares ---------------- */
-:root[data-layout="metro"]{
-  --ground:#000000;--card:#1F1F1F;--card-2:#2B2B2B;--line:#3A3A3A;--line-soft:#262626;
-  --txt:#FFFFFF;--txt-2:#C8C8C8;--txt-3:#9A9A9A;--r:0px}
-:root[data-layout="metro"][data-theme="light"]{
-  --ground:#FFFFFF;--card:#F0F0F0;--card-2:#E4E4E4;--line:#BDBDBD;--line-soft:#E0E0E0;
-  --txt:#111111;--txt-2:#333333;--txt-3:#5E5E5E}
-[data-layout="metro"] .head h1{font-family:var(--font-b);font-weight:300;font-size:44px;line-height:1;letter-spacing:-.03em;text-transform:lowercase}
-[data-layout="metro"] .brand{font-weight:600;text-transform:lowercase}
-[data-layout="metro"] .tool{border:0;border-radius:0}
-[data-layout="metro"] .hero{border:0;border-radius:0;background:var(--sig);color:var(--on-sig);padding:14px;min-height:178px;display:flex;flex-direction:column}
-[data-layout="metro"] .hero .row1{order:2;margin:auto 0 0;justify-content:flex-start}
-[data-layout="metro"] .hero #heroBody{display:flex;flex-direction:column}
-[data-layout="metro"] .state{border:0;background:none;padding:0;color:var(--on-sig);font-size:13px;font-weight:600;opacity:.9}
-[data-layout="metro"] .state .d{background:var(--on-sig) !important}
-[data-layout="metro"] .days b{font-family:var(--font-b);font-weight:300;font-size:64px;letter-spacing:-.04em}
-[data-layout="metro"] .days span{color:var(--on-sig);font-size:17px;font-weight:400}
-[data-layout="metro"] .hero h2{font-family:var(--font-b);font-weight:300;font-size:30px;color:var(--on-sig);text-transform:lowercase}
-[data-layout="metro"] .hero .sub{color:var(--on-sig);opacity:.85;margin-bottom:14px}
-[data-layout="metro"] .hero .btn.pri{background:none;border:2px solid var(--on-sig);color:var(--on-sig);border-radius:0;align-self:flex-start;width:auto;padding:9px 16px;font-weight:600;font-size:14px}
-[data-layout="metro"] .btn{border-radius:0}
-[data-layout="metro"] .tiles{gap:8px;margin-top:8px}
-[data-layout="metro"] .tile{border:0;border-radius:0;color:#fff;aspect-ratio:1;padding:12px;justify-content:space-between;position:relative}
-[data-layout="metro"] .tile:nth-child(1){background:#00897B}
-[data-layout="metro"] .tile:nth-child(2){background:#0B78D1}
-[data-layout="metro"] .tile .t{order:2;margin:0;color:#fff;font-size:15px}
-[data-layout="metro"] .tile .t>svg:first-child{position:absolute;top:12px;left:12px;width:26px;height:26px;padding:0 !important;background:none !important;border:0 !important;color:#fff}
-[data-layout="metro"] .tile .t .ch{display:none}
-[data-layout="metro"] .tile .v{align-self:flex-end;font-family:var(--font-b);font-weight:300;font-size:46px;color:#fff}
-[data-layout="metro"] .tile .v small{color:rgba(255,255,255,.75);font-size:20px}
-[data-layout="metro"] .tile .n{order:3;color:rgba(255,255,255,.82);margin-top:2px}
-[data-layout="metro"] .sec h3{font-family:var(--font-b);font-weight:300;font-size:28px;letter-spacing:-.02em;color:var(--txt);text-transform:lowercase;margin-bottom:10px}
-[data-layout="metro"] #quickRows{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-[data-layout="metro"] #quickRows .row{--tl:#5E5E5E;background:var(--tl);color:#fff;flex-direction:column;align-items:flex-start;justify-content:space-between;
-  aspect-ratio:1.6;padding:12px;border:0;gap:0}
-[data-layout="metro"] #quickRows .row :is(.ch,.t span,.v){display:none}
-[data-layout="metro"] #quickRows .row .t{flex:none;width:100%}
-[data-layout="metro"] #quickRows .row .t b{font-weight:400;font-size:15px;line-height:1.2}
-[data-layout="metro"] #quickRows .row .ic{color:#fff;width:auto;padding:0 !important;background:none !important;border:0 !important}
-[data-layout="metro"] #quickRows .row .ic svg{width:26px;height:26px}
-[data-layout="metro"] #quickRows .row:has(use:is([href="#i-qr"],[href="#i-globe"],[href="#i-shield"],[href="#i-send"],[href="#i-link"])){--tl:#0B78D1}
-[data-layout="metro"] #quickRows .row:has(use:is([href="#i-plus"],[href="#i-wallet"],[href="#i-card"],[href="#i-coin"])){--tl:#1E9E4A}
-[data-layout="metro"] #quickRows .row:has(use:is([href="#i-star"],[href="#i-bolt"])){--tl:#E07A00}
-[data-layout="metro"] #quickRows .row:has(use:is([href="#i-gift"],[href="#i-tag"])){--tl:#D5245A}
-[data-layout="metro"] #quickRows .row:has(use:is([href="#i-ref"],[href="#i-friends"])){--tl:#D80073}
-[data-layout="metro"] #quickRows .row:has(use:is([href="#i-chat"],[href="#i-help"])){--tl:#647687}
-[data-layout="metro"] #quickRows .row:has(use:is([href="#i-dev"],[href="#i-key"])){--tl:#00897B}
-[data-layout="metro"] :is(.card:not(.hero),.plan,.pay,.search,.trial,.deal){border:0;border-radius:0;background:var(--card)}
-[data-layout="metro"] .plan.on{background:var(--sig);color:var(--on-sig)}
-[data-layout="metro"] .plan.on :is(.t span,.pr span,.pr s){color:var(--on-sig) !important;opacity:.8}
-[data-layout="metro"] .plan.on .mark{border-color:var(--on-sig)}
-[data-layout="metro"] .plan.on .mark::after{background:var(--on-sig)}
-[data-layout="metro"] .plan .mark{border-radius:0}
-[data-layout="metro"] .plan .mark::after{border-radius:0}
-[data-layout="metro"] :is(.row,.loc){border-bottom:0}
-[data-layout="metro"] .loc .fl{border:0;border-radius:0}
-[data-layout="metro"] .meter{border-radius:0;height:6px}
-[data-layout="metro"] .meter i{border-radius:0}
-[data-layout="metro"] .nav{border-top:0;background:var(--ground)}
-[data-layout="metro"] .nav .pill{display:none}
-[data-layout="metro"] .nav button{text-transform:lowercase;font-size:11px}
-[data-layout="metro"] .sheet{border:0;border-radius:0;background:var(--card)}
-[data-layout="metro"] .sheet h3{font-family:var(--font-b);font-weight:300;font-size:30px;text-transform:lowercase}
-[data-layout="metro"] :is(.field,.chip,.state,.me .av,.code,.plan .t b em){border-radius:0}
+/* ============================================================
+   Style "brand" — the shop's colour across the top, like a bank's app:
+   the header and the first block of each screen sit on it in the colour's
+   own text, everything under it is the clean white-on-grey.
+   ============================================================ */
+:root[data-layout="brand"]{
+  --ground:#000000;--card:#1C1C1E;--card-2:#2C2C2E;--line:#38383A;--line-soft:#2C2C2E;
+  --txt:#F5F5F7;--txt-2:#AEAEB2;--txt-3:#8E8E93;--r:16px;--r-m:12px;--r-s:10px;--r-l:18px;--head:var(--sig)}
+:root[data-layout="brand"][data-theme="light"]{
+  --ground:#F2F3F5;--card:#FFFFFF;--card-2:#F2F3F5;--line:#E4E6EA;--line-soft:#E4E6EA;
+  --txt:#121417;--txt-2:#5B616B;--txt-3:#666C76}
+:root[data-layout="brand"] .top{background:var(--sig);color:var(--on-sig)}
+:root[data-layout="brand"] .top :is(.brand,.brand b){color:var(--on-sig)}
+:root[data-layout="brand"] .top .tool{background:color-mix(in srgb,var(--on-sig) 14%,transparent);color:var(--on-sig)}
+/* the first block of a screen continues the colour, edge to edge */
+:root[data-layout="brand"] :is(.head,.ha-ans,.hc-top){margin:0 calc(-1 * var(--pad));padding:8px calc(var(--pad) + 2px) 26px;
+  background:var(--sig);color:var(--on-sig);border-radius:0 0 22px 22px}
+:root[data-layout="brand"] :is(.head,.ha-ans,.hc-top) :is(h1,p,.hc-h1,.hc-lead,.hc-st,.hc-st b){color:var(--on-sig)}
+:root[data-layout="brand"] :is(.head p,.ha-ans p,.hc-lead,.hc-st){opacity:.86}
+:root[data-layout="brand"] .ha-ans p .warn{color:var(--on-sig);font-weight:600;opacity:1}
+:root[data-layout="brand"] .hc-st i{background:var(--on-sig)}
+:root[data-layout="brand"] .hc-h1{margin-top:8px}
+:root[data-layout="brand"] .hc-lead{margin-bottom:0}
+:root[data-layout="brand"] .hc-top + .ha-grp{margin-top:14px}
+:root[data-layout="brand"] .ha-ans + .ha-acts{margin-top:14px}
+/* the term calendar is the coloured block itself */
+:root[data-layout="brand"] #homeAlt>.hb-cal:first-child{margin:0 calc(-1 * var(--pad));border-radius:0 0 22px 22px;
+  background:var(--sig);color:var(--on-sig);padding:8px calc(var(--pad) + 2px) 20px}
+:root[data-layout="brand"] #homeAlt>.hb-cal:first-child :is(.hd b,.hd span,.note,.note b,.dw){color:var(--on-sig)}
+:root[data-layout="brand"] #homeAlt>.hb-cal:first-child .note{opacity:.86}
+:root[data-layout="brand"] #homeAlt>.hb-cal:first-child .hb-grid i.in{background:color-mix(in srgb,var(--on-sig) 16%,transparent)}
+:root[data-layout="brand"] #homeAlt>.hb-cal:first-child .hb-grid i.end{background:var(--on-sig);color:var(--sig)}
+:root[data-layout="brand"] #homeAlt>.hb-cal:first-child .hb-grid i.out{color:var(--on-sig);opacity:.42}
+:root[data-layout="brand"] .nav .pill{display:none}
+:root[data-layout="brand"] .nav button.on{color:var(--sig-txt);font-weight:600}
+
+/* ============================================================
+   Style "large" — easy to read: larger text and buttons, plain black on
+   white (or white on black), clear outlines; for anyone who finds small
+   grey print hard, parents included.
+   ============================================================ */
+:root[data-layout="large"]{
+  --ground:#000000;--card:#000000;--card-2:#1A1A1A;--line:#8C8C8C;--line-soft:#8C8C8C;
+  --txt:#FFFFFF;--txt-2:#E6E6E6;--txt-3:#D0D0D0;--r:16px;--r-m:14px;--r-s:12px;--r-l:18px}
+:root[data-layout="large"][data-theme="light"]{
+  --ground:#FFFFFF;--card:#FFFFFF;--card-2:#F0F0F0;--line:#767676;--line-soft:#767676;
+  --txt:#000000;--txt-2:#262626;--txt-3:#3B3B3B}
+:root[data-layout="large"] body{font-size:18px}
+:root[data-layout="large"] :is(.ha-grp,.rows,#locList,#devList,#devRemoved,.card,.tile,.plan,.pay,.trial,.hb-pick button,.field){border:2px solid var(--line) !important}
+:root[data-layout="large"] :is(.row,.ha-row,.loc,.hc-dev) + :is(.row,.ha-row,.loc,.hc-dev)::before{height:2px;transform:none;left:0;background:var(--line)}
+:root[data-layout="large"] :is(.head h1,.ha-ans h1,.hc-h1){font-size:34px;font-weight:700;line-height:1.12}
+:root[data-layout="large"] :is(.head p,.ha-ans p,.hc-lead,.hc-st,.hb-cal .note){font-size:18px;color:var(--txt)}
+:root[data-layout="large"] :is(.row .t b,.ha-row .t,.loc .t b,.hc-dev .t b){font-size:19px;font-weight:500}
+:root[data-layout="large"] :is(.row .t span,.ha-row .t small,.hc-dev .t span,.ha-row .v){font-size:16px;color:var(--txt-2)}
+:root[data-layout="large"] :is(.row,.ha-row,.loc,.hc-dev){min-height:64px}
+:root[data-layout="large"] :is(.row .ic,.ha-row>svg:first-child){width:26px;height:26px;color:var(--txt)}
+:root[data-layout="large"] .btn{font-size:19px;font-weight:700;min-height:60px;border-radius:14px}
+:root[data-layout="large"] .btn.gho{background:var(--card);border:2px solid var(--txt);color:var(--txt)}
+:root[data-layout="large"] .btn.quiet{border:0;text-decoration:underline;text-underline-offset:3px}
+:root[data-layout="large"] :is(.ha-cap,.sec h3){font-size:16px;font-weight:700;color:var(--txt)}
+:root[data-layout="large"] .hb-grid i{font-size:18px;height:44px}
+:root[data-layout="large"] .hb-grid .dw{font-size:14px;color:var(--txt)}
+:root[data-layout="large"] .hb-grid i.in{background:color-mix(in srgb,var(--sig) 26%,transparent)}
+:root[data-layout="large"] .hb-grid i.out{opacity:1;color:var(--txt-3);text-decoration:line-through}
+:root[data-layout="large"] :is(.hb-pick button b,.hb-pick button em){font-size:18px}
+:root[data-layout="large"] .hb-pick button span{font-size:15px;color:var(--txt-2)}
+:root[data-layout="large"] .hb-pick button.on{border-color:var(--sig) !important;border-width:3px !important}
+:root[data-layout="large"] .chip{font-size:17px;border:2px solid var(--line)}
+:root[data-layout="large"] .chips.seg .chip{border:0}
+:root[data-layout="large"] .nav{border-top:2px solid var(--line);background:var(--ground)}
+:root[data-layout="large"] .nav button{font-size:13px;font-weight:600;color:var(--txt-2)}
+:root[data-layout="large"] .nav button.on{color:var(--txt)}
+:root[data-layout="large"] .nav button.on .ni{background:rgba(var(--sig-rgb),.22)}
+:root[data-layout="large"] .nav .pill{display:none}
+:root[data-layout="large"] .nav .ni svg{width:26px;height:26px}
+:root[data-layout="large"] :is(button,a):focus-visible{outline:3px solid var(--sig);outline-offset:2px}
+:root[data-layout="large"] .sheet{border-top:2px solid var(--line)}
+:root[data-layout="large"] .sheet h3{font-size:26px;font-weight:700}
+:root[data-layout="large"] .hc-dev .ic{border:2px solid var(--line);background:none}
+:root[data-layout="large"] .hc-cs span{border:2px solid var(--line);font-size:16px}
+
+/* ============================================================
+   Style "cosmos" — after the VPN landing pages: a deep night ground lit
+   from above by the shop's colour, glass cards with a thin coloured edge,
+   big prices in a white-to-tint gradient, the main button in a gradient
+   from the shop's colour to pink; the best plan wears a ribbon.
+   --sig2 is the partner colour of the gradients.
+   ============================================================ */
+:root[data-layout="cosmos"]{
+  --sig2:color-mix(in oklab,var(--sig) 38%,#EC4899);
+  --ground:#0A0513;--card:color-mix(in srgb,var(--sig) 12%,#150D26);--card-2:color-mix(in srgb,var(--sig) 20%,#1D1433);
+  --line:color-mix(in srgb,var(--sig) 30%,transparent);--line-soft:color-mix(in srgb,var(--sig) 20%,transparent);
+  --txt:#FFFFFF;--txt-2:color-mix(in srgb,var(--sig) 22%,#E4DEF6);--txt-3:color-mix(in srgb,var(--sig) 26%,#B8AED6);
+  --r:24px;--r-m:16px;--r-s:12px;--r-l:28px;
+  --glass:linear-gradient(160deg,color-mix(in srgb,var(--sig) 22%,rgba(40,27,68,.72)),rgba(20,12,38,.86));
+  --glow-a:color-mix(in srgb,var(--sig) 58%,transparent);--glow-b:color-mix(in srgb,var(--sig2) 40%,transparent);
+  --num:linear-gradient(135deg,#FFFFFF,color-mix(in srgb,var(--sig) 30%,#F0E6FF))}
+:root[data-layout="cosmos"][data-theme="light"]{
+  --ground:#FAFAFE;--card:#FFFFFF;--card-2:color-mix(in srgb,var(--sig) 8%,#FFFFFF);
+  --line:color-mix(in srgb,var(--sig) 26%,transparent);--line-soft:color-mix(in srgb,var(--sig) 16%,transparent);
+  --txt:#0A0513;--txt-2:color-mix(in srgb,var(--sig) 30%,#3B2C5C);--txt-3:color-mix(in srgb,var(--sig) 25%,#5A4B7A);
+  --glass:linear-gradient(160deg,#FFFFFF,color-mix(in srgb,var(--sig) 7%,#FFFFFF));
+  --glow-a:color-mix(in srgb,var(--sig) 24%,transparent);--glow-b:color-mix(in srgb,var(--sig2) 18%,transparent);
+  --num:linear-gradient(135deg,#0A0513,color-mix(in srgb,var(--sig) 70%,#0A0513))}
+:root[data-layout="cosmos"] body{background:
+  radial-gradient(110% 55% at 30% -6%,var(--glow-a),transparent 62%),
+  radial-gradient(80% 45% at 100% 40%,color-mix(in srgb,var(--glow-a) 60%,transparent),transparent 62%),
+  radial-gradient(90% 50% at 0% 100%,var(--glow-b),transparent 60%),var(--ground) fixed;
+  background-attachment:fixed}
+:root[data-layout="cosmos"] .top{background:color-mix(in srgb,var(--ground) 70%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+:root[data-layout="cosmos"] :is(.head h1,.ha-ans h1,.hc-h1,.sheet h3){font-weight:800;letter-spacing:-.035em;line-height:1.05}
+:root[data-layout="cosmos"] :is(.head h1,.ha-ans h1){font-size:34px}
+/* glass everywhere a surface is */
+:root[data-layout="cosmos"] :is(.card,.tile,.ha-grp,.rows,#locList,#devList,#devRemoved,.plan,.pay,.trial,.hb-pick button,.search,.hc-cs span,.deal){
+  background:var(--glass);border:1px solid var(--line-soft) !important;box-shadow:0 18px 50px -22px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06)}
+:root[data-layout="cosmos"][data-theme="light"] :is(.card,.tile,.ha-grp,.rows,#locList,#devList,.plan,.pay,.trial,.hb-pick button,.search,.hc-cs span){
+  box-shadow:0 18px 40px -26px color-mix(in srgb,var(--sig) 45%,transparent),inset 0 1px 0 #fff}
+:root[data-layout="cosmos"] :is(.card,.tile,.ha-grp,.rows,#locList,#devList,.hb-cal){border-radius:24px}
+:root[data-layout="cosmos"] :is(.row,.ha-row,.loc,.hc-dev) + :is(.row,.ha-row,.loc,.hc-dev)::before{background:var(--line-soft);transform:none}
+/* the numbers: large, heavy, in the gradient */
+:root[data-layout="cosmos"] :is(.days b,.tile .v,.plan .pr b,.hb-pick button em,.total b,.bill .amt){
+  background:var(--num);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800;letter-spacing:-.04em}
+:root[data-layout="cosmos"] .days b{font-size:44px}
+:root[data-layout="cosmos"] .hb-pick button em{font-size:22px}
+/* buttons: the main one in the gradient with a glow, the rest outlined glass */
+:root[data-layout="cosmos"] .btn{border-radius:14px;font-weight:700}
+:root[data-layout="cosmos"] .btn.pri{background:linear-gradient(135deg,var(--sig),var(--sig2));color:#fff;border:0;
+  box-shadow:0 10px 30px -8px color-mix(in srgb,var(--sig2) 60%,transparent),inset 0 1px 0 rgba(255,255,255,.3)}
+:root[data-layout="cosmos"] .btn.gho{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--txt-2)}
+:root[data-layout="cosmos"][data-theme="light"] .btn.gho{background:#fff;color:var(--txt)}
+:root[data-layout="cosmos"] .btn.quiet{background:none;border:0}
+/* section captions: a small pill with a lit dot */
+:root[data-layout="cosmos"] :is(.ha-cap,.sec h3){display:inline-flex;align-items:center;gap:8px;width:auto;padding:5px 12px;margin-left:0;text-transform:uppercase !important;letter-spacing:.08em !important;
+  border-radius:999px;background:color-mix(in srgb,var(--sig) 12%,transparent);border:1px solid color-mix(in srgb,var(--sig) 28%,transparent);
+  color:var(--txt-2);font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+:root[data-layout="cosmos"] :is(.ha-cap,.sec h3)::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--sig);box-shadow:0 0 10px var(--sig)}
+:root[data-layout="cosmos"] .sec h3 span{display:none}
+/* plans: price cards; the best one wears the ribbon */
+:root[data-layout="cosmos"] .plan{border-radius:24px;padding:18px;position:relative;overflow:hidden}
+:root[data-layout="cosmos"] .plan + .plan{margin-top:12px}
+:root[data-layout="cosmos"] .plan .t b{font-size:18px;font-weight:700;letter-spacing:-.02em}
+:root[data-layout="cosmos"] .plan .pr b{font-size:30px;line-height:1}
+:root[data-layout="cosmos"] .plan .save{color:color-mix(in srgb,var(--sig2) 60%,#fff);font-weight:700}
+:root[data-layout="cosmos"][data-theme="light"] .plan .save{color:color-mix(in srgb,var(--sig2) 80%,#000)}
+:root[data-layout="cosmos"] .plan.on{border-color:color-mix(in srgb,var(--sig) 55%,transparent) !important;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--sig) 30%,#1A0B2E),color-mix(in srgb,var(--sig) 45%,#3D1A63));
+  box-shadow:0 26px 60px -24px color-mix(in srgb,var(--sig) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.1)}
+:root[data-layout="cosmos"][data-theme="light"] .plan.on{background:linear-gradient(160deg,#fff,color-mix(in srgb,var(--sig) 14%,#fff))}
+:root[data-layout="cosmos"] .plan.on .mark{border-color:#fff}
+:root[data-layout="cosmos"] .plan.on .mark::after{background:linear-gradient(135deg,var(--sig),var(--sig2))}
+:root[data-layout="cosmos"] .plan.best{padding-top:52px}
+:root[data-layout="cosmos"] .plan.best::before{content:attr(data-ribbon);position:absolute;left:0;right:0;top:0;height:34px;
+  display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;letter-spacing:.02em;color:#fff;
+  background:linear-gradient(135deg,var(--sig),var(--sig2))}
+:root[data-layout="cosmos"] .plan .pr .cut,:root[data-layout="cosmos"] .plan .t b em{
+  background:linear-gradient(135deg,#FB7185,var(--sig2));color:#fff;border-radius:999px;padding:3px 9px;font-weight:800;
+  box-shadow:0 6px 18px -6px color-mix(in srgb,var(--sig2) 75%,transparent);border:0}
+:root[data-layout="cosmos"] .hb-pick button.on{border-color:color-mix(in srgb,var(--sig) 60%,transparent) !important;
+  box-shadow:0 18px 40px -18px color-mix(in srgb,var(--sig) 70%,transparent)}
+:root[data-layout="cosmos"] .hb-grid i.in{background:color-mix(in srgb,var(--sig) 24%,transparent)}
+:root[data-layout="cosmos"] .hb-grid i.end{background:linear-gradient(135deg,var(--sig),var(--sig2));color:#fff;box-shadow:0 8px 20px -8px var(--sig2)}
+:root[data-layout="cosmos"] .hc-dev .ic{background:color-mix(in srgb,var(--sig) 18%,transparent);border:1px solid var(--line-soft)}
+:root[data-layout="cosmos"] .state .d,:root[data-layout="cosmos"] .hc-st i{box-shadow:0 0 10px currentColor}
+:root[data-layout="cosmos"] .chip.on{background:color-mix(in srgb,var(--sig) 22%,transparent)}
+:root[data-layout="cosmos"] .chips.seg{background:rgba(255,255,255,.05)}
+:root[data-layout="cosmos"] .chips.seg .chip.on{background:linear-gradient(135deg,var(--sig),var(--sig2));color:#fff}
+:root[data-layout="cosmos"] .nav{background:color-mix(in srgb,var(--ground) 78%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line-soft)}
+:root[data-layout="cosmos"] .nav .pill{display:grid}
+:root[data-layout="cosmos"] .nav .pill i{background:color-mix(in srgb,var(--sig) 26%,transparent);box-shadow:0 0 18px -4px var(--sig)}
+:root[data-layout="cosmos"] .nav button.on{color:var(--txt)}
+:root[data-layout="cosmos"] .sheet{background:linear-gradient(180deg,color-mix(in srgb,var(--sig) 14%,#140A26),var(--ground) 40%);border-top:1px solid var(--line)}
+:root[data-layout="cosmos"][data-theme="light"] .sheet{background:linear-gradient(180deg,color-mix(in srgb,var(--sig) 8%,#fff),var(--ground) 40%)}
+:root[data-layout="cosmos"] .field{background:rgba(255,255,255,.05);border-color:var(--line)}
+:root[data-layout="cosmos"][data-theme="light"] .field{background:#fff}
 </style>
 </head>
 <body>
@@ -2653,6 +2789,9 @@ body.resolve .screen.on #quickRows>.row:nth-child(n+3){animation-delay:.22s}
 <g id="i-home"><path d="M3.6 10.4 12 3.8l8.4 6.6v8.2a1.6 1.6 0 0 1-1.6 1.6H5.2a1.6 1.6 0 0 1-1.6-1.6z"/></g>
 <g id="i-globe"><circle cx="12" cy="12" r="8.6"/><path d="M3.4 12h17.2"/><path d="M12 3.4c2.4 2.5 2.4 14.7 0 17.2-2.4-2.5-2.4-14.7 0-17.2Z"/></g>
 <g id="i-dev"><rect x="3.2" y="5.4" width="11.4" height="13.2" rx="1.8"/><rect x="16.6" y="9.2" width="4.2" height="9.4" rx="1.2"/></g>
+<g id="i-phone"><rect x="6.6" y="2.8" width="10.8" height="18.4" rx="2.4"/><path d="M10.6 18.1h2.8"/></g>
+<g id="i-laptop"><rect x="4.2" y="5.2" width="15.6" height="10.6" rx="1.6"/><path d="M2.4 18.8h19.2"/></g>
+<g id="i-tv"><rect x="2.8" y="4.6" width="18.4" height="12.4" rx="1.8"/><path d="M8.6 20.2h6.8"/></g>
 <g id="i-wallet"><rect x="3.2" y="5.6" width="17.6" height="13.6" rx="2.4"/><path d="M3.2 9.8h17.6"/><circle cx="16.6" cy="14.6" r="1.3"/></g>
 <g id="i-user"><circle cx="12" cy="8.4" r="3.6"/><path d="M4.8 20.2a7.4 7.4 0 0 1 14.4 0"/></g>
 <g id="i-ref"><path d="M20.2 12a8.2 8.2 0 1 1-2.5-5.9"/><path d="M20.4 4.2v4.4h-4.4"/></g>
@@ -2709,6 +2848,7 @@ body.resolve .screen.on #quickRows>.row:nth-child(n+3){animation-delay:.22s}
     </div>
 
     <div id="homeDeal"></div>
+    <div id="homeAlt"></div>
     <div class="card hero">
       <span class="glow"></span>
       <div class="row1">
@@ -2835,6 +2975,15 @@ ru: {
   refresh:"Обновить", profile:"Профиль", close:"Закрыть",
   doneTitle:"Доступ открыт", previewOnly:"Это предпросмотр — здесь ничего не отправляется",
   home:"Главная", locations:"Локации", devices:"Устройства", subscription:"Подписка",
+  totalFor:"Итого за {p}", bestChoice:"Лучший выбор", haTrial:"Попробовать бесплатно: {d}", haEndedOn:"Закончилась {d}. Продлите, чтобы VPN снова заработал.",
+  haWorks:"Работает до {d}", haEnds:"Заканчивается {d}", haSoon:"Продлите, чтобы VPN не отключился.", haLeft:"Осталось {n} {w}",
+  haPlan:"тариф «{p}»", haDevs:"до {n} устройств", haNone:"Подписки пока нет", haEnded:"Подписка закончилась", haBlocked:"Доступ закрыт",
+  haTraffic:"Трафик закончился", haOf:"{a} из {b}", haCountries:"Страны", haRenewRow:"Продлить", haFrom:"от {p}", haYour:"Ваша подписка",
+  hbWorks:"VPN работает", hbEnds:"Подписка заканчивается {d}, через {n} {w}.", hbAhead:"Продлить заранее",
+  hbChoose:"Выберите срок", hbUntil:"до {d}", hbRenewFor:"Продлить за {p}", hbBuyFor:"Оформить за {p}",
+  hcWorks:"Работает до {d}", hcTitle:"Ваши устройства", hcLead:"По подписке можно подключить {n} {w}.",
+  hcLeadAll:"По подписке можно подключить сколько угодно устройств.", hcAdd:"Подключить ещё одно", hcFree:"свободно мест: {n}",
+  hcNoFree:"мест не осталось, можно докупить", hcMore:"Нужно больше мест?", hcMoreBtn:"+1 место за {p} в месяц",
   homeOver:"Личный кабинет", access:"Доступ", yourAccess:"Ваш доступ", letsStart:"Начнём",
   stActive:"Работает", stNone:"Нет подписки", stLoading:"Загрузка", stExpired:"Закончилась",
   stTgOnly:"Только Telegram", tgOnlySub:"Подписка закончилась, VPN отключён. До {t} работает только Telegram — чтобы вы успели продлить.",
@@ -2976,6 +3125,15 @@ en: {
   refresh:"Refresh", profile:"Profile", close:"Close",
   doneTitle:"Access is on", previewOnly:"This is a preview — nothing is sent from here",
   home:"Home", locations:"Locations", devices:"Devices", subscription:"Plans",
+  totalFor:"Total for {p}", bestChoice:"Best choice", haTrial:"Try it free: {d}", haEndedOn:"It ended on {d}. Renew to get the VPN back.",
+  haWorks:"Works until {d}", haEnds:"Ends on {d}", haSoon:"Renew so the VPN keeps working.", haLeft:"{n} {w} left",
+  haPlan:"the “{p}” plan", haDevs:"up to {n} devices", haNone:"No subscription yet", haEnded:"Your subscription has ended", haBlocked:"Access is closed",
+  haTraffic:"Traffic is used up", haOf:"{a} of {b}", haCountries:"Countries", haRenewRow:"Renew", haFrom:"from {p}", haYour:"Your subscription",
+  hbWorks:"The VPN works", hbEnds:"Your subscription ends on {d}, in {n} {w}.", hbAhead:"Renew early",
+  hbChoose:"Choose a term", hbUntil:"until {d}", hbRenewFor:"Renew for {p}", hbBuyFor:"Get it for {p}",
+  hcWorks:"Works until {d}", hcTitle:"Your devices", hcLead:"Your subscription covers {n} {w}.",
+  hcLeadAll:"Your subscription covers any number of devices.", hcAdd:"Connect one more", hcFree:"free places: {n}",
+  hcNoFree:"no places left, you can add one", hcMore:"Need more places?", hcMoreBtn:"+1 place for {p} a month",
   homeOver:"Your account", access:"Access", yourAccess:"Your access", letsStart:"Let’s start",
   stActive:"Active", stNone:"No subscription", stLoading:"Loading", stExpired:"Expired",
   stTgOnly:"Telegram only", tgOnlySub:"Your subscription ended and the VPN is off. Until {t} only Telegram works — so you can renew.",
@@ -3298,7 +3456,7 @@ async function loadAll(){
     if (meP) meP.catch(() => {});          // a failure is handled below, where it is awaited
     CFG = await API.call("/api/app/config");
     if (PREVIEW){
-      ME = PREVIEW_STATE === "new" ? null : demoMe();
+      ME = demoMe();
       banner("");
     } else if (tg && tg.initData){
       ME = await meP;
@@ -3569,7 +3727,6 @@ function drawHome(){
       <button class="btn pri wide" onclick="go('sub')">${esc(t("chooseSub"))} ${svg("i-arr", 17, 'class="ar"')}</button>`;
   }
   $("heroBody").innerHTML = body;
-  document.querySelector(".hero .row1").dataset.brand = (CFG && CFG.brand) || (window.KV_BRAND && window.KV_BRAND.brand) || "";
   const daysNow = has ? Math.max(0, Math.ceil((ME.expires_at - Date.now() / 1000) / 86400)) : 0;
   const daysEl = has ? document.querySelector("#heroBody .days b") : null;
   if (daysEl){
@@ -3627,6 +3784,192 @@ function drawHome(){
       <span class="ic">${svg(ic)}</span>
       <span class="t"><b>${esc(b)}</b><span>${esc(s)}</span></span>
       ${svg("i-chev", 15, 'class="ch" stroke-width="2"')}</button>`).join("");
+  drawHomeAlt();
+}
+
+/* ============================ home: answer / term / devices ============================
+   The other home screens of the panel's "Home screen" setting (data-home). Each is
+   built around one thing the person came for: a plain answer, the calendar of the
+   term with renewal, or the devices. The classic card is drawn by drawHome(). */
+function homeKind(){ return document.documentElement.getAttribute("data-home") || "classic"; }
+function homeState(){
+  const now = Date.now() / 1000;
+  const has = !!(ME && ME.has_subscription);
+  const grace = ME && !has && ME.grace_until && !ME.blocked ? ME.grace_until : 0;
+  const tgOnly = ME && !has && !grace && ME.tg_only_until && !ME.blocked ? ME.tg_only_until : 0;
+  const left = has ? Math.max(0, Math.ceil((ME.expires_at - now) / 86400)) : 0;
+  const lim = ME ? ME.device_limit || 0 : 0, used = ME ? (ME.devices || []).length : 0;
+  return { has, grace, tgOnly, left, lim, used, end:has ? ME.expires_at : 0 };
+}
+const shortDate = ts => new Date(ts * 1000).toLocaleDateString(LANG === "ru" ? "ru-RU" : "en-US", { day:"numeric", month:"short" }).replace(".", "");
+function homeMinPrice(){
+  const ps = paidPlans();
+  return ps.length ? Math.min(...ps.map(p => disc(p.price, autoDisc().percent))) : 0;
+}
+function homeCountries(){
+  const seen = new Set(), out = [];
+  ((CFG && CFG.servers) || []).forEach(s => { if (s.country && !seen.has(s.country)){ seen.add(s.country); out.push(s.country); } });
+  return out;
+}
+function homeRow(fn, ic, title, value, sub){
+  return `<button class="ha-row" onclick="${fn}">${svg(ic, 21)}
+    <span class="t">${esc(title)}${sub ? `<small>${esc(sub)}</small>` : ""}</span>
+    ${value ? `<span class="v">${value}</span>` : ""}${svg("i-chev", 15, 'class="ch" stroke-width="2"')}</button>`;
+}
+/* The words for the state: [title, line under it, is it a warning]. */
+function homeWords(st){
+  if (ME && ME.blocked) return [t("haBlocked"), t("blockedLead"), true];
+  if (st.tgOnly){
+    const when = new Date(st.tgOnly * 1000).toLocaleString(LANG === "ru" ? "ru-RU" : "en-US", { day:"numeric", month:"long", hour:"2-digit", minute:"2-digit" });
+    return [t("stTgOnly"), t("tgOnlySub", { t:when }), true];
+  }
+  if (st.grace) return [t("haEnded"), t("graceSub", { d:dateStr(ME.expires_at), g:dateStr(st.grace) }), true];
+  if (!st.has && ME && ME.expires_at > 0) return [t("haEnded"), t("haEndedOn", { d:dateStr(ME.expires_at) }), true];
+  if (!st.has){
+    const min = homeMinPrice();
+    return [t("haNone"), ((CFG && CFG.tagline && CFG.tagline[LANG]) || t("oneSub")) + (min ? " " + t("from", { p:money(min) }) : ""), false];
+  }
+  if (ME.traffic_blocked)
+    return [t("haTraffic"), t((CFG.traffic_packs || []).length ? "trafficOutLead" : "trafficOutRenew"), true];
+  const soon = st.left <= 3;
+  const parts = [t("haLeft", { n:st.left, w:pl(st.left, "dN") })];
+  if (ME.plan) parts.push(t("haPlan", { p:planName(ME.plan) }));
+  if (st.lim) parts.push(t("haDevs", { n:st.lim }));
+  return [t(soon ? "haEnds" : "haWorks", { d:dateStr(st.end) }), parts.join(", ") + ".", soon, soon ? t("haSoon") : ""];
+}
+/* The main action: connect while it works, otherwise renew, top up or choose. */
+function homeMain(st){
+  if (salesPaused() && !st.has) return "";
+  if (st.has && ME.traffic_blocked)
+    return (CFG.traffic_packs || []).length
+      ? `<button class="btn pri wide" onclick="sheetTraffic()">${esc(t("topUp"))}</button>`
+      : `<button class="btn pri wide" onclick="go('sub')">${esc(t("renew"))}</button>`;
+  if (st.has && st.left <= 3)
+    return `<button class="btn pri wide" onclick="go('sub')">${esc(t("renew"))}</button>
+      <button class="btn gho wide" onclick="sheetConnect()">${esc(t("connectDevice"))}</button>`;
+  if (st.has) return `<button class="btn pri wide" onclick="sheetConnect()">${svg("i-plus", 18, 'stroke-width="2"')}${esc(t("connectDevice"))}</button>`;
+  if (st.grace || st.tgOnly || (ME && ME.expires_at > 0)) return `<button class="btn pri wide" onclick="go('sub')">${esc(t("renew"))}</button>`;
+  const trial = homeTrial("pri");
+  return trial ? trial + `<button class="btn gho wide" onclick="go('sub')">${esc(t("chooseSub"))}</button>`
+               : `<button class="btn pri wide" onclick="go('sub')">${esc(t("chooseSub"))}</button>`;
+}
+/* The free trial for someone who never had a subscription, when the shop has one. */
+function homeTrial(cls){
+  const trial = ((CFG && CFG.plans) || []).find(x => x.is_trial);
+  if (!trial || !ME || !ME.trial_available || salesPaused() || !((CFG.servers || []).length)) return "";
+  return `<button class="btn ${cls} wide" onclick="trialClick(${Number(trial.id)})">${svg("i-bolt", 18, 'stroke-width="2"')}${esc(t("haTrial", { d:trial.days + " " + pl(trial.days, "dN") }))}</button>`;
+}
+function homeAnswerHead(st){
+  const [title, line, warn, more] = homeWords(st);
+  return `<section class="ha-ans"><h1>${esc(title)}</h1><p>${esc(line)}${more ? ` <span class="warn">${esc(more)}</span>` : ""}</p></section>`;
+}
+function homeList(st){
+  const rows = [];
+  const live = st.has || st.grace;
+  if (live) rows.push(homeRow("go('devs')", "i-dev", t("devices"), st.lim ? esc(t("haOf", { a:st.used, b:st.lim })) : String(st.used)));
+  const cs = homeCountries();
+  if (cs.length) rows.push(homeRow("go('locs')", "i-globe", t("haCountries"),
+    `<span class="ha-flags">${cs.slice(0, 5).map(flag).join("")}</span>${cs.length > 5 ? " +" + (cs.length - 5) : ""}`));
+  if (st.has && ME.traffic_limit > 0)
+    rows.push(homeRow((CFG.traffic_packs || []).length ? "sheetTraffic()" : "go('sub')", "i-bolt", t("traffic"),
+      esc(t("trafficOf", { u:gb(ME.traffic_used), l:gb(ME.traffic_limit) }))));
+  if (st.has && !salesPaused()){
+    const min = homeMinPrice();
+    rows.push(homeRow("go('sub')", "i-card", t("haRenewRow"), min ? esc(t("haFrom", { p:money(min) })) : ""));
+  }
+  return rows.length ? `<div class="ha-cap">${esc(t("haYour"))}</div><div class="ha-grp">${rows.join("")}</div>` : "";
+}
+
+function homePickPlan(id){ pick.planId = id; pick.devices = 0; pick.quote = null; drawHomeAlt(); }
+function homeTerm(st){
+  const plans = paidPlans();
+  let out = "";
+  if (st.has){
+    const end = new Date(st.end * 1000), today = new Date();
+    const y = end.getFullYear(), m = end.getMonth(), last = new Date(y, m + 1, 0).getDate();
+    const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+    const sameMonth = today.getFullYear() === y && today.getMonth() === m;
+    const from = sameMonth ? today.getDate() : 1, endDay = end.getDate();
+    const wd = LANG === "ru" ? ["пн", "вт", "ср", "чт", "пт", "сб", "вс"] : ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    let cells = wd.map(d => `<span class="dw">${d}</span>`).join("") + "<i></i>".repeat(lead);
+    for (let d = 1; d <= last; d++){
+      const col = (lead + d - 1) % 7;
+      let cls = d === endDay ? "end" : d >= from && d < endDay ? "in" : "out";
+      if (cls === "in"){
+        if (d === from || col === 0) cls += " s";
+        if (d === endDay - 1 || col === 6) cls += " e";
+      }
+      if (sameMonth && d === today.getDate() && d !== endDay) cls += " today";
+      cells += `<i class="${cls}">${d}</i>`;
+    }
+    const [title, , warn] = homeWords(st);
+    const month = end.toLocaleDateString(LANG === "ru" ? "ru-RU" : "en-US", { month:"long" }) + (y !== today.getFullYear() ? " " + y : "");
+    out += `<div class="ha-grp hb-cal"><div class="hd"><b>${esc(month)}</b><span${warn ? ' class="warn"' : ""}>${esc(warn ? title : t("hbWorks"))}</span></div>
+      <div class="hb-grid">${cells}</div>
+      <div class="note">${t("hbEnds", { d:"<b>" + esc(dateStr(st.end)) + "</b>", n:st.left, w:esc(pl(st.left, "dN")) })}</div></div>`;
+  } else {
+    out += homeAnswerHead(st);
+    const trial = homeTrial("gho");
+    if (trial) out += `<div class="ha-acts">${trial}</div>`;
+  }
+  if (plans.length && !salesPaused() && !(ME && ME.blocked)){
+    if (pick.planId == null || !plans.some(p => p.id === pick.planId)){
+      const best = bestOf(plans); pick.planId = best != null ? best : plans[0].id;
+    }
+    const base = st.has ? st.end : Date.now() / 1000;
+    const pct = autoDisc().percent;
+    out += `<div class="ha-cap">${esc(st.has ? t("hbAhead") : t("hbChoose"))}</div>
+      <div class="hb-pick">${plans.slice(0, 4).map(p => `<button class="${p.id === pick.planId ? "on" : ""}" onclick="homePickPlan(${Number(p.id)})">
+        <b>${esc(planName(p))}</b><span>${esc(t("hbUntil", { d:shortDate(base + p.days * 86400) }))}</span><em>${esc(money(disc(p.price, pct)))}</em></button>`).join("")}</div>`;
+    const sel = plans.find(p => p.id === pick.planId);
+    out += `<button class="btn pri wide hb-go" onclick="go('sub')">${esc(t(st.has || (ME && ME.expires_at > 0) ? "hbRenewFor" : "hbBuyFor", { p:money(disc(sel.price, pct)) }))}</button>`;
+  }
+  if (st.has) out += `<button class="btn gho wide hb-go" onclick="sheetConnect()">${svg("i-plus", 18, 'stroke-width="2"')}${esc(t("connectDevice"))}</button>`;
+  return out;
+}
+
+function homeDevices(st){
+  if (!st.has && !st.grace) return homeAnswerHead(st) + `<div class="ha-acts">${homeMain(st)}</div>` + homeCountriesBlock();
+  const [title, , warn] = homeWords(st);
+  const devs = ME.devices || [];
+  const free = st.lim ? Math.max(0, st.lim - st.used) : 1;
+  let rows = devs.map(d => `<button class="hc-dev" onclick="go('devs')"><span class="ic">${svg(devIcon(d), 20)}</span>
+      <span class="t"><b>${esc(d.model || d.app || t("deviceX"))}</b><span>${esc([d.model ? d.app : "", ago(d.last_seen)].filter(Boolean).join(", "))}</span></span></button>`).join("");
+  rows += `<button class="hc-dev free" onclick="${free ? "sheetConnect()" : "sheetDevices()"}"><span class="ic">${svg("i-plus", 20, 'stroke-width="2"')}</span>
+      <span class="t"><b>${esc(devs.length ? t("hcAdd") : t("connectDevice"))}</b><span>${esc(!st.lim ? t("unlimitedDev") : free ? t("hcFree", { n:free }) : t("hcNoFree"))}</span></span>
+      ${svg("i-chev", 15, 'class="ch" stroke-width="2"')}</button>`;
+  return `<div class="hc-top"><div class="hc-st${warn ? " warn" : ""}"><i></i><span>${warn ? esc(title) : t("hcWorks", { d:"<b>" + esc(dateStr(st.end)) + "</b>" })}</span></div>
+    <h1 class="hc-h1">${esc(t("hcTitle"))}</h1>
+    <p class="hc-lead">${esc(st.lim ? t("hcLead", { n:st.lim, w:pl(st.lim, "devN") }) : t("hcLeadAll"))}</p></div>
+    <div class="ha-grp">${rows}</div>
+    ${st.lim && CFG && CFG.device_price ? `<div class="hc-more"><span>${esc(t("hcMore"))}</span><button onclick="sheetDevices()">${esc(t("hcMoreBtn", { p:money(CFG.device_price) }))}</button></div>` : ""}
+    ${homeCountriesBlock()}
+    ${salesPaused() ? "" : `<div class="ha-grp hc-renew"><div class="r"><span>${esc(t("haRenewRow"))}</span><b>${esc(t("haFrom", { p:money(homeMinPrice()) }))}</b></div>
+      <button class="btn pri wide" onclick="go('sub')">${esc(t("renew"))}</button></div>`}`;
+}
+/* A drawing for the kind of device, from what its VPN app reports. */
+function devIcon(d){
+  const x = ((d.os || "") + " " + (d.model || "") + " " + (d.app || "")).toLowerCase();
+  if (/android ?tv|tvos|apple ?tv|smart ?tv|\btv\b|webos|tizen/.test(x)) return "i-tv";
+  if (/mac|windows|linux|macbook|imac|desktop|laptop/.test(x)) return "i-laptop";
+  if (/ios|iphone|android|ipad|phone/.test(x)) return "i-phone";
+  return "i-dev";
+}
+function homeCountriesBlock(){
+  const cs = homeCountries();
+  return cs.length ? `<div class="ha-cap">${esc(t("haCountries"))}</div><div class="hc-cs">${cs.map(c =>
+    `<span><i>${flag(c)}</i>${esc(countryName(c))}</span>`).join("")}</div>` : "";
+}
+
+function drawHomeAlt(){
+  const box = $("homeAlt");
+  if (!box) return;
+  const kind = homeKind();
+  if (kind === "classic"){ box.innerHTML = ""; return; }          // no ME: a new customer (the panel's preview)
+  const st = homeState();
+  if (kind === "answer") box.innerHTML = homeAnswerHead(st) + `<div class="ha-acts">${homeMain(st)}</div>` + homeList(st);
+  else if (kind === "term") box.innerHTML = homeTerm(st);
+  else box.innerHTML = homeDevices(st);
 }
 
 /* ============================ locations ============================ */
@@ -3684,10 +4027,10 @@ function drawDevs(){
   $("devPrice").textContent = CFG ? t("devPrice", { p:money(CFG.device_price) }) : "";
   $("devList").innerHTML = devs.length
     ? devs.map(d => `<div class="row${fresh(d.id) ? " row-in" : ""}" data-dev="${Number(d.id)}">
-        <span class="ic">${svg("i-dev", 18)}</span>
+        <span class="ic">${svg(devIcon(d), 18)}</span>
         <span class="t"><b>${esc(d.model || d.app || t("deviceX"))}</b>
           <span>${esc([[d.os, d.os_version].filter(Boolean).join(" "), d.app && d.model ? d.app : "",
-                       t("lastSeen", { w:ago(d.last_seen) })].filter(Boolean).join(" · "))}</span></span>
+                       t("lastSeen", { w:ago(d.last_seen) })].filter(Boolean).join(", "))}</span></span>
         <button class="x" onclick="forgetDev(${Number(d.id)}, '${jsq(d.model || d.app || t("deviceX"))}')"
           aria-label="${esc(t("forgotten"))}">${svg("i-trash", 17)}</button>
       </div>`).join("")
@@ -3697,9 +4040,9 @@ function drawDevs(){
   const gone = (ME && ME.removed_devices) || [];
   $("devRemovedSec").hidden = !(has && gone.length);
   $("devRemoved").innerHTML = gone.map(d => `<div class="row" data-dev="${Number(d.id)}">
-        <span class="ic">${svg("i-dev", 18)}</span>
+        <span class="ic">${svg(devIcon(d), 18)}</span>
         <span class="t"><b>${esc(d.model || d.app || t("deviceX"))}</b>
-          <span>${esc([[d.os, d.os_version].filter(Boolean).join(" "), t("removedNote")].filter(Boolean).join(" · "))}</span></span>
+          <span>${esc([[d.os, d.os_version].filter(Boolean).join(" "), t("removedNote")].filter(Boolean).join(", "))}</span></span>
         <button class="btn gho sm" onclick="restoreDev(${Number(d.id)})">${esc(t("restoreDev"))}</button>
       </div>`).join("");
 }
@@ -3807,7 +4150,7 @@ function drawSub(){
         placeholder="${esc(t("promoPh"))}" autocomplete="off" autocapitalize="characters" spellcheck="false" onkeydown="if(event.key==='Enter')applyPromo()">
         <button class="btn gho" onclick="applyPromo()">${esc(t("apply"))}</button></div>
       ${q && q.promo ? `<div class="promo-ok">${esc(t(q.promo_applied === false ? "promoKept" : "promoOk"))}${q.bonus_days
-          ? " · " + esc(t("promoDays", { n:q.bonus_days })) : ""}</div>` : ""}
+          ? ", " + esc(t("promoDays", { n:q.bonus_days })) : ""}</div>` : ""}
     </div>
     <div class="sec"><h3>${esc(t("payWith"))}</h3>
       ${ms.length ? `<div class="pays ${ms.length === 1 ? "one" : ""}" style="grid-template-columns:repeat(${ms.length === 4 ? 2 : Math.min(ms.length, 3)},1fr)">
@@ -3816,7 +4159,7 @@ function drawSub(){
             ${svg(ic, 20)}<span class="pw"><b>${esc(name)}</b><span>${esc(k === "balance" ? money(ME.ref_balance) : note)}</span></span></button>`).join("")}
       </div>` : `<div class="empty" style="padding:16px">${esc(t("noMethods"))}</div>`}
     </div>
-    <div class="total"><span>${esc(t("total"))} · ${esc(planName(p))}</span>
+    <div class="total"><span>${esc(t("totalFor", { p:planName(p) }))}</span>
       <span>${(q ? q.amount : localPrice) < fullPrice ? `<s>${money(fullPrice)}</s>` : ""}<b>${money(q ? q.amount : localPrice)}</b></span></div>
     ${short ? `<p class="fine" style="color:var(--bad);margin:-4px 0 12px">${esc(t("balanceShort", { p:money((q ? q.amount : localPrice) - ME.ref_balance) }))}</p>` : ""}
     ${noServers ? `<div class="empty" style="padding:14px 16px">${svg("i-globe", 22)}<b>${esc(t("noServersYet"))}</b><span>${esc(t("salesPaused"))}</span></div>` : ""}
@@ -3835,10 +4178,10 @@ function planCard(p, scale){
   const per = p.days >= 60 ? Math.round(price / (p.days / 30)) : 0;
   const spec = [p.devices ? p.devices + " " + pl(p.devices, "devN") : "",
                 p.traffic_gb ? t("gbN", { n:p.traffic_gb }) : "",
-                p.bypass_gb && CFG && CFG.bypass ? t("bypassGbN", { n:p.bypass_gb }) : ""].filter(Boolean).join(" · ");
+                p.bypass_gb && CFG && CFG.bypass ? t("bypassGbN", { n:p.bypass_gb }) : ""].filter(Boolean).join(", ");
   const note = save > 0 ? `<span class="save">${esc(t("save", { p:money(save) }))}</span>`
     : best === p.id ? `<span class="save">${esc(t("bestPrice"))}</span>` : esc(spec);
-  return `<button class="plan ${pick.planId === p.id ? "on" : ""}" onclick="setPlan(${p.id})">
+  return `<button class="plan ${pick.planId === p.id ? "on" : ""}${best === p.id ? " best" : ""}"${best === p.id ? ` data-ribbon="${esc(t("bestChoice"))}"` : ""} onclick="setPlan(${p.id})">
     <span class="mark"></span>
     <span class="t"><b>${esc(planName(p))}${p.badge ? `<em>${esc(p.badge)}</em>` : ""}</b><span>${note}</span></span>
     <span class="pr">
@@ -4114,7 +4457,7 @@ function sheetBypass(){
       <span class="v">${money(g.price)}</span></button>`).join("");
   openSheet(`<h3>${esc(t("bypassT"))}<i>.</i></h3>
     <p class="lead">${esc(t("bypassLead"))}</p>
-    <p class="lead"><b>${esc(left > 0 ? t("bypassLeft", { x:gb(left) }) : t("bypassNone"))}</b>${ME.bypass_used ? " · " + esc(t("bypassUsed", { x:gb(ME.bypass_used) })) : ""}</p>
+    <p class="lead"><b>${esc(left > 0 ? t("bypassLeft", { x:gb(left) }) : t("bypassNone"))}</b>${ME.bypass_used ? ", " + esc(t("bypassUsed", { x:gb(ME.bypass_used) })) : ""}</p>
     ${packs.length ? methodChips() + `<div class="rows">${rows}</div>` : `<p class="lead">${esc(t("bypassNoPacks"))}</p>`}`);
 }
 
@@ -4149,7 +4492,7 @@ async function sheetMyGifts(){
   openSheet(`<h3>${esc(t("myGifts"))}<i>.</i></h3><div class="rows">${rows.length ? rows.map(g => `
     <button class="row" onclick="copyText('${jsq(g.link)}','${jsq(t("linkCopied"))}')">
       <span class="ic">${svg("i-gift")}</span>
-      <span class="t"><b>${esc(g.code)}</b><span>${esc(planName(g.plan))} · ${esc(g.used ? t("giftUsed") : t("giftFree"))}</span></span>
+      <span class="t"><b>${esc(g.code)}</b><span>${esc(planName(g.plan))}, ${esc(g.used ? t("giftUsed") : t("giftFree"))}</span></span>
       ${svg("i-copy", 16, 'class="ch"')}</button>`).join("")
     : `<div class="empty">${svg("i-gift", 26)}<b>${esc(t("noGifts"))}</b></div>`}</div>`);
 }
@@ -4332,9 +4675,9 @@ async function sheetInvite(){
     ${w && (w.history || []).length ? `<h4>${esc(t("wdHistT"))}</h4>
       <div class="rows">${w.history.map(h => `<div class="row" style="cursor:default">
         <span class="ic">${svg("i-wallet", 20)}</span>
-        <span class="t"><b>${money(h.amount)}</b><span>${esc(h.method)} · ${esc(h.details)} · ${esc(dateStr(h.created_at))}${h.note ? " · " + esc(h.note) : ""}</span></span>
+        <span class="t"><b>${money(h.amount)}</b><span>${esc(h.method)}, ${esc(h.details)}, ${esc(dateStr(h.created_at))}${h.note ? ", " + esc(h.note) : ""}</span></span>
         <span class="st-tag ${h.status}">${esc(t(st[h.status]))}</span></div>`).join("")}</div>` : ""}
-    ${d.enabled && d.top ? `<h4>${esc(t(topTitle))} · ${esc(t(topPeriod))}</h4>
+    ${d.enabled && d.top ? `<h4>${esc(t(topTitle))}, ${esc(t(topPeriod))}</h4>
       <div class="rows reftop">${d.top.length ? d.top.map(r => `<div class="row"><span class="pl">${r.place}</span>
         <span class="t"><b>${esc(r.name)}</b></span><span class="v">${d.top_type === "days" && moneyMode ? money(r.value)
           : r.value + (d.top_type === "days" ? " " + esc(t("dShort")) : "")}</span></div>`).join("")
@@ -4360,7 +4703,7 @@ function walletHtml(w, pend){
     </div>` : ""}
     ${notes.length ? `<p class="fine">${esc(notes.join(" "))}</p>` : ""}
     ${pend ? `<div class="pend"><span class="t"><b>${esc(t("wdPending", { a:money(pend.amount), m:pend.method }))}</b>
-        <span>${esc(pend.details)} · ${esc(t("wdPendingN"))}</span></span>
+        <span>${esc(pend.details)}, ${esc(t("wdPendingN"))}</span></span>
       <button class="btn gho" onclick="cancelPayout(${pend.id}, this)">${esc(t("wdCancel"))}</button></div>` : ""}
   </div>`;
 }
@@ -4609,12 +4952,12 @@ function sheetConnect(){
     return;
   }
   openSheet(`<h3>${esc(t("connT"))}<i>.</i></h3>
-    <div class="chips" style="margin-bottom:16px">
+    <div class="chips seg" style="margin-bottom:16px">
       <button class="chip on" id="cnPhone" onclick="connTab('phone')">${esc(t("phonePc"))}</button>
       <button class="chip" id="cnTv" onclick="connTab('tv')">${esc(t("tv"))}</button>
     </div>
     <div id="connBody"></div>
-    <button class="btn gho wide" style="margin-top:12px" onclick="resetLink()">${svg("i-ref", 16)} ${esc(t("resetLink"))}</button>`);
+    <button class="btn gho wide quiet" style="margin-top:12px" onclick="resetLink()">${svg("i-ref", 16)} ${esc(t("resetLink"))}</button>`);
   connTab("phone");
 }
 function connTab(which){
@@ -4640,7 +4983,7 @@ function connTab(which){
         <li><b>${esc(t("step3", { a:a.name }))}</b><span>${esc(t("step3n"))}</span></li>
       </ol>
       <p style="color:var(--txt-3);font-size:12.5px;margin-top:14px">${esc(t("otherOs"))}
-        ${others.map(k => `<a href="#" onclick="setupOs='${k}';connTab('phone');return false">${esc(OS_NAME[k])}</a>`).join(" · ")}</p>
+        ${others.map(k => `<a href="#" onclick="setupOs='${k}';connTab('phone');return false">${esc(OS_NAME[k])}</a>`).join(", ")}</p>
       <button class="btn gho wide" style="margin-top:12px" onclick="copyText(ME.sub_url,'${jsq(t("linkCopied"))}')">${esc(t("copyLink"))}</button>`;
   } else {
     box.innerHTML = `
@@ -4726,9 +5069,12 @@ function applyTheme(){
   else light = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
   document.documentElement.setAttribute("data-theme", light ? "light" : "dark");
   // The page's own ground (a style may paint the light scheme cream, not white).
-  const bg = getComputedStyle(document.documentElement).getPropertyValue("--ground").trim() || (light ? "#FFFFFF" : BRAND.ground);
+  const cs = getComputedStyle(document.documentElement);
+  const bg = cs.getPropertyValue("--ground").trim() || (light ? "#FFFFFF" : BRAND.ground);
+  // A style with a coloured top (data-layout="brand") paints Telegram's header the same.
+  const head = cs.getPropertyValue("--head").trim() || bg;
   if (tg){
-    try { tg.setHeaderColor(bg); tg.setBackgroundColor(bg); } catch (e) {}
+    try { tg.setHeaderColor(/^#[0-9a-f]{6}$/i.test(head) ? head : bg); tg.setBackgroundColor(bg); } catch (e) {}
     try { tg.setBottomBarColor(bg); } catch (e) {}
     // Our accent on Telegram's button — otherwise it is Telegram blue.
     try { tg.MainButton.setParams({ color: light ? BRAND.fill_light : BRAND.fill,
@@ -4950,10 +5296,16 @@ function startFx(){
 /* ============================ live preview in the panel ============================ */
 /* /app?preview=1 inside the panel: a demo customer, nothing is sent, and
    the panel pushes unsaved looks here as the owner changes them. */
-function demoMe(){
+/* The person in the panel's preview: subscribed, ending in two days, ended
+   yesterday (state "soon" / "ended"), or null for a new customer. */
+function demoMe(state){
+  state = state || PREVIEW_STATE;
+  if (state === "new") return null;
   const p = paidPlans()[1] || paidPlans()[0] || null, now = Date.now() / 1000;
-  return { tg_id:1, first_name:LANG === "ru" ? "Анна" : "Anna", lang:LANG, active:true, has_subscription:true,
-    blocked:false, traffic_blocked:false, expires_at:now + 23 * 86400 + 3600, plan:p,
+  const until = state === "soon" ? now + 2 * 86400 - 3600 : state === "ended" ? now - 86400 : now + 23 * 86400 + 3600;
+  const live = state !== "ended";
+  return { tg_id:1, first_name:LANG === "ru" ? "Анна" : "Anna", lang:LANG, active:live, has_subscription:live,
+    blocked:false, traffic_blocked:false, expires_at:until, plan:p,
     device_limit:(p && p.devices) || 3, traffic_used:0, traffic_limit:0,
     devices:[{ id:1, model:"iPhone 15", app:"Happ", os:"iOS", os_version:"18", last_seen:now - 300 },
              { id:2, model:"MacBook Air", app:"Happ", os:"macOS", os_version:"15", last_seen:now - 7200 }],
@@ -4969,7 +5321,7 @@ function applyLook(m){
     if (l.getAttribute("href") !== m.font_href) l.href = m.font_href;
   }
   const a = m.attrs || {};
-  ["backdrop", "icons", "motion", "effect", "cards", "splash", "layout"].forEach(k => { if (a[k]) root.setAttribute("data-" + k, a[k]); });
+  ["backdrop", "icons", "motion", "effect", "cards", "splash", "layout", "home"].forEach(k => { if (a[k]) root.setAttribute("data-" + k, a[k]); });
   if (m.brand) Object.assign(BRAND, m.brand);
   if (m.name != null){ window.KV_BRAND = Object.assign(window.KV_BRAND || {}, { brand:m.name }); if (CFG) CFG.brand = m.name; $("spName").textContent = m.name; $("spName").setAttribute("data-full", m.name); }
   if (m.logo !== undefined){
@@ -5016,7 +5368,7 @@ if (PREVIEW){
     else if (m.type === "kv-splash") replaySplash();
     else if (m.type === "kv-done") celebrate(t("doneTitle"), t("subActive"));
     else if (m.type === "kv-scheme"){ THEME_PREF = m.value; applyTheme(); startFx(); }
-    else if (m.type === "kv-state"){ PREVIEW_STATE = m.value; ME = m.value === "new" ? null : demoMe(); drawAll(); }
+    else if (m.type === "kv-state"){ PREVIEW_STATE = m.value; ME = demoMe(); drawAll(); }
     else if (m.type === "kv-tab") go(m.value);
   });
   try { window.parent.postMessage({ type:"kv-ready" }, location.origin); } catch (e) {}

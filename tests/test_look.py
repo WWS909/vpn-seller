@@ -165,7 +165,7 @@ def test_theme_info_lists_colours_and_parts(client, admin):
     assert [p["id"] for p in d["presets"]] == list(theme.PRESETS)
     neon = next(p for p in d["presets"] if p["id"] == "neon")
     assert neon["accent"] == "#3DFF9A" and neon["surface"] == "black" and neon["ground"] == "#000000"
-    assert set(d["options"]) == {"backdrop", "icons", "motion", "effect", "cards", "layout"}
+    assert set(d["options"]) == {"backdrop", "icons", "motion", "effect", "cards", "layout", "home"}
     assert d["look"]["layout"] == "classic"
     assert "winter" in d["options"]["backdrop"] and "pixel" in d["options"]["icons"] and "lacquer" in d["options"]["cards"]
     assert d["look"]["motion"] == "lively" and d["look"]["cards"] == "solid"
@@ -193,7 +193,7 @@ def test_live_preview_gives_the_same_css_as_the_page(client, admin):
     assert "#FF7A45" in pv["css"] and "--r:24px" in pv["css"] and "Comfortaa" in pv["css"]
     assert "family=Comfortaa" in pv["font_href"]
     assert pv["attrs"] == {"backdrop": "aurora", "icons": "badge", "motion": "lively", "effect": "none",
-                           "cards": "solid", "layout": "classic", "splash": "auto"}
+                           "cards": "solid", "layout": "classic", "home": "classic", "splash": "auto"}
     client.post("/api/admin/settings", headers=admin, json=body)
     page = client.get("/app").text
     assert pv["css"].split("}")[0] in page          # the same variables as the real page
@@ -445,32 +445,51 @@ def test_colour_tiles_and_ring_icons(client, admin):
         assert part in panel, part
 
 
-# ---------------------------------------------------------------- layouts
-def test_layouts_change_the_build_not_only_the_colour(client, admin):
+# ---------------------------------------------------------------- style and home screen
+def test_style_and_home_screen(client, admin):
     from app import theme
-    assert theme.LAYOUTS == ("classic", "tg", "pass", "poster", "metro")
+    assert theme.LAYOUTS == ("classic", "clean", "tonal", "brand", "large", "cosmos") and theme.HOMES == ("classic", "answer", "term", "devices")
     page = client.get("/app").text
-    assert 'data-layout="classic"' in re.search(r"<html[^>]*>", page).group(0)
-    for k in theme.LAYOUTS[1:]:
-        assert f'[data-layout="{k}"]' in page, k
-    # a layout of its own: the background and the card style are its own too
+    tag = re.search(r"<html[^>]*>", page).group(0)
+    assert 'data-layout="classic"' in tag and 'data-home="classic"' in tag
+    for part in ('[data-layout="clean"]', ':root[data-layout="tonal"]', ':root[data-layout="brand"] .top', ':root[data-layout="large"]',
+                 'getPropertyValue("--head")', ':root[data-layout="cosmos"] .plan.best::before', 'bestChoice:"Лучший выбор"', 'id="homeAlt"', "function drawHomeAlt(", "function homeTerm(", "function homeDevices(",
+                 'haWorks:"Работает до {d}"', 'hcTitle:"Your devices"', "function homeTrial(", "function devIcon(",
+                 'id="i-laptop"', 'state === "soon"', '[data-layout]:not([data-layout="classic"]) .chips.seg'):
+        assert part in page, part
+    # the clean style paints its own background and cards; the home screen goes with any style
     r = client.post("/api/admin/settings", headers=admin, json={
-        "layout": "pass", "backdrop": "aurora", "cards": "glass", "icons": "tiles"})
+        "layout": "clean", "home": "term", "backdrop": "aurora", "cards": "glass"})
     assert r.status_code == 200, r.text
     tag = re.search(r"<html[^>]*>", client.get("/app").text).group(0)
-    for attr in ('data-layout="pass"', 'data-backdrop="plain"', 'data-cards="solid"', 'data-icons="tiles"'):
+    for attr in ('data-layout="clean"', 'data-home="term"', 'data-backdrop="plain"', 'data-cards="solid"'):
         assert attr in tag, tag
-    # the saved background and cards come back with the classic layout
-    client.post("/api/admin/settings", headers=admin, json={"layout": "classic"})
+    client.post("/api/admin/settings", headers=admin, json={"layout": "classic", "home": "devices"})
     tag = re.search(r"<html[^>]*>", client.get("/app").text).group(0)
-    assert 'data-backdrop="aurora"' in tag and 'data-cards="glass"' in tag
-    # the live preview does the same; a wrong layout is refused
+    assert 'data-backdrop="aurora"' in tag and 'data-cards="glass"' in tag and 'data-home="devices"' in tag
+    # an old layout from 1.6.0 falls back to classic
+    from app import core
+    from app.db import SessionLocal
+    db = SessionLocal(); core.put(db, "layout", "poster"); db.close()
+    import time; time.sleep(3.2)
+    assert 'data-layout="classic"' in re.search(r"<html[^>]*>", client.get("/app").text).group(0)
+    # the live preview; wrong values are refused
     r = client.post("/api/admin/theme/preview", headers=admin, json={
-        "theme_preset": "ocean", "font": "unbounded", "layout": "poster", "backdrop": "stars", "cards": "neon"})
+        "theme_preset": "ocean", "font": "golos", "layout": "clean", "home": "answer", "backdrop": "stars", "cards": "neon"})
     assert r.status_code == 200, r.text
-    pv = r.json()
-    assert pv["attrs"]["layout"] == "poster" and pv["attrs"]["backdrop"] == "plain" and pv["attrs"]["cards"] == "solid"
-    assert client.post("/api/admin/settings", headers=admin, json={"layout": "bento"}).status_code == 400
+    a = r.json()["attrs"]
+    assert a["layout"] == "clean" and a["home"] == "answer" and a["backdrop"] == "plain" and a["cards"] == "solid"
+    for bad in ({"layout": "poster"}, {"home": "bento"}):
+        assert client.post("/api/admin/settings", headers=admin, json=bad).status_code == 400, bad
     panel = client.get("/admin").text
-    for part in ('id="layOpts"', "function layThumb(", 'layTg:"Как в Telegram"', 'layPoster:"Poster"', "layout:LOOK.layout"):
+    for part in ('id="homeOpts"', 'id="layOpts"', "function homeThumb(", "function styleThumb(", 'hmTerm:"Срок"',
+                 'layClean:"Clean"', 'layTonal:"Мягкий"', 'layBrand:"Brand"', 'layLarge:"Крупный"', 'layCosmos:"Космос"', 'if (k === "cosmos")', "home:LOOK.home", '["soon", "pvSoon"]', '["ended", "pvEnded"]', 'cleanFont:"'):
         assert part in panel, part
+
+
+def test_every_new_style_paints_its_own_surfaces(client, admin):
+    for k in ("tonal", "brand", "large", "cosmos"):
+        r = client.post("/api/admin/settings", headers=admin, json={"layout": k, "backdrop": "stars", "cards": "neon"})
+        assert r.status_code == 200, r.text
+        tag = re.search(r"<html[^>]*>", client.get("/app").text).group(0)
+        assert f'data-layout="{k}"' in tag and 'data-backdrop="plain"' in tag and 'data-cards="solid"' in tag, tag

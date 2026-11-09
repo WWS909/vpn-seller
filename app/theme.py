@@ -115,6 +115,8 @@ FONTS: dict[str, dict] = {
     # good apps. All with a full Cyrillic.
     "ptsans":     {"kind": "sans", "name": "PT Sans", "d": "PT Sans", "b": "PT Sans",
                    "load": "family=PT+Sans:wght@400;700"},
+    "golos":      {"kind": "sans", "name": "Golos", "d": "Golos Text", "b": "Golos Text",
+                   "load": "family=Golos+Text:wght@400;500;600;700"},
     "plex":       {"kind": "sans", "name": "IBM Plex Sans", "d": "IBM Plex Sans", "b": "IBM Plex Sans",
                    "load": "family=IBM+Plex+Sans:wght@300;400;500;600;700"},
     "fira":       {"kind": "sans", "name": "Fira Sans", "d": "Fira Sans", "b": "Fira Sans",
@@ -171,9 +173,17 @@ MODES = ("auto", "dark", "light")
 # a seasonal effect. Each is an attribute on <html>; the pages style them.
 BACKDROPS = ("glow", "aurora", "orbs", "night", "retro", "halftone", "winter", "lunar", "grid", "stars", "plain")
 ICONS = ("thin", "regular", "bold", "badge", "tiles", "ring", "duo", "3d", "neon", "pixel", "comic", "ornament", "fortune")
-# How the screens are built. "classic" is the original look; the others bring
-# their own surfaces, so the background and the card style are not used there.
-LAYOUTS = ("classic", "tg", "pass", "poster", "metro")
+# The style of the surfaces: "classic" (dark cards; background, cards and the
+# special sets are chosen in the panel), "clean" (light grey and white groups
+# like Telegram), "tonal" (after Material 3: tinted surfaces, pill buttons),
+# "brand" (the shop's colour across the top, like a bank's app), "large"
+# (larger text, high contrast) or "cosmos" (a night ground lit by the shop's
+# colour, glass cards, gradient prices — after the VPN landing pages). The new ones follow Telegram light/dark and
+# paint their own background and cards.
+LAYOUTS = ("classic", "clean", "tonal", "brand", "large", "cosmos")
+# What the home screen is built around: the classic card, a plain answer
+# ("works until …"), the calendar of the term with renewal, or the devices.
+HOMES = ("classic", "answer", "term", "devices")
 MOTIONS = ("lively", "calm", "off")
 EFFECTS = ("none", "snow")
 # The kind of opening screen: "auto" follows the cards (pixel, comic, snowy and
@@ -348,6 +358,7 @@ def look(db: Session) -> dict:
         "effect": _pick(core.get(db, "effect"), EFFECTS, "none"),
         "cards": _pick(core.get(db, "cards"), CARDS, "solid"),
         "layout": _pick(core.get(db, "layout"), LAYOUTS, "classic"),
+        "home": _pick(core.get(db, "home"), HOMES, "classic"),
         "splash": core.get(db, "splash") != "0",
         "splash_kind": _pick(core.get(db, "splash_kind"), SPLASHES, "auto"),
         "splash_cfg": splash_cfg(db),
@@ -369,7 +380,7 @@ def html_attrs(lk: dict) -> str:
     return (f' data-backdrop="{lk["backdrop"]}" data-icons="{lk["icons"]}"'
             f' data-motion="{lk["motion"]}" data-effect="{lk["effect"]}"'
             f' data-cards="{lk.get("cards", "solid")}" data-splash="{lk.get("splash_kind", "auto")}"'
-            f' data-layout="{lk.get("layout", "classic")}"')
+            f' data-layout="{lk.get("layout", "classic")}" data-home="{lk.get("home", "classic")}"')
 
 
 def preview(params: dict) -> dict:
@@ -398,6 +409,7 @@ def preview(params: dict) -> dict:
             "effect": _pick(str(params.get("effect")), EFFECTS, "none"),
             "cards": _pick(str(params.get("cards")), CARDS, "solid"),
             "layout": _pick(str(params.get("layout")), LAYOUTS, "classic"),
+            "home": _pick(str(params.get("home")), HOMES, "classic"),
             "splash": _pick(str(params.get("splash_kind")), SPLASHES, "auto")}),
         "brand": {"ground": th["s_ground"], "fill": th["fill"], "on_fill": th["on_fill"],
                   "fill_light": th["fill_light"], "on_fill_light": th["on_fill_light"]},
