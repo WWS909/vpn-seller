@@ -71,13 +71,22 @@ DEFAULTS: dict[str, str] = {
     "font": "unbounded",                # a font pair from app/theme.py FONTS
     "layout": "classic",                # the style of the surfaces: app/theme.py LAYOUTS
     "home": "classic",                  # what the home screen is built around: app/theme.py HOMES
+    "enter": "rise",                    # how the blocks come in: app/theme.py ENTERS
+    "top": "auto",                      # the header bar with the logo: app/theme.py TOPS
+    "top_color": "",                    # its colour when top is "custom": #RRGGBB
+    "art": "none",                      # the picture at the top of home: app/theme.py ARTS
+    "art_image": "",                    # the owner's picture, set by uploading a file, not by this form
+    "art_info": "",                     # its main colour and size, worked out on upload
+    "buttons": "auto",                  # the shape of the buttons: app/theme.py BUTTONS
+    "celebrate": "check",               # after a payment: check | confetti
+    "haptics": "1",                     # a light tap of the phone on presses (Telegram's haptic feedback)
     "font_custom": "",                  # a Google Fonts family for the headings, when font is "custom"
     "radius": "normal",                 # sharp | normal | round
     "backdrop": "glow",                 # glow | aurora | orbs | night | grid | stars | plain
     "cards": "solid",                   # solid | glass (frosted) | neon (frosted, neon edges)
     "icons": "regular",                 # thin | regular | bold | badge | duo | 3d | neon
     "motion": "lively",                 # lively | calm | off
-    "effect": "none",                   # none | snow
+    "effect": "none",                   # none | snow | leaves | petals
     "splash": "1",                      # the opening screen with the logo
     "splash_kind": "auto",              # auto (the style's own) | pulse | orbit | ring | burst | type | minimal
     "splash_mark": "logo",              # the sign on it: logo (the shield when there is none) | letter | shield

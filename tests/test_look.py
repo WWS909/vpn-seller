@@ -155,7 +155,9 @@ def test_opening_screen_choices(client, admin):
 def test_bad_look_values_are_refused(client, admin):
     for bad in ({"backdrop": "lava"}, {"icons": "emoji"},
                 {"motion": "crazy"}, {"effect": "rain"}, {"splash": "yes"}, {"font": "papyrus"},
-                {"cards": "metal"}, {"splash_kind": "fireworks"}):
+                {"cards": "metal"}, {"splash_kind": "fireworks"}, {"enter": "bounce"}, {"top": "rainbow"},
+                {"top_color": "red"}, {"art": "kitten"}, {"buttons": "round"}, {"celebrate": "party"},
+                {"haptics": "yes"}, {"layout": "retro"}):
         assert client.post("/api/admin/settings", headers=admin, json=bad).status_code == 400, bad
 
 
@@ -165,7 +167,8 @@ def test_theme_info_lists_colours_and_parts(client, admin):
     assert [p["id"] for p in d["presets"]] == list(theme.PRESETS)
     neon = next(p for p in d["presets"] if p["id"] == "neon")
     assert neon["accent"] == "#3DFF9A" and neon["surface"] == "black" and neon["ground"] == "#000000"
-    assert set(d["options"]) == {"backdrop", "icons", "motion", "effect", "cards", "layout", "home"}
+    assert set(d["options"]) == {"backdrop", "icons", "motion", "effect", "cards", "layout", "home",
+                                 "enter", "top", "art", "buttons", "celebrate"}
     assert d["look"]["layout"] == "classic"
     assert "winter" in d["options"]["backdrop"] and "pixel" in d["options"]["icons"] and "lacquer" in d["options"]["cards"]
     assert d["look"]["motion"] == "lively" and d["look"]["cards"] == "solid"
@@ -193,7 +196,8 @@ def test_live_preview_gives_the_same_css_as_the_page(client, admin):
     assert "#FF7A45" in pv["css"] and "--r:24px" in pv["css"] and "Comfortaa" in pv["css"]
     assert "family=Comfortaa" in pv["font_href"]
     assert pv["attrs"] == {"backdrop": "aurora", "icons": "badge", "motion": "lively", "effect": "none",
-                           "cards": "solid", "layout": "classic", "home": "classic", "splash": "auto"}
+                           "cards": "solid", "layout": "classic", "home": "classic", "splash": "auto",
+                           "enter": "rise", "buttons": "auto", "top": "auto", "art": "none"}
     client.post("/api/admin/settings", headers=admin, json=body)
     page = client.get("/app").text
     assert pv["css"].split("}")[0] in page          # the same variables as the real page
@@ -448,7 +452,7 @@ def test_colour_tiles_and_ring_icons(client, admin):
 # ---------------------------------------------------------------- style and home screen
 def test_style_and_home_screen(client, admin):
     from app import theme
-    assert theme.LAYOUTS == ("classic", "clean", "tonal", "brand", "large", "cosmos") and theme.HOMES == ("classic", "answer", "term", "devices")
+    assert theme.LAYOUTS == ("classic", "clean", "tonal", "brand", "large", "cosmos", "paper", "brutal", "terminal") and theme.HOMES == ("classic", "answer", "term", "devices")
     page = client.get("/app").text
     tag = re.search(r"<html[^>]*>", page).group(0)
     assert 'data-layout="classic"' in tag and 'data-home="classic"' in tag
@@ -493,3 +497,93 @@ def test_every_new_style_paints_its_own_surfaces(client, admin):
         assert r.status_code == 200, r.text
         tag = re.search(r"<html[^>]*>", client.get("/app").text).group(0)
         assert f'data-layout="{k}"' in tag and 'data-backdrop="plain"' in tag and 'data-cards="solid"' in tag, tag
+
+
+def test_newspaper_brutal_and_terminal_styles(client, admin):
+    for k in ("paper", "brutal", "terminal"):
+        r = client.post("/api/admin/settings", headers=admin, json={"layout": k, "backdrop": "stars", "cards": "neon"})
+        assert r.status_code == 200, r.text
+        tag = re.search(r"<html[^>]*>", client.get("/app").text).group(0)
+        assert f'data-layout="{k}"' in tag and 'data-backdrop="plain"' in tag and 'data-cards="solid"' in tag, tag
+    page = client.get("/app").text
+    for k in ("paper", "brutal", "terminal"):
+        assert f':root[data-layout="{k}"]' in page and f':root[data-layout="{k}"][data-theme="light"]' in page
+
+
+def test_unusual_fonts_are_for_the_app_and_never_made_bold_by_hand(client, admin):
+    from app import theme
+    fonts = {f["id"]: f for f in client.get("/api/admin/theme/fonts", headers=admin).json()}
+    odd = [f for f in fonts.values() if f["kind"] == "odd"]
+    assert len(odd) >= 10 and all(f["app_only"] for f in odd)
+    for k in ("oldstandard", "cormorant", "zenantique", "podkova", "jura", "kelly", "dela", "dotgothic", "glitch", "caveat"):
+        assert k in fonts, k
+    # a face with a single weight: the browser must not smear a bold out of it
+    assert client.post("/api/admin/settings", headers=admin, json={"font": "dela"}).status_code == 200
+    assert "font-synthesis-weight:none" in client.get("/app").text
+    assert client.post("/api/admin/settings", headers=admin, json={"font": "jura"}).status_code == 200
+    assert "font-synthesis-weight:none" not in re.search(r'<style id="kv-theme">(.*?)</style>', client.get("/app").text, re.S).group(1)
+    # the panel keeps its plain face with an unusual one chosen
+    assert theme.font_vars("glitch", "normal", "admin")[1] == theme.font_vars("unbounded", "normal", "admin")[1]
+
+
+def test_header_colour(client, admin):
+    def head():
+        page = client.get("/app").text
+        return re.search(r"<html[^>]*>", page).group(0), re.search(r'<style id="kv-theme">(.*?)</style>', page, re.S).group(1)
+    tag, css = head()
+    assert 'data-top="auto"' in tag and "--top-bg" not in css
+    assert client.post("/api/admin/settings", headers=admin, json={"top": "accent"}).status_code == 200
+    tag, css = head()
+    assert 'data-top="accent"' in tag and "--top-bg:var(--sig)" in css and "--head:var(--sig)" in css
+    # a colour of its own gets a readable text colour; Telegram's header the same colour
+    assert client.post("/api/admin/settings", headers=admin, json={"top": "custom", "top_color": "#ffd60a"}).status_code == 200
+    tag, css = head()
+    assert 'data-top="custom"' in tag and "--top-bg:#FFD60A" in css and "--head:#FFD60A" in css
+    on = re.search(r"--top-on:(#[0-9A-F]{6})", css).group(1)
+    from app import theme
+    assert theme.contrast(on, "#FFD60A") >= 4.5
+    # without a colour, or a picture header without a picture: as the style
+    assert client.post("/api/admin/settings", headers=admin, json={"top_color": ""}).status_code == 200
+    assert 'data-top="auto"' in head()[0]
+    assert client.post("/api/admin/settings", headers=admin, json={"top": "image"}).status_code == 200
+    assert 'data-top="auto"' in head()[0]
+
+
+def test_own_picture_for_home_and_header(client, admin):
+    photo = _png(lambda d: d.rectangle((0, 0, 900, 300), fill=(30, 90, 200, 255)))
+    assert client.post("/api/admin/brand/art", headers=admin,
+                       files={"file": ("x.svg", b"<svg xmlns='http://www.w3.org/2000/svg'/>", "image/svg+xml")}).status_code == 400
+    assert client.post("/api/admin/brand/art", files={"file": ("p.png", photo, "image/png")}).status_code == 401
+    r = client.post("/api/admin/brand/art", headers=admin, files={"file": ("p.png", photo, "image/png")})
+    assert r.status_code == 200, r.text
+    url = r.json()["art_image"]
+    assert re.fullmatch(r"/brand/art-[0-9a-f]{12}\.webp", url)
+    got = client.get(url)
+    assert got.status_code == 200 and got.headers["content-type"] == "image/webp" and got.content[8:12] == b"WEBP"
+    head = r.json()["art_info"]["head"]
+    assert re.fullmatch(r"#[0-9A-F]{6}", head)
+    # the form cannot point the picture anywhere else
+    client.post("/api/admin/settings", headers=admin, json={"art_image": "../../etc/passwd", "art": "own", "top": "image"})
+    page = client.get("/app").text
+    tag = re.search(r"<html[^>]*>", page).group(0)
+    assert 'data-art="own"' in tag and 'data-top="image"' in tag
+    assert url in page and f"--head:{head}" in page and _boot(client)["art_image"] == url
+    # a preview may only name a picture of the brand folder
+    pv = client.post("/api/admin/theme/preview", headers=admin,
+                     json={"font": "golos", "top": "image", "art": "own", "art_image": "https://evil.example/x.webp"}).json()
+    assert pv["attrs"]["top"] == "auto" and "evil" not in pv["css"]
+    pv = client.post("/api/admin/theme/preview", headers=admin, json={"font": "golos", "top": "image", "art_image": url}).json()
+    assert pv["attrs"]["top"] == "image" and url in pv["css"]
+    assert client.delete("/api/admin/brand/art", headers=admin).status_code == 200
+    assert client.get(url).status_code == 404
+    tag = re.search(r"<html[^>]*>", client.get("/app").text).group(0)
+    assert 'data-art="none"' in tag and 'data-top="auto"' in tag
+
+
+def test_entrance_buttons_effects_and_confetti(client, admin):
+    body = {"enter": "spring", "buttons": "stamp", "effect": "leaves", "celebrate": "confetti", "haptics": "0", "art": "city"}
+    assert client.post("/api/admin/settings", headers=admin, json=body).status_code == 200
+    tag = re.search(r"<html[^>]*>", client.get("/app").text).group(0)
+    assert 'data-enter="spring"' in tag and 'data-buttons="stamp"' in tag and 'data-effect="leaves"' in tag and 'data-art="city"' in tag
+    boot = _boot(client)
+    assert boot["celebrate"] == "confetti" and boot["haptics"] is False and boot["effect"] == "leaves"

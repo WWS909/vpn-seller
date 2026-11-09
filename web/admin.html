@@ -567,6 +567,23 @@ details summary{cursor:pointer;color:var(--muted);font-size:12.5px;font-weight:6
   select{max-width:100%}
   .rowtg:has(> select){flex-wrap:wrap}.rowtg > select{flex:1 1 100%;min-width:0}
 }
+
+/* the picture and button pickers of the look */
+.th.opt .sw.art{position:relative;overflow:hidden;padding:0;display:block}
+.th.opt .sw.art svg{position:absolute;inset:0;width:100%;height:100%}
+.opts.arts{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+.opts.btns{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+.th.opt .sw.bt{display:grid;place-items:center;background:#16181c;padding:0 10px}
+.sw.bt span{display:block;width:100%;text-align:center;font-size:12px;font-weight:700;padding:7px 0;background:var(--b);color:var(--bon);border-radius:8px}
+.sw.bt-key span{border-radius:9px;box-shadow:0 4px 0 color-mix(in oklab,var(--b) 60%,#000);transform:translateY(-2px)}
+.sw.bt-stamp span{border:2px solid #fff;border-radius:7px;box-shadow:3px 3px 0 #fff}
+.sw.bt-arrow span{border-radius:99px;text-align:left;padding-left:10px;padding-right:24px;position:relative;font-size:11px}
+.sw.bt-arrow span::after{content:"\2192";position:absolute;right:4px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;
+  display:grid;place-items:center;background:color-mix(in srgb,currentColor 18%,transparent);font-size:12px}
+.sw.bt-notch span{border-radius:0;clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 7px,100% calc(100% - 7px),calc(100% - 7px) 100%,7px 100%,0 calc(100% - 7px),0 7px)}
+.sw.bt-pixel span{border-radius:0;box-shadow:inset -3px -3px 0 rgba(0,0,0,.28),inset 3px 3px 0 rgba(255,255,255,.22);
+  clip-path:polygon(0 4px,2px 4px,2px 2px,4px 2px,4px 0,calc(100% - 4px) 0,calc(100% - 4px) 2px,calc(100% - 2px) 2px,calc(100% - 2px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 2px) calc(100% - 4px),calc(100% - 2px) calc(100% - 2px),calc(100% - 4px) calc(100% - 2px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 2px),2px calc(100% - 2px),2px calc(100% - 4px),0 calc(100% - 4px))}
+.sw.bt-outline span{background:none;color:var(--b);box-shadow:inset 0 0 0 1.5px var(--b),inset 0 0 0 3.5px #16181c,inset 0 0 0 4.5px var(--b)}
 </style>
 </head>
 <body>
@@ -791,7 +808,7 @@ ru: {
   chAdminHint:"Добавьте бота в администраторы канала — иначе Telegram не покажет, кто подписан. Если сменили тип канала (публичный ↔ приватный), привяжите его заново.",
   chCheck:"Сохранить и проверить", chOk:"Работает: «{t}»", chAdd:"Добавить канал", chEmpty:"Каналов нет — нажмите «Добавить канал». Если каналов несколько, человек должен подписаться на каждый.", chCountN:"каналов: {n}",
   brandT:"Название", brandReset:"Сбросить название и логотип", brandResetQ:"Вернуть стандартное название и щит вместо логотипа?",
-cleanFont:"Для этого стиля поставил шрифт Golos — его можно сменить ниже", hmT:"Главный экран", hmSub:"с чего начинается приложение", hmAnswer:"Ответ", hmAnswerS:"«Работает до 26 декабря», кнопка и короткий список", hmTerm:"Срок", hmTermS:"календарь до конца подписки и продление сразу", hmDevices:"Устройства", hmDevicesS:"подключённые устройства и свободные места", hmClassic:"Классика", hmClassicS:"карточка с днями и две плитки", layT:"Стиль", laySub:"фон, карточки, шрифт заголовков", layClean:"Чистый", layCleanS:"светлый, как списки Telegram; тёмный, если Telegram тёмный", layTonal:"Мягкий", layTonalS:"фон в оттенке цвета магазина, круглые кнопки — как в Android", layBrand:"Фирменный", layBrandS:"цветная шапка в цвет магазина — как в приложениях банков", layLarge:"Крупный", layLargeS:"крупный текст, контраст и большие кнопки — легко читать", layCosmos:"Космос", layCosmosS:"ночной фон с подсветкой, стеклянные карточки и цены-градиенты — как на сайтах VPN", layClassic:"Тёмная классика", layClassicS:"тёмные карточки, свои фоны и особые наборы", layOwn:"В этом стиле фон и карточки свои — эти настройки работают в «Тёмной классике».", fontT:"Шрифт", fkSans:"Простые", fkSerif:"С засечками", fkChar:"С характером", fkFun:"Для особых оформлений", fkCustom:"Свой шрифт с Google Fonts", fCustomPh:"Название, например Lobster", fCustomHint:"Любое семейство с fonts.google.com для заголовков и цифр, текст останется в Golos. Выбирайте шрифт с кириллицей.", fCustomBad:"Такого шрифта нет на Google Fonts или в нём нет кириллицы", fCustomEmpty:"Впишите название шрифта", fOnlyApp:"только в приложении", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
+cleanFont:"Для этого стиля поставил шрифт Golos — его можно сменить ниже", fkOdd:"Необычные", layPaper:"Газета", layPaperS:"чернила на газетной бумаге, линейки вместо карточек, тарифы — прайс с точками", layBrutal:"Брутал", layBrutalS:"толстые обводки, жёсткие тени, кнопки вдавливаются, подписи-наклейки", layTerminal:"Терминал", layTerminalS:"консоль: моноширинный шрифт, курсор, [ кнопки ] и прайс с точками", styleFont:"Для этого стиля поставил шрифт {f} — его можно сменить ниже", topT:"Шапка", topSub:"полоса сверху с логотипом и названием", topAuto:"Как в стиле", topAccent:"Цвет магазина", topCustom:"Свой цвет", topGradient:"Градиент", topImage:"Картинка", topColor:"Цвет шапки", topNoImg:"Для шапки-картинки загрузите свою картинку — ниже, в «Картинке на главной».", topHint:"Цвет надписей подбирается сам, чтобы название читалось. Верх Telegram над приложением красится так же.", artT:"Картинка на главной", artSub:"над главным экраном", artNone:"Нет", artCity:"Город", artBauhaus:"Баухаус", artContours:"Карта высот", artWaves:"Волны", artStars:"Звёздная карта", artOwn:"Своя", artUpload:"Загрузить свою", artHint:"Рисунки берут цвет магазина и меняются вместе со светлой и тёмной темой. Своя картинка — PNG, JPEG или WebP до 4 МБ; её же можно поставить в шапку.", artDone:"Картинка загружена", artGone:"Картинка удалена", btnT:"Кнопки", btnSub:"форма главных кнопок", bAuto:"Как в стиле", bKey:"Клавиша", bStamp:"Штамп", bArrow:"Со стрелкой", bNotch:"Билет", bPixel:"Пиксели", bOutline:"Двойной контур", bSample:"Продлить", hapT:"Отклик при нажатии", hapOn:"Вибрация", hapOff:"Без вибрации", hapHint:"Лёгкий толчок телефона при нажатии, как в приложениях банков. Работает в Telegram на телефоне.", enterT:"Появление", eRise:"Снизу", eSpring:"Пружина", eSlide:"Сбоку", eBlur:"Из размытия", eUnfold:"Раскрытие", enterHint:"Как блоки появляются при открытии и при смене вкладки, когда движение «Живые». Выбранное сразу проигрывается в телефоне справа.", efLeaves:"Листопад", efPetals:"Лепестки", celT:"После оплаты", celCheck:"Галочка", celConfetti:"Конфетти", celHint:"Что видит человек, когда оплата прошла. Посмотреть — кнопка «Оплата прошла» под телефоном.", hmT:"Главный экран", hmSub:"с чего начинается приложение", hmAnswer:"Ответ", hmAnswerS:"«Работает до 26 декабря», кнопка и короткий список", hmTerm:"Срок", hmTermS:"календарь до конца подписки и продление сразу", hmDevices:"Устройства", hmDevicesS:"подключённые устройства и свободные места", hmClassic:"Классика", hmClassicS:"карточка с днями и две плитки", layT:"Стиль", laySub:"фон, карточки, шрифт заголовков", layClean:"Чистый", layCleanS:"светлый, как списки Telegram; тёмный, если Telegram тёмный", layTonal:"Мягкий", layTonalS:"фон в оттенке цвета магазина, круглые кнопки — как в Android", layBrand:"Фирменный", layBrandS:"цветная шапка в цвет магазина — как в приложениях банков", layLarge:"Крупный", layLargeS:"крупный текст, контраст и большие кнопки — легко читать", layCosmos:"Космос", layCosmosS:"ночной фон с подсветкой, стеклянные карточки и цены-градиенты — как на сайтах VPN", layClassic:"Тёмная классика", layClassicS:"тёмные карточки, свои фоны и особые наборы", layOwn:"В этом стиле фон и карточки свои — эти настройки работают в «Тёмной классике».", fontT:"Шрифт", fkSans:"Простые", fkSerif:"С засечками", fkChar:"С характером", fkFun:"Для особых оформлений", fkCustom:"Свой шрифт с Google Fonts", fCustomPh:"Название, например Lobster", fCustomHint:"Любое семейство с fonts.google.com для заголовков и цифр, текст останется в Golos. Выбирайте шрифт с кириллицей.", fCustomBad:"Такого шрифта нет на Google Fonts или в нём нет кириллицы", fCustomEmpty:"Впишите название шрифта", fOnlyApp:"только в приложении", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
   linksT:"Свои кнопки", linksSub:"в профиле клиента, до 6", linkAdd:"Добавить кнопку", linkRu:"Текст (RU)", linkEn:"Текст (EN)",
   linksEmpty:"Например: «Наш канал», «Чат клиентов», «Сайт».", linkBad:"Ссылка должна начинаться с https://, tg:// или mailto:",
   exExcel:"Excel", exOrdersT:"Заказы в Excel", exOrdersHint:"Таблица для учёта и налоговой: дата, клиент, что куплено, сумма, способ оплаты. Внизу — итог.",
@@ -854,7 +871,7 @@ cleanFont:"Для этого стиля поставил шрифт Golos — е
   spkMotionOff:"Сейчас анимация выключена — заставки не будет ни в каком виде. Включите «Живая» или «Спокойная».",
   spkPlay:"Нажмите на вид — он сразу проиграется в телефоне справа.",
   splashPh:"например: Быстрый VPN прямо в Telegram", effectT:"Сезонный эффект", efNone:"Нет", efSnow:"Снег",
-  effectHint:"Лёгкий снег за карточками — например, к Новому году. Не мешает читать.",
+  effectHint:"Снег, листья или лепестки за карточками — к сезону. Не мешают читать.",
   textsT:"Тексты и тема", botT:"Бот в Telegram", botSub:"видно ещё до /start",
   botAbout:"Короткое описание", botAboutHint:"До 120 знаков: в профиле бота и когда им делятся.",
   botDesc:"Описание", botDescHint:"До 512 знаков: «Что умеет этот бот?» в пустом чате. Пусто — как в @BotFather.",
@@ -1234,7 +1251,7 @@ en: {
   chAdminHint:"Make the bot an administrator of the channel — otherwise Telegram does not tell who is subscribed. If you changed the channel type (public ↔ private), bind it again.",
   chCheck:"Save and check", chOk:"Works: “{t}”", chAdd:"Add a channel", chEmpty:"No channels — press Add a channel. With several, a person must join each of them.", chCountN:"channels: {n}",
   brandT:"Name", brandReset:"Reset name and logo", brandResetQ:"Restore the standard name and the shield instead of the logo?",
-cleanFont:"Golos is set for this style — you can change it below", hmT:"Home screen", hmSub:"what the app opens with", hmAnswer:"Answer", hmAnswerS:"“Works until Dec 26”, a button and a short list", hmTerm:"Term", hmTermS:"a calendar to the end of the subscription, renewal right there", hmDevices:"Devices", hmDevicesS:"connected devices and free places", hmClassic:"Classic", hmClassicS:"a card with the days and two tiles", layT:"Style", laySub:"background, cards, heading font", layClean:"Clean", layCleanS:"light like Telegram’s lists; dark when Telegram is dark", layTonal:"Soft", layTonalS:"surfaces tinted with your colour, pill buttons — like Android", layBrand:"Brand", layBrandS:"your colour across the top — like a bank’s app", layLarge:"Large", layLargeS:"larger text, contrast and big buttons — easy to read", layCosmos:"Cosmos", layCosmosS:"a night ground lit by your colour, glass cards, gradient prices — like VPN sites", layClassic:"Dark classic", layClassicS:"dark cards, own backgrounds and special sets", layOwn:"This style has its own background and cards — these settings work in Dark classic.", fontT:"Font", fkSans:"Plain", fkSerif:"Serif", fkChar:"With character", fkFun:"For special looks", fkCustom:"Your own from Google Fonts", fCustomPh:"A name, like Lobster", fCustomHint:"Any family from fonts.google.com for headings and numbers; the text stays in Golos. Pick one with Cyrillic if you sell in Russian.", fCustomBad:"No such font on Google Fonts, or it has no Cyrillic", fCustomEmpty:"Type the name of the font", fOnlyApp:"app only", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
+cleanFont:"Golos is set for this style — you can change it below", fkOdd:"Unusual", layPaper:"Newspaper", layPaperS:"ink on newsprint, rules instead of cards, plans as a price list with dots", layBrutal:"Brutal", layBrutalS:"thick outlines, hard shadows, buttons that press in, sticker labels", layTerminal:"Terminal", layTerminalS:"a console: monospace, a cursor, [ buttons ] and a dotted price list", styleFont:"{f} is set for this style — you can change it below", topT:"Header", topSub:"the bar at the top with the logo and name", topAuto:"As the style", topAccent:"Shop colour", topCustom:"Own colour", topGradient:"Gradient", topImage:"Picture", topColor:"Header colour", topNoImg:"For a picture header, upload your picture below, in “Picture on home”.", topHint:"The text colour is picked for you so the name stays readable. Telegram’s own top bar takes the same colour.", artT:"Picture on home", artSub:"above the home screen", artNone:"None", artCity:"City", artBauhaus:"Bauhaus", artContours:"Contour map", artWaves:"Waves", artStars:"Star chart", artOwn:"Your own", artUpload:"Upload your own", artHint:"The drawings take your colour and follow light and dark. Your own picture: PNG, JPEG or WebP up to 4 MB; it can also go into the header.", artDone:"Picture uploaded", artGone:"Picture removed", btnT:"Buttons", btnSub:"the shape of the main buttons", bAuto:"As the style", bKey:"Key", bStamp:"Stamp", bArrow:"With an arrow", bNotch:"Ticket", bPixel:"Pixels", bOutline:"Double outline", bSample:"Renew", hapT:"Feedback on press", hapOn:"Vibration", hapOff:"No vibration", hapHint:"A light tap of the phone on presses, like banking apps. Works in Telegram on a phone.", enterT:"Entrance", eRise:"From below", eSpring:"Spring", eSlide:"From the side", eBlur:"Out of a blur", eUnfold:"Unfold", enterHint:"How the blocks come in when the app opens and on a tab switch, with lively motion. The phone on the right plays it at once.", efLeaves:"Falling leaves", efPetals:"Petals", celT:"After payment", celCheck:"A tick", celConfetti:"Confetti", celHint:"What the person sees when the payment goes through. See it with the “Payment done” button under the phone.", hmT:"Home screen", hmSub:"what the app opens with", hmAnswer:"Answer", hmAnswerS:"“Works until Dec 26”, a button and a short list", hmTerm:"Term", hmTermS:"a calendar to the end of the subscription, renewal right there", hmDevices:"Devices", hmDevicesS:"connected devices and free places", hmClassic:"Classic", hmClassicS:"a card with the days and two tiles", layT:"Style", laySub:"background, cards, heading font", layClean:"Clean", layCleanS:"light like Telegram’s lists; dark when Telegram is dark", layTonal:"Soft", layTonalS:"surfaces tinted with your colour, pill buttons — like Android", layBrand:"Brand", layBrandS:"your colour across the top — like a bank’s app", layLarge:"Large", layLargeS:"larger text, contrast and big buttons — easy to read", layCosmos:"Cosmos", layCosmosS:"a night ground lit by your colour, glass cards, gradient prices — like VPN sites", layClassic:"Dark classic", layClassicS:"dark cards, own backgrounds and special sets", layOwn:"This style has its own background and cards — these settings work in Dark classic.", fontT:"Font", fkSans:"Plain", fkSerif:"Serif", fkChar:"With character", fkFun:"For special looks", fkCustom:"Your own from Google Fonts", fCustomPh:"A name, like Lobster", fCustomHint:"Any family from fonts.google.com for headings and numbers; the text stays in Golos. Pick one with Cyrillic if you sell in Russian.", fCustomBad:"No such font on Google Fonts, or it has no Cyrillic", fCustomEmpty:"Type the name of the font", fOnlyApp:"app only", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
   linksT:"Own buttons", linksSub:"in the customer's profile, up to 6", linkAdd:"Add a button", linkRu:"Text (RU)", linkEn:"Text (EN)",
   linksEmpty:"For example: “Our channel”, “Customer chat”, “Website”.", linkBad:"A link must start with https://, tg:// or mailto:",
   exExcel:"Excel", exOrdersT:"Orders to Excel", exOrdersHint:"A table for bookkeeping and taxes: date, customer, what was bought, amount, payment method. A total at the bottom.",
@@ -1297,7 +1314,7 @@ cleanFont:"Golos is set for this style — you can change it below", hmT:"Home s
   spkMotionOff:"Motion is off now, so there is no opening screen of any kind. Choose Lively or Calm.",
   spkPlay:"Tap a kind and it plays in the phone on the right.",
   splashPh:"e.g. Fast VPN right in Telegram", effectT:"Seasonal effect", efNone:"None", efSnow:"Snow",
-  effectHint:"Light snow behind the cards — for New Year, say. Does not get in the way of reading.",
+  effectHint:"Snow, leaves or petals behind the cards — for the season. They do not get in the way of reading.",
   textsT:"Texts and scheme", botT:"The bot in Telegram", botSub:"seen before /start",
   botAbout:"Short description", botAboutHint:"Up to 120 characters: in the bot's profile and when it is shared.",
   botDesc:"Description", botDescHint:"Up to 512 characters: “What can this bot do?” in an empty chat. Empty — as set in @BotFather.",
@@ -3613,6 +3630,9 @@ async function pLook(){
            fonts, font:vals.font || "unbounded", fontCustom:vals.font_custom || "", radius:vals.radius || "normal", links,
            backdrop:lk.backdrop || "glow", icons:lk.icons || "regular", layout:lk.layout || "classic", home:lk.home || "classic", motion:lk.motion || "lively",
            effect:lk.effect || "none", cards:lk.cards || "solid", splash:lk.splash !== false,
+           enter:lk.enter || "rise", top:lk.top || "auto", topColor:vals.top_color || "", art:lk.art || "none",
+           artImage:lk.art_image || "", artInfo:lk.art_info || {}, buttons:lk.buttons || "auto",
+           celebrate:lk.celebrate || "check", haptics:lk.haptics !== false, hapticsV:lk.haptics === false ? "0" : "1", autoFont:"",
            splashKind:lk.splash_kind || "auto",
            sp:Object.assign({ mark:"logo", plate:"auto", size:"m", color:"style", bg:"app", name:"auto", speed:"normal" }, lk.splash_cfg || {}),
            logoInfo:lk.logo_info || null };
@@ -3625,6 +3645,22 @@ async function pLook(){
     </div>
     <div class="card"><h3>${esc(t("layT"))}<span class="mini">${esc(t("laySub"))}</span></h3>
       <div class="lays two-l" id="layOpts"></div>
+    </div>
+    <div class="card" id="topCard"><h3>${esc(t("topT"))}<span class="mini">${esc(t("topSub"))}</span></h3>
+      ${tabsOf("topTabs", "top", [["auto", "topAuto"], ["accent", "topAccent"], ["gradient", "topGradient"], ["custom", "topCustom"], ["image", "topImage"]])}
+      <div class="field" id="topColorRow" style="margin:12px 0 0" hidden><label>${esc(t("topColor"))}</label><div class="colorrow">
+        <input type="color" id="topIn" value="${esc(LOOK.topColor || "#1E6BFF")}" oninput="setTopColor(this.value)">
+        <input id="topHex" value="${esc(LOOK.topColor || "#1E6BFF")}" maxlength="7" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value))setTopColor(this.value)"></div></div>
+      <div class="hint" id="topHint" style="margin-top:10px">${esc(t("topHint"))}</div>
+    </div>
+    <div class="card" id="artCard"><h3>${esc(t("artT"))}<span class="mini">${esc(t("artSub"))}</span></h3>
+      <div class="opts arts" id="artOpts"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <label class="btn ghost sm" style="cursor:pointer">${ic("i-upload", "xs")}${esc(t("artUpload"))}
+          <input type="file" id="artIn" accept="image/png,image/jpeg,image/webp" hidden onchange="uploadArt(this)"></label>
+        <button class="btn ghost sm" id="artRm" onclick="removeArt(this)" ${LOOK.artImage ? "" : "hidden"}>${ic("i-trash", "xs")}${esc(t("remove"))}</button>
+      </div>
+      <div class="hint" style="margin-top:10px">${esc(t("artHint"))}</div>
     </div>
     <div class="card"><h3>${esc(t("brandT"))}<span class="mini"><button class="btn ghost sm" onclick="resetBrand(this)">${esc(t("brandReset"))}</button></span></h3>
       <div class="field"><label>${esc(t("brandName"))}</label><input id="lkName" maxlength="40" value="${esc(vals.brand_name)}" oninput="pushLook();drawSplash()"></div>
@@ -3656,6 +3692,11 @@ async function pLook(){
         <div class="field"><label>${esc(t("iconsT"))}</label><div class="opts" id="iconOpts"></div></div>
       </div>
     </div>
+    <div class="card" id="btnCard"><h3>${esc(t("btnT"))}<span class="mini">${esc(t("btnSub"))}</span></h3>
+      <div class="opts btns" id="btnOpts"></div>
+      <div class="field" style="margin:14px 0 0"><label>${esc(t("hapT"))}</label>${tabsOf("hapTabs", "hapticsV", [["1", "hapOn"], ["0", "hapOff"]])}
+        <div class="hint">${esc(t("hapHint"))}</div></div>
+    </div>
     <div class="card" id="bdCard"><h3>${esc(t("bdT"))}<span class="mini">${esc(t("bdSub"))}</span></h3>
       <div class="hint" id="bdOwn" style="margin:-4px 0 12px" hidden>${esc(t("layOwn"))}</div>
       <div id="bdBody"><div class="opts wide" id="bdOpts"></div>
@@ -3665,8 +3706,12 @@ async function pLook(){
     <div class="card"><h3>${esc(t("motionT"))}</h3>
       <div class="field"><label>${esc(t("motionLvl"))}</label>${tabsOf("motionTabs", "motion", [["lively", "mLively"], ["calm", "mCalm"], ["off", "mOff"]])}
         <div class="hint" id="motionHint"></div></div>
-      <div class="field"><label>${esc(t("effectT"))}</label>${tabsOf("effectTabs", "effect", [["none", "efNone"], ["snow", "efSnow"]])}
+      <div class="field"><label>${esc(t("enterT"))}</label>${tabsOf("enterTabs", "enter", [["rise", "eRise"], ["spring", "eSpring"], ["slide", "eSlide"], ["blur", "eBlur"], ["unfold", "eUnfold"]])}
+        <div class="hint">${esc(t("enterHint"))}</div></div>
+      <div class="field"><label>${esc(t("effectT"))}</label>${tabsOf("effectTabs", "effect", [["none", "efNone"], ["snow", "efSnow"], ["leaves", "efLeaves"], ["petals", "efPetals"]])}
         <div class="hint">${esc(t("effectHint"))}</div></div>
+      <div class="field"><label>${esc(t("celT"))}</label>${tabsOf("celTabs", "celebrate", [["check", "celCheck"], ["confetti", "celConfetti"]])}
+        <div class="hint">${esc(t("celHint"))}</div></div>
     </div>
     <div class="card" id="spCard"><h3>${esc(t("splashT"))}<span class="mini">${esc(t("splashSub"))}</span></h3>
       <div class="opts spk" id="spOpts"></div>
@@ -3721,7 +3766,7 @@ function fontLoad(f){
   l.href = `https://fonts.googleapis.com/css2?${f.load}&display=swap`;
   document.head.appendChild(l);
 }
-const FONT_GROUPS = [["sans", "fkSans"], ["serif", "fkSerif"], ["char", "fkChar"], ["fun", "fkFun"]];
+const FONT_GROUPS = [["sans", "fkSans"], ["serif", "fkSerif"], ["char", "fkChar"], ["odd", "fkOdd"], ["fun", "fkFun"]];
 function drawFonts(){
   LOOK.fonts.forEach(fontLoad);
   if (LOOK.fontCustom) customFontLoad(LOOK.fontCustom);
@@ -3817,16 +3862,36 @@ function curColors(){
   const ground = p ? p.ground : { black:"#000000", graphite:"#111214", midnight:"#060913", indigo:"#07051A", retro:"#100C2E", noir:"#15121F", winter:"#060D1E", lacquer:"#1A0A0B" }[LOOK.surface] || "#000000";
   return { hex, rgb, ground };
 }
+// Each style starts with the font it was drawn for: the quiet ones with Golos,
+// the newspaper with an old book face, the brutal one with a heavy poster
+// gothic, the terminal with a dot-matrix face. Only the default font or one
+// a style put there is replaced; a font the owner picked stays.
+const STYLE_FONT = { clean:"golos", tonal:"golos", brand:"golos", large:"golos", cosmos:"golos",
+                     paper:"oldstandard", brutal:"dela", terminal:"dotgothic" };
 function setLook(key, v){
   LOOK[key] = v;
-  // The clean style is quiet; the wide default heading font fights it, so it
-  // starts with Golos (one face for all). Any other font chosen stays.
-  if (key === "layout" && v !== "classic" && (LOOK.font === "unbounded" || LOOK.font === "unbounded-manrope")){
-    LOOK.font = "golos"; drawFonts(); toast(t("cleanFont"));
+  if (key === "hapticsV") LOOK.haptics = v === "1";
+  const want = key === "layout" ? STYLE_FONT[v] : "";
+  if (want && LOOK.font !== want && (LOOK.font === "unbounded" || LOOK.font === "unbounded-manrope" || LOOK.font === LOOK.autoFont)){
+    LOOK.font = want; LOOK.autoFont = want; drawFonts();
+    const f = LOOK.fonts.find(x => x.id === want);
+    toast(t("styleFont", { f:f ? f.name.split(" + ")[0] : want }));
   }
-  const box = { radius:"radTabs", motion:"motionTabs", effect:"effectTabs", cards:"cardsTabs" }[key];
+  if (key === "top" && v === "image" && !LOOK.artImage) toast(t("topNoImg"), true);
+  const box = { radius:"radTabs", motion:"motionTabs", effect:"effectTabs", cards:"cardsTabs", enter:"enterTabs",
+                celebrate:"celTabs", hapticsV:"hapTabs", top:"topTabs" }[key];
   if (box) document.querySelectorAll(`#${box} button`).forEach(b => b.classList.toggle("on", b.dataset.v === v));
   drawOpts();
+  lookChanged();
+  // a new entrance plays at once in the phone
+  if (key === "enter") setTimeout(() => frameSay({ type:"kv-enter" }), 420);
+  if (key === "celebrate" && v === "confetti") setTimeout(() => frameSay({ type:"kv-done" }), 420);
+}
+function setTopColor(v){
+  LOOK.topColor = v.toUpperCase();
+  if ($("topIn")) $("topIn").value = LOOK.topColor;
+  if ($("topHex") && document.activeElement !== $("topHex")) $("topHex").value = LOOK.topColor;
+  if (LOOK.top !== "custom") return setLook("top", "custom");
   lookChanged();
 }
 function lookChanged(){ previewLook(); }
@@ -3886,6 +3951,23 @@ function homeThumb(k, hex){
     + `<i style="left:6px;top:86px;width:calc(50% - 9px);height:34px;background:${c.s};border-radius:6px"></i><i style="right:6px;top:86px;width:calc(50% - 9px);height:34px;background:${c.s};border-radius:6px"></i>`);
 }
 function styleThumb(k, hex){
+  if (k === "paper") return `<span class="ph" style="background:#F3EFE6">
+    <i style="left:8px;right:8px;top:12px;height:3px;border-top:1px solid #1A1714;border-bottom:1px solid #1A1714"></i>
+    <i style="left:8px;top:22px;width:74px;height:10px;background:#1A1714;border-radius:1px"></i><i style="left:8px;top:36px;width:50px;height:10px;background:#1A1714;border-radius:1px"></i>
+    <i style="left:8px;right:8px;top:54px;height:1px;background:#1A1714"></i>
+    ${[62, 76, 90].map(y => `<i style="left:8px;top:${y}px;width:30px;height:5px;background:#4A443C;border-radius:1px"></i><i style="left:42px;right:30px;top:${y + 3}px;border-top:2px dotted #CFC7B8"></i><i style="right:8px;top:${y}px;width:18px;height:5px;background:${hex};border-radius:1px"></i>`).join("")}
+    <i style="left:8px;right:8px;top:106px;height:16px;background:#1A1714"></i></span>`;
+  if (k === "brutal") return `<span class="ph" style="background:color-mix(in srgb,${hex} 16%,#FFF8EC)">
+    <i style="left:8px;top:10px;width:46px;height:12px;background:#0B0B0B;border-radius:3px;transform:rotate(-2deg)"></i>
+    <i style="left:8px;right:12px;top:30px;height:40px;background:#fff;border:2px solid #0B0B0B;border-radius:7px;box-shadow:3px 3px 0 #0B0B0B"></i>
+    <i style="left:16px;top:42px;width:54px;height:9px;background:color-mix(in srgb,${hex} 70%,transparent)"></i>
+    <i style="left:8px;right:12px;top:82px;height:18px;background:${hex};border:2px solid #0B0B0B;border-radius:7px;box-shadow:3px 3px 0 #0B0B0B"></i>
+    <i style="left:8px;right:12px;top:108px;height:14px;background:#fff;border:2px solid #0B0B0B;border-radius:7px;box-shadow:3px 3px 0 #0B0B0B"></i></span>`;
+  if (k === "terminal") return `<span class="ph" style="background:#060807;font:9px/1 ui-monospace,monospace;color:${hex}">
+    <i style="left:8px;top:12px;width:8px;height:8px;color:#5b6a5f">&gt;</i><i style="left:18px;top:12px;width:56px;height:8px;background:${hex};opacity:.9"></i><i style="left:78px;top:12px;width:6px;height:9px;background:${hex}"></i>
+    <i style="left:6px;right:6px;top:30px;height:48px;border:1px dashed color-mix(in srgb,${hex} 55%,transparent)"></i>
+    ${[38, 52, 66].map(y => `<i style="left:12px;top:${y}px;width:22px;height:5px;background:color-mix(in srgb,${hex} 45%,#ECEFEA)"></i><i style="left:38px;right:32px;top:${y + 2}px;border-top:2px dotted color-mix(in srgb,${hex} 35%,transparent)"></i><i style="right:12px;top:${y}px;width:16px;height:5px;background:${hex}"></i>`).join("")}
+    <i style="left:6px;right:6px;top:88px;height:16px;background:${hex}"></i><i style="left:6px;right:6px;top:110px;height:14px;border:1px dashed color-mix(in srgb,${hex} 55%,transparent)"></i></span>`;
   if (k === "cosmos") return `<span class="ph" style="background:radial-gradient(90% 55% at 50% 0%,${hex}77,transparent 65%),radial-gradient(70% 40% at 0% 100%,#EC489944,transparent 60%),#0A0513">
     <i style="left:8px;top:10px;width:62px;height:9px;background:#fff;border-radius:2px"></i>
     <i style="left:6px;right:6px;top:26px;height:50px;border-radius:10px;border:1px solid ${hex}55;background:linear-gradient(160deg,${hex}44,#140C26DD);overflow:hidden"></i>
@@ -3916,11 +3998,101 @@ function styleThumb(k, hex){
     <i style="left:12px;right:12px;top:70px;height:10px;background:${hex};border-radius:3px"></i>
     <i style="left:6px;top:96px;width:calc(50% - 9px);height:26px;background:#0C0D0F;border:1px solid #22252B;border-radius:8px"></i><i style="right:6px;top:96px;width:calc(50% - 9px);height:26px;background:#0C0D0F;border:1px solid #22252B;border-radius:8px"></i></span>`;
 }
+/* The pictures on home, drawn exactly as the app draws them (artSvg in
+   web/index.html), with the app's variables set on the tile. */
+function artRand(seed){ let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function artSvg(kind){
+  const W = 360, H = 132, r = artRand(7), f = (c, extra = "") => `style="fill:${c}${extra}"`;
+  const mix = (a, p, b) => `color-mix(in srgb,${a} ${p}%,${b})`;
+  let g = "";
+  if (kind === "city"){
+    g += `<defs><linearGradient id="arSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${mix("var(--sig)", 46, "var(--ground)")}"/><stop offset="1" style="stop-color:${mix("var(--sig)", 16, "var(--ground)")}"/></linearGradient></defs>`;
+    g += `<rect width="${W}" height="${H}" fill="url(#arSky)"/>`;
+    for (let i = 0; i < 26; i++) g += `<circle class="ar-st" cx="${(r() * W).toFixed(1)}" cy="${(r() * 60).toFixed(1)}" r="${(.5 + r() * 1.1).toFixed(2)}" ${f("var(--txt)")}/>`;
+    g += `<circle class="ar-mn" cx="300" cy="32" r="13" ${f("var(--txt)", ";opacity:.9")}/><circle class="ar-cut" cx="306" cy="27" r="12" ${f(mix("var(--sig)", 46, "var(--ground)"))}/>`;
+    const row = (y0, hmin, hmax, fill, lit) => {
+      let x = -6;
+      while (x < W){
+        const w = 18 + Math.round(r() * 26), h = hmin + Math.round(r() * (hmax - hmin)), y = H - h;
+        g += `<rect x="${x}" y="${y}" width="${w}" height="${h + 2}" ${f(fill)}/>`;
+        if (r() < .3) g += `<rect x="${x + w / 2 - 1}" y="${y - 9}" width="2" height="9" ${f(fill)}/>`;
+        if (lit) for (let wy = y + 6; wy < H - 6; wy += 9) for (let wx = x + 4; wx < x + w - 5; wx += 7)
+          if (r() < .28) g += `<rect x="${wx}" y="${wy}" width="3" height="4" ${f(r() < .8 ? "var(--sig)" : "var(--txt)", ";opacity:.9")}/>`;
+        x += w + (r() < .3 ? 3 : 0);
+      }
+    };
+    row(0, 40, 92, mix("var(--sig)", 28, "var(--ground)"), false);
+    row(0, 22, 66, "var(--ground)", true);
+  } else if (kind === "bauhaus"){
+    g += `<rect width="${W}" height="${H}" ${f("var(--card-2)")}/>`;
+    g += `<path d="M0 0H70A70 70 0 0 1 0 70Z" ${f(mix("var(--sig)", 45, "var(--card-2)"))}/>`;
+    g += `<circle cx="268" cy="140" r="92" ${f("var(--sig)")}/>`;
+    g += `<path d="M44 132A56 56 0 0 1 156 132Z" ${f("var(--txt)")}/>`;
+    for (let i = 0; i < 5; i++) g += `<rect x="${176 + i * 9}" y="16" width="4.5" height="62" ${f("var(--txt)")}/>`;
+    g += `<path d="M98 18H140L119 54Z" ${f("var(--sig)")}/>`;
+    g += `<circle cx="322" cy="30" r="12" ${f("var(--txt)")}/>`;
+    g += `<circle cx="100" cy="132" r="22" ${f("var(--card-2)")}/>`;
+    g += `<rect x="232" y="22" width="44" height="6" ${f("var(--txt)")}/>`;
+  } else if (kind === "contours"){
+    g += `<rect width="${W}" height="${H}" ${f("var(--card-2)")}/>`;
+    const hill = (cx, cy, rings, base, step, ph) => {
+      for (let k = rings; k >= 1; k--){
+        let d = "";
+        for (let a = 0; a <= 64; a++){
+          const th = a / 64 * Math.PI * 2;
+          const rr = base + k * step + Math.sin(th * 3 + ph + k * .35) * (3 + k * .9) + Math.sin(th * 5 + ph * 2) * 2.2;
+          d += (a ? "L" : "M") + (cx + Math.cos(th) * rr * 1.45).toFixed(1) + " " + (cy + Math.sin(th) * rr).toFixed(1);
+        }
+        g += `<path d="${d}Z" style="fill:none;stroke:${k % 4 === 0 ? "var(--sig)" : mix("var(--txt)", 30, "transparent")};stroke-width:${k % 4 === 0 ? 1.6 : 1}"/>`;
+      }
+    };
+    hill(96, 70, 12, 2, 9.5, .4); hill(292, 40, 9, 2, 10, 2.1);
+    g += `<path d="M96 70C150 98 210 104 292 40" style="fill:none;stroke:var(--sig);stroke-width:1.6;stroke-dasharray:4 5"/>`;
+    g += `<circle cx="96" cy="70" r="4.5" ${f("var(--sig)")}/><circle cx="292" cy="40" r="4.5" ${f("var(--sig)")}/>`;
+  } else if (kind === "waves"){
+    g += `<rect width="${W}" height="${H}" ${f("var(--card-2)")}/>`;
+    for (let row = 0, y = -6; y < H + 30; row++, y += 11){
+      for (let x = (row % 2) * 20 - 20; x < W + 30; x += 40){
+        g += `<circle cx="${x}" cy="${y}" r="19.5" style="fill:var(--card-2);stroke:var(--sig);stroke-width:1.5"/>`;
+        g += `<circle cx="${x}" cy="${y}" r="13" style="fill:none;stroke:${mix("var(--sig)", 60, "transparent")};stroke-width:1.3"/>`;
+        g += `<circle cx="${x}" cy="${y}" r="6.5" style="fill:none;stroke:${mix("var(--sig)", 40, "transparent")};stroke-width:1.2"/>`;
+      }
+    }
+  } else if (kind === "stars"){
+    g += `<rect width="${W}" height="${H}" ${f("var(--card-2)")}/>`;
+    for (let k = 1; k <= 6; k++) g += `<circle cx="180" cy="250" r="${70 + k * 34}" style="fill:none;stroke:${mix("var(--txt)", 16, "transparent")};stroke-width:1;stroke-dasharray:2 5"/>`;
+    for (let k = -4; k <= 4; k++){ const a = (k * 14 - 90) * Math.PI / 180;
+      g += `<path d="M180 250L${(180 + Math.cos(a) * 320).toFixed(1)} ${(250 + Math.sin(a) * 320).toFixed(1)}" style="stroke:${mix("var(--txt)", 12, "transparent")};stroke-width:1"/>`; }
+    for (let i = 0; i < 46; i++) g += `<circle cx="${(r() * W).toFixed(1)}" cy="${(r() * H).toFixed(1)}" r="${(.4 + r() * .9).toFixed(2)}" ${f("var(--txt)", ";opacity:.55")}/>`;
+    const pts = [[46, 92], [84, 64], [126, 74], [168, 44], [214, 58], [252, 30], [300, 52], [328, 88]];
+    g += `<path d="M${pts.map(p => p.join(" ")).join("L")}" style="fill:none;stroke:${mix("var(--txt)", 45, "transparent")};stroke-width:1"/>`;
+    pts.forEach(([x, y], i) => { if (i !== 5) g += `<circle cx="${x}" cy="${y}" r="${i % 3 ? 2.1 : 2.8}" ${f("var(--txt)")}/>`; });
+    const [sx, sy] = pts[5];
+    g += `<path d="M${sx} ${sy - 11}Q${sx + 1.6} ${sy - 1.6} ${sx + 11} ${sy}Q${sx + 1.6} ${sy + 1.6} ${sx} ${sy + 11}Q${sx - 1.6} ${sy + 1.6} ${sx - 11} ${sy}Q${sx - 1.6} ${sy - 1.6} ${sx} ${sy - 11}Z" ${f("var(--sig)")}/>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${g}</svg>`;
+}
+function artThumb(k, hex){
+  const vars = `--sig:${hex};--ground:#0B0C0E;--card-2:#17191D;--txt:#E9EBEF`;
+  if (k === "none") return `<span class="sw" style="background:var(--surface);display:grid;place-items:center;color:var(--muted2)">—</span>`;
+  if (k === "own") return `<span class="sw" style="${LOOK.artImage ? `background:#000 url('${esc(LOOK.artImage)}') center/cover` : "background:var(--surface);display:grid;place-items:center;color:var(--muted2)"}">${LOOK.artImage ? "" : ic("i-upload", "xs")}</span>`;
+  return `<span class="sw art" style="${vars}">${artSvg(k)}</span>`;
+}
+function onOf(hex){
+  const l = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(c => c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4);
+  return .2126 * l[0] + .7152 * l[1] + .0722 * l[2] > .36 ? "#111" : "#fff";
+}
+function btnThumb(k, hex){
+  const on = onOf(hex);
+  return `<span class="sw bt bt-${k}" style="--b:${hex};--bon:${on}"><span>${esc(t("bSample"))}</span></span>`;
+}
 function drawOpts(){
   const { rgb, ground, hex } = curColors();
   $("homeOpts").innerHTML = [["answer", "hmAnswer"], ["term", "hmTerm"], ["devices", "hmDevices"], ["classic", "hmClassic"]].map(([k, l]) =>
     `<button class="th lay ${LOOK.home === k ? "on" : ""}" onclick="setLook('home','${k}')">${homeThumb(k, hex)}<b>${esc(t(l))}</b><small>${esc(t(l + "S"))}</small></button>`).join("");
-  $("layOpts").innerHTML = [["clean", "layClean"], ["tonal", "layTonal"], ["brand", "layBrand"], ["large", "layLarge"], ["cosmos", "layCosmos"], ["classic", "layClassic"]].map(([k, l]) =>
+  $("layOpts").innerHTML = [["clean", "layClean"], ["tonal", "layTonal"], ["brand", "layBrand"], ["large", "layLarge"], ["cosmos", "layCosmos"],
+    ["paper", "layPaper"], ["brutal", "layBrutal"], ["terminal", "layTerminal"], ["classic", "layClassic"]].map(([k, l]) =>
     `<button class="th lay ${LOOK.layout === k ? "on" : ""}" onclick="setLook('layout','${k}')">${styleThumb(k, hex)}<b>${esc(t(l))}</b><small>${esc(t(l + "S"))}</small></button>`).join("");
   const own = LOOK.layout !== "classic";
   $("bdOwn").hidden = !own; $("bdBody").classList.toggle("dimmed", own);
@@ -3931,7 +4103,34 @@ function drawOpts(){
     `<button class="th opt ${LOOK.backdrop === k ? "on" : ""}" onclick="setLook('backdrop','${k}')">
       <span class="sw" style="background:${bdCss(k, rgb, ground)}"></span><b>${esc(t(l))}</b></button>`).join("");
   $("motionHint").textContent = t("mHint_" + LOOK.motion);
+  $("artOpts").innerHTML = [["none", "artNone"], ["city", "artCity"], ["bauhaus", "artBauhaus"], ["contours", "artContours"], ["waves", "artWaves"], ["stars", "artStars"], ["own", "artOwn"]].map(([k, l]) =>
+    `<button class="th opt ${LOOK.art === k ? "on" : ""}" onclick="${k === "own" && !LOOK.artImage ? "$('artIn').click()" : `setLook('art','${k}')`}">${artThumb(k, hex)}<b>${esc(t(l))}</b></button>`).join("");
+  $("btnOpts").innerHTML = [["auto", "bAuto"], ["key", "bKey"], ["stamp", "bStamp"], ["arrow", "bArrow"], ["notch", "bNotch"], ["pixel", "bPixel"], ["outline", "bOutline"]].map(([k, l]) =>
+    `<button class="th opt ${LOOK.buttons === k ? "on" : ""}" onclick="setLook('buttons','${k}')">${btnThumb(k, hex)}<b>${esc(t(l))}</b></button>`).join("");
+  $("topColorRow").hidden = LOOK.top !== "custom";
+  if ($("artRm")) $("artRm").hidden = !LOOK.artImage;
   drawSplash();
+}
+async function uploadArt(inp){
+  const f = inp.files && inp.files[0]; if (!f) return;
+  const fd = new FormData(); fd.append("file", f);
+  try {
+    const r = await fetch("/api/admin/brand/art", { method:"POST", headers:{ Authorization:"Bearer " + TOKEN }, body:fd });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.detail || t("error"));
+    LOOK.artImage = d.art_image; LOOK.artInfo = d.art_info || {};
+    LOOK.art = "own"; drawOpts(); pushLook(true); toast(t("artDone"));
+  } catch (e){ fail(e); } finally { inp.value = ""; }
+}
+async function removeArt(btn){
+  btn.disabled = true;
+  try {
+    await api("/brand/art", { method:"DELETE" });
+    LOOK.artImage = ""; LOOK.artInfo = {};
+    if (LOOK.art === "own") LOOK.art = "none";
+    if (LOOK.top === "image") setLook("top", "auto");
+    drawOpts(); pushLook(); toast(t("artGone"));
+  } catch (e){ fail(e); } finally { btn.disabled = false; }
 }
 /* ---- the opening screen: its kind ("off" is no screen), and how it fits the brand */
 const SPLASH_KINDS = ["off", "auto", "pulse", "orbit", "ring", "burst", "type", "minimal"];
@@ -4044,7 +4243,9 @@ function pushLook(now){
     if (!LOOK || !$("lkFrame")) return;
     const body = { theme_preset:LOOK.preset, theme_accent:LOOK.accent, theme_surface:LOOK.surface,
                    font:LOOK.font, font_custom:LOOK.fontCustom, radius:LOOK.radius, icons:LOOK.icons, backdrop:LOOK.backdrop, layout:LOOK.layout, home:LOOK.home,
-                   motion:LOOK.motion, effect:LOOK.effect, cards:LOOK.cards, splash_kind:LOOK.splashKind };
+                   motion:LOOK.motion, effect:LOOK.effect, cards:LOOK.cards, splash_kind:LOOK.splashKind,
+                   enter:LOOK.enter, top:LOOK.top, top_color:LOOK.topColor, art:LOOK.art, art_image:LOOK.artImage,
+                   art_head:(LOOK.artInfo || {}).head || "", buttons:LOOK.buttons, celebrate:LOOK.celebrate, haptics:LOOK.haptics ? "1" : "0" };
     const replay = !!LOOK.replay; LOOK.replay = false;
     let pv;
     try { pv = await api("/theme/preview", { method:"POST", body }); } catch (e){ return; }
@@ -4113,6 +4314,8 @@ async function saveLook(btn){
                  links_json:JSON.stringify(links),
                  icons:LOOK.icons, backdrop:LOOK.backdrop, layout:LOOK.layout, home:LOOK.home, motion:LOOK.motion,
                  effect:LOOK.effect, cards:LOOK.cards, splash:LOOK.splash ? "1" : "0", splash_kind:LOOK.splashKind,
+                 enter:LOOK.enter, top:LOOK.top, top_color:LOOK.topColor, art:LOOK.art, buttons:LOOK.buttons,
+                 celebrate:LOOK.celebrate, haptics:LOOK.haptics ? "1" : "0",
                  splash_mark:LOOK.sp.mark, splash_plate:LOOK.sp.plate, splash_size:LOOK.sp.size, splash_color:LOOK.sp.color,
                  splash_bg:LOOK.sp.bg, splash_name:LOOK.sp.name, splash_speed:LOOK.sp.speed,
                  splash_text_ru:$("spRu").value.trim(), splash_text_en:$("spEn").value.trim(),

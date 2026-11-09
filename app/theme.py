@@ -136,15 +136,54 @@ FONTS: dict[str, dict] = {
                    "load": "family=Literata:wght@300;400;500;600;700&family=Golos+Text:wght@400;500;600;700"},
     "robotoslab": {"kind": "serif", "name": "Roboto Slab + Golos", "d": "Roboto Slab", "b": "Golos Text",
                    "load": "family=Roboto+Slab:wght@300;400;500;700&family=Golos+Text:wght@400;500;600;700"},
+    "oldstandard": {"kind": "serif", "name": "Old Standard + PT Sans", "d": "Old Standard TT", "b": "PT Sans",
+                   "load": "family=Old+Standard+TT:wght@400;700&family=PT+Sans:wght@400;700"},
+    "cormorant":  {"kind": "serif", "name": "Cormorant + Golos", "d": "Cormorant", "b": "Golos Text",
+                   "load": "family=Cormorant:wght@500;600;700&family=Golos+Text:wght@400;500;600;700"},
+    "zenantique": {"kind": "serif", "name": "Zen Antique + Golos", "d": "Zen Antique", "b": "Golos Text", "solo": True,
+                   "load": "family=Zen+Antique&family=Golos+Text:wght@400;500;600;700"},
     # Headings with a character of their own.
     "oswald":     {"kind": "char", "name": "Oswald + Golos", "d": "Oswald", "b": "Golos Text",
                    "load": "family=Oswald:wght@300;400;500;700&family=Golos+Text:wght@400;500;600;700"},
-    "russo":      {"kind": "char", "name": "Russo One + Golos", "d": "Russo One", "b": "Golos Text",
+    "russo":      {"kind": "char", "name": "Russo One + Golos", "d": "Russo One", "b": "Golos Text", "solo": True,
                    "load": "family=Russo+One&family=Golos+Text:wght@400;500;600;700"},
     "tektur":     {"kind": "char", "name": "Tektur + Golos", "d": "Tektur", "b": "Golos Text",
                    "load": "family=Tektur:wght@400;500;700&family=Golos+Text:wght@400;500;600;700"},
     "plexmono":   {"kind": "char", "name": "IBM Plex Mono + Sans", "d": "IBM Plex Mono", "b": "IBM Plex Sans",
                    "load": "family=IBM+Plex+Mono:wght@300;400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700"},
+    # More with character: a slab, a technical face, a narrow slab and a heavy poster gothic.
+    "podkova":    {"kind": "char", "name": "Podkova + Golos", "d": "Podkova", "b": "Golos Text",
+                   "load": "family=Podkova:wght@500;700;800&family=Golos+Text:wght@400;500;600;700"},
+    "jura":       {"kind": "char", "name": "Jura", "d": "Jura", "b": "Jura",
+                   "load": "family=Jura:wght@400;500;600;700"},
+    "kelly":      {"kind": "char", "name": "Kelly Slab + Golos", "d": "Kelly Slab", "b": "Golos Text", "solo": True,
+                   "load": "family=Kelly+Slab&family=Golos+Text:wght@400;500;600;700"},
+    "dela":       {"kind": "char", "name": "Dela Gothic One + Golos", "d": "Dela Gothic One", "b": "Golos Text", "solo": True,
+                   "load": "family=Dela+Gothic+One&family=Golos+Text:wght@400;500;600;700"},
+    # Unusual: for headings and prices only (the text stays readable), and
+    # only in the app — the panel keeps its plain type.
+    "rubikmono":  {"kind": "odd", "name": "Rubik Mono One + Golos", "d": "Rubik Mono One", "b": "Golos Text", "solo": True,
+                   "load": "family=Rubik+Mono+One&family=Golos+Text:wght@400;500;600;700", "app_only": True},
+    "ruslan":     {"kind": "odd", "name": "Ruslan Display + Golos", "d": "Ruslan Display", "b": "Golos Text", "solo": True,
+                   "load": "family=Ruslan+Display&family=Golos+Text:wght@400;500;600;700", "app_only": True},
+    "handjet":    {"kind": "odd", "name": "Handjet + Golos", "d": "Handjet", "b": "Golos Text",
+                   "load": "family=Handjet:wght@400;600;800&family=Golos+Text:wght@400;500;600;700", "app_only": True},
+    "dotgothic":  {"kind": "odd", "name": "DotGothic16 + JetBrains Mono", "d": "DotGothic16", "d2": "JetBrains Mono", "b": "JetBrains Mono", "solo": True,
+                   "load": "family=DotGothic16&family=JetBrains+Mono:wght@400;500;600;700", "app_only": True},
+    "glitch":     {"kind": "odd", "name": "Rubik Glitch + Golos", "d": "Rubik Glitch", "b": "Golos Text", "solo": True,
+                   "load": "family=Rubik+Glitch&family=Golos+Text:wght@400;500;600;700", "app_only": True},
+    "doodle":     {"kind": "odd", "name": "Rubik Doodle Shadow + Golos", "d": "Rubik Doodle Shadow", "b": "Golos Text", "solo": True,
+                   "load": "family=Rubik+Doodle+Shadow&family=Golos+Text:wght@400;500;600;700", "app_only": True},
+    "seymour":    {"kind": "odd", "name": "Seymour One + Golos", "d": "Seymour One", "b": "Golos Text", "solo": True,
+                   "load": "family=Seymour+One&family=Golos+Text:wght@400;500;600;700", "app_only": True},
+    "train":      {"kind": "odd", "name": "Train One + Golos", "d": "Train One", "b": "Golos Text", "solo": True,
+                   "load": "family=Train+One&family=Golos+Text:wght@400;500;600;700", "app_only": True},
+    "underdog":   {"kind": "odd", "name": "Underdog + Golos", "d": "Underdog", "b": "Golos Text", "solo": True,
+                   "load": "family=Underdog&family=Golos+Text:wght@400;500;600;700", "app_only": True},
+    "caveat":     {"kind": "odd", "name": "Caveat + Golos", "d": "Caveat", "b": "Golos Text",
+                   "load": "family=Caveat:wght@500;700&family=Golos+Text:wght@400;500;600;700", "app_only": True},
+    "shantell":   {"kind": "odd", "name": "Shantell Sans", "d": "Shantell Sans", "b": "Shantell Sans",
+                   "load": "family=Shantell+Sans:wght@400;500;600;700;800", "app_only": True},
     # A pixel font with a clean Cyrillic (Pixelify's д and П are not usable),
     # with a terminal font for the text: a smooth sans next to pixels looks pasted on.
     # Only for the mini app: it is sharp at sizes the app sets for it, and
@@ -157,13 +196,13 @@ FONTS: dict[str, dict] = {
     # New Year: round heavy letters (white with a candy-red edge in the app), a gold display serif for the Lunar one.
     "festive":    {"kind": "fun", "name": "Nunito Black", "d": "Nunito", "b": "Nunito",
                    "load": "family=Nunito:wght@400;600;700;800;900", "app_only": True},
-    "lunar":      {"kind": "fun", "name": "Yeseva One + Golos", "d": "Yeseva One", "b": "Golos Text",
+    "lunar":      {"kind": "fun", "name": "Yeseva One + Golos", "d": "Yeseva One", "b": "Golos Text", "solo": True,
                    "load": "family=Yeseva+One&family=Golos+Text:wght@400;500;600;700", "app_only": True},
     "system":     {"kind": "sans", "name": "System", "d": "system-ui", "b": "system-ui", "load": ""},
 }
 # The groups of the picker in the panel, in this order. "custom" is any family
 # from Google Fonts typed in by the owner (font_custom), for the headings.
-FONT_KINDS = ("sans", "serif", "char", "fun", "custom")
+FONT_KINDS = ("sans", "serif", "char", "odd", "fun", "custom")
 CUSTOM_FONT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 ]{0,39}$")
 # Corner roundness: (app cards, admin cards)
 RADII = {"square": (0, 6), "sharp": (8, 8), "normal": (16, 13), "round": (24, 18)}
@@ -178,14 +217,32 @@ ICONS = ("thin", "regular", "bold", "badge", "tiles", "ring", "duo", "3d", "neon
 # like Telegram), "tonal" (after Material 3: tinted surfaces, pill buttons),
 # "brand" (the shop's colour across the top, like a bank's app), "large"
 # (larger text, high contrast) or "cosmos" (a night ground lit by the shop's
-# colour, glass cards, gradient prices — after the VPN landing pages). The new ones follow Telegram light/dark and
-# paint their own background and cards.
-LAYOUTS = ("classic", "clean", "tonal", "brand", "large", "cosmos")
+# colour, glass cards, gradient prices — after the VPN landing pages), "paper"
+# (a newspaper: ink on newsprint, rules instead of cards, a price list with
+# dotted leaders), "brutal" (thick outlines, hard offset shadows, flat bold
+# colour) or "terminal" (a console: monospace, a phosphor colour, [ buttons ]).
+# The new ones follow Telegram light/dark and paint their own background and cards.
+LAYOUTS = ("classic", "clean", "tonal", "brand", "large", "cosmos", "paper", "brutal", "terminal")
 # What the home screen is built around: the classic card, a plain answer
 # ("works until …"), the calendar of the term with renewal, or the devices.
 HOMES = ("classic", "answer", "term", "devices")
 MOTIONS = ("lively", "calm", "off")
-EFFECTS = ("none", "snow")
+# How the blocks of a screen come in (when the motion is lively): rise from
+# below, spring in, slide from the side, come out of a blur, or unfold downwards.
+ENTERS = ("rise", "spring", "slide", "blur", "unfold")
+EFFECTS = ("none", "snow", "leaves", "petals")
+# The bar at the top with the logo: as the style paints it, the shop's colour,
+# a colour of its own (top_color), a gradient of the shop's colour, or a picture.
+TOPS = ("auto", "accent", "custom", "gradient", "image")
+# A picture at the top of the home screen: none, one of the drawings (they take
+# the shop's colour and follow light/dark), or the owner's own (art_image).
+ARTS = ("none", "city", "bauhaus", "contours", "waves", "stars", "own")
+# The buttons: as the style draws them, or a shape of their own — a key that
+# presses down, a stamp with a hard shadow, a label with an arrow, cut corners,
+# stepped pixel corners, or an outline.
+BUTTONS = ("auto", "key", "stamp", "arrow", "notch", "pixel", "outline")
+# What happens when a payment goes through: the tick, or the tick with confetti.
+CELEBRATES = ("check", "confetti")
 # The kind of opening screen: "auto" follows the cards (pixel, comic, snowy and
 # lacquer cards have their own); the others are the same for every look.
 SPLASHES = ("auto", "pulse", "orbit", "ring", "burst", "type", "minimal")
@@ -342,7 +399,8 @@ def font_vars(font: str, radius_id: str, page: str, custom: str = "") -> tuple[s
     r_app, r_admin = RADII.get(radius_id) or RADII["normal"]
     radius = r_admin if page == "admin" else r_app
     href = f"https://fonts.googleapis.com/css2?{f['load']}&display=swap" if f["load"] else ""
-    return href, f":root{{--font-d:{d};--font-b:{b};--r:{radius}px}}"
+    solo = "font-synthesis-weight:none;" if f.get("solo") else ""
+    return href, f":root{{--font-d:{d};--font-b:{b};--r:{radius}px;{solo}}}"
 
 
 def _pick(value: str, allowed: tuple, default: str) -> str:
@@ -359,6 +417,15 @@ def look(db: Session) -> dict:
         "cards": _pick(core.get(db, "cards"), CARDS, "solid"),
         "layout": _pick(core.get(db, "layout"), LAYOUTS, "classic"),
         "home": _pick(core.get(db, "home"), HOMES, "classic"),
+        "enter": _pick(core.get(db, "enter"), ENTERS, "rise"),
+        "top": _pick(core.get(db, "top"), TOPS, "auto"),
+        "top_color": core.get(db, "top_color") if HEX.match(core.get(db, "top_color") or "") else "",
+        "art": _pick(core.get(db, "art"), ARTS, "none"),
+        "art_image": art_url(db),
+        "art_info": art_info(db),
+        "buttons": _pick(core.get(db, "buttons"), BUTTONS, "auto"),
+        "celebrate": _pick(core.get(db, "celebrate"), CELEBRATES, "check"),
+        "haptics": core.get(db, "haptics") != "0",
         "splash": core.get(db, "splash") != "0",
         "splash_kind": _pick(core.get(db, "splash_kind"), SPLASHES, "auto"),
         "splash_cfg": splash_cfg(db),
@@ -380,7 +447,47 @@ def html_attrs(lk: dict) -> str:
     return (f' data-backdrop="{lk["backdrop"]}" data-icons="{lk["icons"]}"'
             f' data-motion="{lk["motion"]}" data-effect="{lk["effect"]}"'
             f' data-cards="{lk.get("cards", "solid")}" data-splash="{lk.get("splash_kind", "auto")}"'
-            f' data-layout="{lk.get("layout", "classic")}" data-home="{lk.get("home", "classic")}"')
+            f' data-layout="{lk.get("layout", "classic")}" data-home="{lk.get("home", "classic")}"'
+            f' data-enter="{lk.get("enter", "rise")}" data-top="{_top_kind(lk)}" data-art="{_art_kind(lk)}"'
+            f' data-buttons="{lk.get("buttons", "auto")}"')
+
+
+def _top_kind(lk: dict) -> str:
+    """The header kind that can really be drawn: a picture needs one, a
+    colour of its own needs a colour."""
+    top = lk.get("top", "auto")
+    if top == "image" and not lk.get("art_image"):
+        return "auto"
+    if top == "custom" and not HEX.match(lk.get("top_color") or ""):
+        return "auto"
+    return top
+
+
+def _art_kind(lk: dict) -> str:
+    art = lk.get("art", "none")
+    return "none" if art == "own" and not lk.get("art_image") else art
+
+
+def top_css(lk: dict) -> str:
+    """CSS variables for the header bar. --head is Telegram's own header above
+    the app: it takes the same colour, so the two read as one bar."""
+    kind = _top_kind(lk)
+    if kind == "accent":
+        return ":root{--top-bg:var(--sig);--top-on:var(--on-sig);--head:var(--sig)}"
+    if kind == "gradient":
+        return (":root{--top-bg:linear-gradient(115deg,var(--sig) 10%,color-mix(in oklab,var(--sig) 78%,#fff) 100%);"
+                "--top-on:var(--on-sig);--head:var(--sig)}")
+    if kind == "custom":
+        c = lk["top_color"].upper()
+        return f":root{{--top-bg:{c};--top-on:{text_on(c)};--head:{c}}}"
+    if kind == "image":
+        url = lk["art_image"]
+        info = lk.get("art_info") or {}
+        head = info.get("head") if HEX.match(info.get("head") or "") else "#000000"
+        # A dark veil keeps the name and the buttons readable on any picture.
+        return (f":root{{--top-bg:linear-gradient(rgba(0,0,0,.38),rgba(0,0,0,.38)),url(\"{url}\") center/cover;"
+                f"--top-on:#FFFFFF;--head:{head}}}")
+    return ""
 
 
 def preview(params: dict) -> dict:
@@ -398,10 +505,17 @@ def preview(params: dict) -> dict:
             raise ValueError("theme_surface: " + " | ".join(SURFACES))
         preset = "custom"
     th = _hand_picked(resolve(accent, surface, "auto", preset), preset)
+    # The picture is the one already uploaded: only its own address is taken.
+    art_image = str(params.get("art_image") or "")
+    if not ART_URL.fullmatch(art_image):
+        art_image = ""
+    lk_top = {"top": _pick(str(params.get("top")), TOPS, "auto"), "top_color": str(params.get("top_color") or ""),
+              "art": _pick(str(params.get("art")), ARTS, "none"), "art_image": art_image,
+              "art_info": {"head": str(params.get("art_head") or "")}}
     href, fvars = font_vars(str(params.get("font") or ""), str(params.get("radius") or ""), "app",
                             str(params.get("font_custom") or ""))
     return {
-        "css": css(th, "app") + fvars, "font_href": href,
+        "css": css(th, "app") + fvars + top_css(lk_top), "font_href": href,
         "attrs": own_surfaces({
             "backdrop": _pick(str(params.get("backdrop")), BACKDROPS, "glow"),
             "icons": _pick(str(params.get("icons")), ICONS, "regular"),
@@ -410,7 +524,13 @@ def preview(params: dict) -> dict:
             "cards": _pick(str(params.get("cards")), CARDS, "solid"),
             "layout": _pick(str(params.get("layout")), LAYOUTS, "classic"),
             "home": _pick(str(params.get("home")), HOMES, "classic"),
+            "enter": _pick(str(params.get("enter")), ENTERS, "rise"),
+            "buttons": _pick(str(params.get("buttons")), BUTTONS, "auto"),
+            "top": _top_kind(lk_top), "art": _art_kind(lk_top),
             "splash": _pick(str(params.get("splash_kind")), SPLASHES, "auto")}),
+        "art_image": lk_top["art_image"],
+        "celebrate": _pick(str(params.get("celebrate")), CELEBRATES, "check"),
+        "haptics": str(params.get("haptics", "1")) != "0",
         "brand": {"ground": th["s_ground"], "fill": th["fill"], "on_fill": th["on_fill"],
                   "fill_light": th["fill_light"], "on_fill_light": th["on_fill_light"]},
     }
@@ -646,7 +766,9 @@ def remove_logo(db: Session) -> None:
 
 
 def logo_path(name: str) -> Path | None:
-    if not re.fullmatch(r"logo-[0-9a-f]{12}\.(png|jpg|webp|svg)", name or ""):
+    """A file of the brand folder by its name: the logo or the picture."""
+    if not (re.fullmatch(r"logo-[0-9a-f]{12}\.(png|jpg|webp|svg)", name or "")
+            or re.fullmatch(r"art-[0-9a-f]{12}\.webp", name or "")):
         return None
     p = brand_dir() / name
     return p if p.is_file() else None
@@ -655,6 +777,80 @@ def logo_path(name: str) -> Path | None:
 def logo_url(db: Session) -> str:
     name = core.get(db, "logo")
     return f"/brand/{name}" if name and logo_path(name) else ""
+
+
+# ---------------------------------------------------------------------------
+#  The picture: a photo or drawing of the owner's for the header and the home
+#  screen. Only raster images (an SVG could carry a script into a background),
+#  stored as WebP no wider than ART_SIDE, with its main colour for Telegram's header.
+# ---------------------------------------------------------------------------
+ART_MAX = 4 * 1024 * 1024
+ART_SIDE = 1200
+ART_URL = re.compile(r"/brand/art-[0-9a-f]{12}\.webp")
+
+
+def save_art(db: Session, data: bytes) -> str:
+    import io
+
+    from PIL import Image, UnidentifiedImageError
+    if not data:
+        raise ValueError("empty file")
+    if len(data) > ART_MAX:
+        raise ValueError("the picture must be at most 4 MB")
+    if sniff(data) not in ("png", "jpg", "webp"):
+        raise ValueError("only PNG, JPEG or WebP")
+    too_big = ValueError(f"at most {LOGO_SOURCE_MAX * 2}×{LOGO_SOURCE_MAX * 2} pixels")
+    try:
+        im = Image.open(io.BytesIO(data))
+    except Image.DecompressionBombError:
+        raise too_big
+    except (UnidentifiedImageError, OSError, SyntaxError, ValueError):
+        raise ValueError("the image cannot be read")
+    if max(im.size) > LOGO_SOURCE_MAX * 2:
+        raise too_big
+    if getattr(im, "n_frames", 1) > 1:
+        raise ValueError("animated images are not supported")
+    try:
+        im.load()
+    except (OSError, SyntaxError, ValueError, Image.DecompressionBombError):
+        raise ValueError("the image cannot be read")
+    im = im.convert("RGB")
+    im.thumbnail((ART_SIDE, ART_SIDE), Image.LANCZOS)
+    out = io.BytesIO()
+    im.save(out, "WEBP", quality=84, method=5)
+    body = out.getvalue()
+    # The colour behind the veil of the header: the picture's average, darkened as the veil darkens it.
+    r, g, b = im.resize((1, 1), Image.BOX).getpixel((0, 0))
+    head = to_hex(tuple(v * .62 for v in (r, g, b)))
+    name = f"art-{hashlib.sha256(body).hexdigest()[:12]}.webp"
+    (brand_dir() / name).write_bytes(body)
+    old = core.get(db, "art_image")
+    core.put(db, "art_image", name)
+    core.put(db, "art_info", json.dumps({"file": name, "head": head, "w": im.width, "h": im.height}))
+    if old and old != name:
+        (brand_dir() / old).unlink(missing_ok=True)
+    return name
+
+
+def remove_art(db: Session) -> None:
+    old = core.get(db, "art_image")
+    core.put(db, "art_image", "")
+    core.put(db, "art_info", "")
+    if old:
+        (brand_dir() / old).unlink(missing_ok=True)
+
+
+def art_url(db: Session) -> str:
+    name = core.get(db, "art_image")
+    return f"/brand/{name}" if name and name.startswith("art-") and logo_path(name) else ""
+
+
+def art_info(db: Session) -> dict:
+    try:
+        info = json.loads(core.get(db, "art_info") or "{}")
+    except ValueError:
+        return {}
+    return info if info.get("file") == core.get(db, "art_image") else {}
 
 
 # ---------------------------------------------------------------------------
@@ -671,10 +867,12 @@ def inject(db: Session, page_html: str, page: str) -> str:
             "fill_light": th["fill_light"], "on_fill_light": th["on_fill_light"],
             "motion": lk["motion"], "splash": lk["splash"], "splash_text": lk["splash_text"],
             "splash_cfg": lk["splash_cfg"], "logo_info": lk["logo_info"],
-            "effect": lk["effect"]}
+            "effect": lk["effect"], "celebrate": lk["celebrate"], "haptics": lk["haptics"],
+            "art": _art_kind(lk), "art_image": lk["art_image"]}
     boot_js = json.dumps(boot, ensure_ascii=False).replace("</", "<\\/")
     font_link, font_vars = font_css(db, page)
-    head = (f'{font_link}<style id="kv-theme">{css(th, page)}{font_vars}</style>'
+    tops = top_css(lk) if page == "app" else ""
+    head = (f'{font_link}<style id="kv-theme">{css(th, page)}{font_vars}{tops}</style>'
             f"<script>window.KV_BRAND={boot_js};</script>")
     if logo:
         kind = LOGO_TYPES[logo.rsplit(".", 1)[1]]

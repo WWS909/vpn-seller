@@ -1479,7 +1479,7 @@ def save_settings(data: dict, db: Session = Depends(get_db), admin=A):
     from .. import referral, theme
     changed = []
     for key, value in data.items():
-        if key not in core.DEFAULTS or key in ("logo", "logo_info") or key in PRIVATE_SETTINGS:
+        if key not in core.DEFAULTS or key in ("logo", "logo_info", "art_image", "art_info") or key in PRIVATE_SETTINGS:
             continue
         value = "" if value is None else str(value)
         if key == "theme_accent" and not theme.HEX.match(value):
@@ -1501,6 +1501,8 @@ def save_settings(data: dict, db: Session = Depends(get_db), admin=A):
         for opt, allowed in (("backdrop", theme.BACKDROPS), ("icons", theme.ICONS),
                              ("motion", theme.MOTIONS), ("effect", theme.EFFECTS),
                              ("cards", theme.CARDS), ("layout", theme.LAYOUTS), ("home", theme.HOMES), ("splash", ("0", "1")),
+                             ("enter", theme.ENTERS), ("top", theme.TOPS), ("art", theme.ARTS), ("buttons", theme.BUTTONS),
+                             ("celebrate", theme.CELEBRATES), ("haptics", ("0", "1")),
                              ("splash_kind", theme.SPLASHES), *theme.SPLASH_OPTS.items()):
             if key == opt and value not in allowed:
                 raise HTTPException(400, f"{opt}: " + " | ".join(allowed))
@@ -1509,6 +1511,10 @@ def save_settings(data: dict, db: Session = Depends(get_db), admin=A):
                 value = clients.clean(value)
             except ValueError as e:
                 raise HTTPException(400, str(e))
+        if key == "top_color":
+            value = value.strip().upper()
+            if value and not theme.HEX.match(value):
+                raise HTTPException(400, "top_color: a colour like #1E6BFF")
         if key == "splash_color":
             value = value.strip()
             if value not in ("style", "logo") and not theme.HEX.match(value):
@@ -1776,7 +1782,8 @@ def theme_info(db: Session = Depends(get_db), _=A):
             "current": theme.current(db), "logo": theme.logo_url(db),
             "look": theme.look(db),
             "options": {"backdrop": theme.BACKDROPS, "icons": theme.ICONS, "layout": theme.LAYOUTS, "home": theme.HOMES,
-                        "motion": theme.MOTIONS, "effect": theme.EFFECTS,
+                        "motion": theme.MOTIONS, "effect": theme.EFFECTS, "enter": theme.ENTERS, "top": theme.TOPS,
+                        "art": theme.ARTS, "buttons": theme.BUTTONS, "celebrate": theme.CELEBRATES,
                         "cards": theme.CARDS}}
 
 
@@ -2101,6 +2108,31 @@ async def upload_logo(request: Request, db: Session = Depends(get_db), admin=A):
         raise HTTPException(400, str(e))
     core.audit(db, "Logo uploaded", admin, name)
     return {"ok": True, "logo": f"/brand/{name}", "logo_info": theme.logo_info(db)}
+
+
+@router.post("/brand/art")
+async def upload_art(request: Request, db: Session = Depends(get_db), admin=A):
+    """The owner's picture for the header and the top of the home screen."""
+    from .. import theme
+    form = await request.form()
+    file = form.get("file")
+    if file is None or not hasattr(file, "read"):
+        raise HTTPException(400, "no file")
+    data = await file.read(theme.ART_MAX + 1)
+    try:
+        name = theme.save_art(db, data)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    core.audit(db, "Picture uploaded", admin, name)
+    return {"ok": True, "art_image": f"/brand/{name}", "art_info": theme.art_info(db)}
+
+
+@router.delete("/brand/art")
+def delete_art(db: Session = Depends(get_db), admin=A):
+    from .. import theme
+    theme.remove_art(db)
+    core.audit(db, "Picture removed", admin, "")
+    return {"ok": True}
 
 
 @router.delete("/brand/logo")

@@ -3,6 +3,19 @@
 Each version is a `## X.Y.Z — date` heading with one change per "-" line.
 The shop reads this file to tell the owner what is new.
 
+## 1.7.1 — 2026-11-09
+- Three new styles that change more than colours. Newspaper: ink on newsprint, rules instead of cards, plans as a dotted price list, a hatched calendar, solid-ink buttons. Brutal: thick outlines, hard shadows, sticker labels, buttons that sink into their shadow, a tilted tag on the best-value plan. Terminal: a console — monospace in your colour, dashed frames, a cursor after the headline, [ buttons ]. All light and dark.
+- Choosing a style sets a heading font that suits it: Old Standard for Newspaper, Dela Gothic for Brutal, DotGothic16 for Terminal. A font you picked yourself stays.
+- 18 new fonts with Cyrillic, 50 in all. Serif: Old Standard, Cormorant, Zen Antique. With character: Podkova, Jura, Kelly Slab, Dela Gothic. A new Unusual group (headings and prices in the app only): Rubik Mono, Ruslan Display, Handjet, DotGothic16, Rubik Glitch, Rubik Doodle Shadow, Seymour One, Train One, Underdog, Caveat, Shantell Sans.
+- Fixed: faces with a single weight (Russo One, Yeseva One and the new ones) are no longer made bold by the browser, so the strokes stay clean.
+- Header: the colour of the bar with the logo — as the style, your colour, a gradient, a colour of its own or a picture. The text colour is picked for you; Telegram’s top bar takes the same colour.
+- Picture on home: City, Bauhaus, Contour map, Waves, Star chart — drawings in your colour that follow light and dark by themselves. Or your own picture (PNG, JPEG, WebP up to 4 MB), which can also go into the header.
+- Buttons: six shapes over any style — Key, Stamp, With an arrow, Ticket, Pixels, Double outline.
+- Feedback on press: a light tap of the phone on buttons and choices — it can be turned off.
+- Entrance: the blocks come in from below, with a spring, from the side, out of a blur or unfolding; the same on a tab switch. The panel plays the chosen one at once.
+- Confetti in your colour after a payment, if you like.
+- Seasonal effect: falling leaves and petals besides the snow.
+
 ## 1.7.0 — 2026-11-09
 - The look constructor is rebuilt around two main parts: Home screen and Style. The Pass, Poster and Tiles layouts of 1.6.0 are gone (shops that chose them get Classic back).
 - Three new home screens: Answer (“Works until Dec 26”, one button and a short list), Term (a calendar to the end of the subscription with renewal right there) and Devices (connected devices, free places, “Connect one more”). The words and the main button change when the subscription is ending, has ended or the traffic is used up.
