@@ -1,0 +1,46 @@
+name: Ошибка / Bug
+description: Что-то работает не так / Something does not work
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Уберите из текста и журнала токены, пароли и адреса серверов. Уязвимости — не сюда, а через SECURITY.md.
+        Remove tokens, passwords and server addresses. Security issues go through SECURITY.md.
+  - type: textarea
+    id: what
+    attributes:
+      label: Что случилось / What happened
+      description: Что делали, что ожидали, что получилось / What you did, expected and got
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Версия / Version
+      description: Меню vpn-seller или админка → «Обновления» / Server menu or admin → Updates
+      placeholder: "1.7.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: panel
+    attributes:
+      label: Панель / Panel
+      options: ["3x-ui 2.x", "3x-ui 3.x", "Marzban", "Remnawave", "Не важно / Not related"]
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Где / Where
+      options: ["Мини-приложение / Mini app", "Админка / Admin panel", "Бот / Bot", "Оплата / Payments", "Установка, меню на сервере / Installer, server menu", "Другое / Other"]
+  - type: textarea
+    id: log
+    attributes:
+      label: Журнал / Logs
+      description: vpn-seller → «Журнал», строки с ошибкой / Server menu → Logs, the lines with the error
+      render: text
+  - type: textarea
+    id: shots
+    attributes:
+      label: Скриншоты / Screenshots

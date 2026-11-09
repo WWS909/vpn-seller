@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Вопрос по настройке / Setup question
+    url: https://github.com/WWS909/vpn-seller/discussions
+    about: Спросите в обсуждениях / Ask in Discussions
+  - name: Посмотреть демо / Try the demo
+    url: https://t.me/Cristal_vpn_app
+    about: Магазин на VPN Seller в Telegram / A live shop in Telegram

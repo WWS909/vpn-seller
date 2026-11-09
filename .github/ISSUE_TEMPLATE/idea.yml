@@ -1,0 +1,20 @@
+name: Идея / Idea
+description: Предложить новую функцию или изменение / Suggest a feature or change
+labels: [idea]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу решить / The problem
+      description: Что сейчас неудобно вам или клиентам / What is inconvenient for you or your customers
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Как это могло бы работать / How it could work
+  - type: textarea
+    id: example
+    attributes:
+      label: Где видели похожее / Seen it elsewhere
+      description: Ссылка или скриншот, если есть / A link or a screenshot

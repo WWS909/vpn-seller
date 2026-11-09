@@ -580,6 +580,10 @@ app/
 web/               index.html (Mini App), admin.html, legal.html
 ```
 
+## Contributing
+
+Bugs and ideas go to [issues](https://github.com/WWS909/vpn-seller/issues/new/choose), setup questions to [discussions](https://github.com/WWS909/vpn-seller/discussions). How to send a change: [CONTRIBUTING.md](CONTRIBUTING.md). If the project helped you, a star makes it easier for others to find.
+
 ## License
 
 [MIT](LICENSE). You are responsible for complying with the laws of your country and your payment providers' rules.

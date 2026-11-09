@@ -602,6 +602,10 @@ app/
 web/               index.html (Mini App), admin.html, legal.html
 ```
 
+## Как помочь
+
+Ошибки и идеи — в [заявках](https://github.com/WWS909/vpn-seller/issues/new/choose), вопросы по настройке — в [обсуждениях](https://github.com/WWS909/vpn-seller/discussions). Как прислать правку — в [CONTRIBUTING.md](CONTRIBUTING.md). Если проект пригодился, поставьте звезду — так его проще найти другим.
+
 ## Лицензия
 
 [MIT](LICENSE). Вы отвечаете за соблюдение законов своей страны и правил платёжных систем.
