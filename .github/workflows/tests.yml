@@ -81,7 +81,13 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U vpn -d fakepg" --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
+      # The installer copies this checkout and the update scenario runs
+      # `git pull` in it: it must be on a branch, not on the detached merge
+      # commit a pull request is checked out as by default.
       - uses: actions/checkout@v6
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.head_ref || github.ref_name }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
