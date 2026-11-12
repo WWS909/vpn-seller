@@ -38,14 +38,47 @@ def _pay(client, uid, order_id, amount, charge, **extra):
 
 
 # ---------------------------------------------------------------- support
+def _msg(uid, text, mid=1, **extra):
+    return {"message": {"message_id": mid, "text": text, "chat": {"id": uid, "type": "private"},
+                        "from": {"id": uid, "first_name": "Ann", "username": "ann"}, **extra}}
+
+
+def _to(uid):
+    return [m for m in Fake.sent("sendMessage") if m["chat_id"] == uid]
+
+
+def _press(client, uid, data, mid=500):
+    return _bot(client, {"callback_query": {"id": f"cb{mid}", "data": data, "from": {"id": uid},
+                                            "message": {"message_id": mid, "chat": {"id": uid}}}})
+
+
+def test_plain_message_to_the_bot_is_not_a_request(client, admin):
+    uid = 7211
+    for i in range(3):
+        _bot(client, _msg(uid, f"привет {i}", mid=i))
+    # nothing reached the admins and nothing was stored
+    assert not [m for m in Fake.sent("sendMessage") if m["chat_id"] == 999 and "привет" in m["text"]]
+    assert client.get("/api/admin/support", headers=admin).json()["waiting"] == 0
+    assert client.get("/api/app/support", headers=tg(uid)).json()["messages"] == []
+    # the person got one answer (not one per message), with the way to the app and to support
+    got = _to(uid)
+    assert len(got) == 1 and "не читаются" in got[0]["text"]
+    rows = got[0]["reply_markup"]["inline_keyboard"]
+    assert rows[0][0]["web_app"]["url"].endswith("/app")
+    assert rows[1][0] == {"text": "Написать в поддержку", "callback_data": "sup:open"}
+
+
 def test_support_question_and_answer_through_the_bot(client, admin):
     uid = 7201
-    _bot(client, {"message": {"message_id": 5, "text": "Не подключается <b>", "chat": {"id": uid, "type": "private"},
-                              "from": {"id": uid, "first_name": "Ann", "username": "ann"}}})
+    # the button opens the chat; the next message is the question
+    _press(client, uid, "sup:open")
+    assert "Напишите вопрос" in _to(uid)[-1]["text"]
+    assert _to(uid)[-1]["reply_markup"]["inline_keyboard"][0][0]["callback_data"] == "sup:cancel"
+    _bot(client, _msg(uid, "Не подключается <b>", mid=5))
     to_admin = [m for m in Fake.sent("sendMessage") if m["chat_id"] == 999][-1]
     assert "Не подключается &lt;b&gt;" in to_admin["text"] and "@ann" in to_admin["text"]
     assert to_admin["reply_markup"]["inline_keyboard"][0][0]["callback_data"] == f"a:uc:{uid}"
-    assert any("передано в поддержку" in m["text"] for m in Fake.sent("sendMessage") if m["chat_id"] == uid)
+    assert any("передано в поддержку" in m["text"] for m in _to(uid))
     admin_msg_id = Fake.message_id - 1          # the copy the admin got (the ack came after)
 
     threads = client.get("/api/admin/support", headers=admin).json()
@@ -55,41 +88,77 @@ def test_support_question_and_answer_through_the_bot(client, admin):
     _bot(client, {"message": {"message_id": 77, "text": "Обновите подписку в приложении",
                               "chat": {"id": 999, "type": "private"}, "from": {"id": 999},
                               "reply_to_message": {"message_id": admin_msg_id}}})
-    answer = [m for m in Fake.sent("sendMessage") if m["chat_id"] == uid][-1]
+    answer = _to(uid)[-1]
     assert "Обновите подписку" in answer["text"]
     assert [m for m in Fake.sent("sendMessage") if m["chat_id"] == 999][-1]["text"] == "Отправлено клиенту"
     assert client.get("/api/admin/support", headers=admin).json()["waiting"] == 0
+
+    # After an answer the customer simply replies in the bot — no button needed.
+    _bot(client, _msg(uid, "А на телефоне?", mid=6))
+    assert [m for m in Fake.sent("sendMessage") if m["chat_id"] == 999 and "А на телефоне?" in m["text"]]
 
     # The same thread from the app and from the panel.
     client.post("/api/app/support", json={"text": "Спасибо, заработало"}, headers=tg(uid))
     r = client.post(f"/api/admin/support/{uid}", headers=admin, json={"text": "Рады помочь"})
     msgs = r.json()["messages"]
-    assert [m["from_admin"] for m in msgs] == [False, True, False, True]
-    assert [m["source"] for m in msgs] == ["bot", "bot", "app", "panel"]
+    assert [m["from_admin"] for m in msgs] == [False, True, False, False, True]
+    assert [m["source"] for m in msgs] == ["bot", "bot", "bot", "app", "panel"]
     mine = client.get("/api/app/support", headers=tg(uid)).json()
     assert mine["enabled"] and mine["messages"][-1]["text"] == "Рады помочь"
 
 
+def test_support_chat_closes_by_itself_and_on_cancel(client, admin, db):
+    from app import support
+    from app.models import User
+    uid = 7212
+    _bot(client, _msg(uid, "/support"))
+    assert "Напишите вопрос" in _to(uid)[-1]["text"]
+    # changed their mind
+    _press(client, uid, "sup:cancel", mid=501)
+    edits = Fake.sent("editMessageText")
+    assert edits and "не создано" in edits[-1]["text"]
+    _bot(client, _msg(uid, "ой", mid=2))
+    assert not [m for m in Fake.sent("sendMessage") if m["chat_id"] == 999 and "ой" in m["text"]]
+    # opened, but the time ran out: a later message is plain again
+    _press(client, uid, "sup:open", mid=502)
+    u = db.query(User).filter(User.tg_id == uid).one()
+    u.support_open_until = int(__import__("time").time()) - 1
+    db.commit()
+    _bot(client, _msg(uid, "через час", mid=3))
+    assert not [m for m in Fake.sent("sendMessage") if m["chat_id"] == 999 and "через час" in m["text"]]
+    # closed from the panel: the chat closes too
+    _press(client, uid, "sup:open", mid=503)
+    _bot(client, _msg(uid, "вопрос", mid=4))
+    db.expire_all()
+    assert support.is_open(db.query(User).filter(User.tg_id == uid).one())
+    client.post(f"/api/admin/support/{uid}/close", headers=admin)
+    db.expire_all()
+    assert not support.is_open(db.query(User).filter(User.tg_id == uid).one())
+
+
 def test_support_off_and_flood_limit(client, admin):
     uid = 7202
+    _press(client, uid, "sup:open")
     for i in range(22):
-        _bot(client, {"message": {"message_id": i, "text": f"q{i}", "chat": {"id": uid, "type": "private"},
-                                  "from": {"id": uid}}})
+        _bot(client, _msg(uid, f"q{i}", mid=i))
     got = [m for m in Fake.sent("sendMessage") if m["chat_id"] == 999 and "q" in m["text"]]
     assert len(got) == 20
     # Over the limit the customer hears "too many" — and nothing else on top.
-    to_customer = [m["text"] for m in Fake.sent("sendMessage") if m["chat_id"] == uid]
-    assert not any("Подписка, серверы" in x for x in to_customer)
+    to_customer = [m["text"] for m in _to(uid)]
+    assert not any("не читаются" in x for x in to_customer)
     assert client.post("/api/app/support", json={"text": "x"}, headers=tg(uid)).status_code == 429
     client.post("/api/admin/settings", headers=admin, json={"support_enabled": "0"})
     before = len(Fake.sent("sendMessage"))
-    _bot(client, {"message": {"message_id": 99, "text": "hello", "chat": {"id": 7203, "type": "private"},
-                              "from": {"id": 7203}}})
+    _bot(client, _msg(7203, "hello", mid=99))
     sent = Fake.sent("sendMessage")[before:]
     # Support is off: nothing reaches the admins, but the bot is not silent —
-    # the customer gets the way into the app.
+    # the customer gets the way into the app, and no support button.
     assert [m["chat_id"] for m in sent] == [7203]
-    assert sent[0]["reply_markup"]["inline_keyboard"][0][0]["web_app"]["url"].endswith("/app")
+    rows = sent[0]["reply_markup"]["inline_keyboard"]
+    assert rows[0][0]["web_app"]["url"].endswith("/app") and len(rows) == 1
+    # /support while it is off: the same way into the app
+    _bot(client, _msg(7204, "/support"))
+    assert "не читаются" in _to(7204)[-1]["text"]
     assert client.get("/api/app/support", headers=tg(7203)).json()["enabled"] is False
 
 

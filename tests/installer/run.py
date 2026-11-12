@@ -6,7 +6,10 @@ End-to-end test of install.sh on one machine, without pulling images.
     python3 tests/installer/run.py s2 s3      # some of them
 
 Needs: a caddy binary (CADDY_BIN, default /tmp/caddy) and the real docker
-CLI for `docker compose config` (the daemon is not used). For the owner
+CLI for `docker compose config` (the daemon is not used). For the move to
+PostgreSQL (s11, s12) an empty PostgreSQL database stands in for the "db"
+container: FAKE_PG_URL=postgresql+psycopg://user:pass@host/db (it is wiped);
+without it those scenarios are skipped. For the owner
 flow (step "e2e") a real 3x-ui 3.x panel from scripts/dev-3xui.sh:
 XUI_TEST_V3_URL / XUI_TEST_V3_TOKEN / XUI_TEST_V3_INBOUND.
 
@@ -65,6 +68,8 @@ def env_for(scenario: dict, **extra) -> dict:
         "VPN_SELLER_SYSTEMD_DIR": str(WORK / "systemd"),
         # updates never reach the real GitHub from here (s9 brings its own archive)
         "VPN_SHOP_GITHUB_REPO": "OWNER/vpn-seller",
+        # a small server unless a scenario says otherwise: SQLite is the default answer
+        "VPN_SHOP_MEM_MB": "1024",
     })
     e.update(extra)
     return e
@@ -219,6 +224,7 @@ def s2_curl_pipe_tunnel_interactive():
         (r"от 8 символов", ""),
         (r"› Пароль", "Sandbox-Pass-2026"),
         (r"RUB, USD", ""),                                 # currency: Enter = RUB
+        (r"рекомендуем для этого сервера", "1"),           # database: SQLite (1 GB of memory)
         (r"начинаю\?", ""),                                # confirm: Enter = yes
     ]
     # the "just seen" entries type an empty line; drop them (they only
@@ -236,6 +242,8 @@ def s2_curl_pipe_tunnel_interactive():
     check("s2 admin ID detected from the message", e.get("ADMIN_TELEGRAM_IDS") == str(OWNER), e.get("ADMIN_TELEGRAM_IDS"))
     check("s2 mode tunnel", e.get("INSTALL_MODE") == "tunnel" and e.get("COMPOSE_PROFILES") == "tunnel")
     check("s2 password kept", e.get("ADMIN_PASSWORD") == "Sandbox-Pass-2026")
+    check("s2 database question: SQLite recommended on 1 GB", "SQLite — встроенная" in out
+          and "PostgreSQL — для большого магазина" in out and not read_env(d).get("DATABASE_URL", "").startswith("postgres"))
     check("s2 PUBLIC_URL left empty (follows tunnel)", e.get("PUBLIC_URL") == "" and e.get("TUNNEL_METRICS_URL") == "http://tunnel:2000")
     cfg = json.loads((FAKE / "compose.json").read_text())
     check("s2 compose: app + tunnel", set(cfg["services"]) == {"app", "tunnel"})
@@ -277,6 +285,7 @@ def s3_existing_caddy_interactive():
         (r"Домен, например", "Shop3.Example.com"),
         (r"› Пароль", ""),                      # generate
         (r"RUB, USD", "usd"),
+        (r"рекомендуем для этого сервера", ""),            # database: Enter = the first (SQLite)
         (r"начинаю\?", "д"),
     ]
     code, out = run_pty(f"bash {ROOT / 'install.sh'}", env_for(scen, VPN_SHOP_DIR=str(d)), answers)
@@ -443,18 +452,19 @@ def s10_menu_tools(d: Path):
     back = (r"вернуться в меню", "")
     env_before = (d / ".env").read_text()
     answers = [
-        (r"Ваш выбор", "12"), back,                               # what's new
-        (r"Ваш выбор", "11"), (r"Ваш выбор", "1"), (r"Час \(0–23\)", "3"), back,   # night auto-update at 03:00
+        (r"Ваш выбор", "13"), back,                               # what's new
+        (r"Ваш выбор", "12"), (r"Ваш выбор", "1"), (r"Час \(0–23\)", "3"), back,   # night auto-update at 03:00
         (r"Ваш выбор", "5"), back,                                # a backup
         (r"Ваш выбор", "6"), (r"Ваш выбор", "0"), back,           # the restore list, then back
         (r"Ваш выбор", "7"), back,                                # the day's results to Telegram
         (r"Ваш выбор", "4"), (r"Ваш выбор", "1"), back,           # restart
-        (r"Ваш выбор", "13"), (r"Ваш выбор", "1"), back,          # cleanup
+        (r"Ваш выбор", "14"), (r"Ваш выбор", "1"), back,          # cleanup
         # a way back everywhere
         (r"Ваш выбор", "1"), (r"Ваш выбор", "0"), back,           # update → back
-        (r"Ваш выбор", "8"), (r"Ваш выбор", "2"), (r"› shopId", "0"), back,   # YooKassa → back at the first key
-        (r"Ваш выбор", "9"), (r"Ваш выбор", "0"), back,           # change address → back
-        (r"Ваш выбор", "10"), (r"Ваш выбор", "0"), back,          # token/ID/password → back
+        (r"Ваш выбор", "9"), (r"Ваш выбор", "2"), (r"› shopId", "0"), back,   # YooKassa → back at the first key
+        (r"Ваш выбор", "10"), (r"Ваш выбор", "0"), back,          # change address → back
+        (r"Ваш выбор", "11"), (r"Ваш выбор", "0"), back,          # token/ID/password → back
+        (r"Ваш выбор", "8"), (r"Перейти на PostgreSQL\?", "н"), back,   # the move → no
         (r"Ваш выбор", "0"),
     ]
     code, out = run_pty(f"bash {d / 'install.sh'}", env_for({}, VPN_SHOP_DIR=str(d)), answers)
@@ -463,6 +473,8 @@ def s10_menu_tools(d: Path):
     check("s10 banner says SELLER", "S E L L E R" in out)
     check("s10 header card", "работает" in out and "сегодня" in out and "клиенты" in out and "диск" in out, out[:2500])
     check("s10 menu sections", all(x in out for x in ("Магазин", "Данные", "Настройки", "Прочее")))
+    check("s10 menu shows the database", "база" in out and "Перейти на PostgreSQL" in out and "Что будет:" in out)
+    check("s10 the move declined: still SQLite", not read_env(d).get("DATABASE_URL", "").startswith("postgres"))
     check("s10 what's new shown", (ROOT / "VERSION").read_text().strip() in out and "•" in out)
     check("s10 auto-update on at 03:00", "автообновление включено, в 03:00" in out, out[-2500:])
     r = subprocess.run([sys.executable, "-m", "app.cli", "summary"], cwd=d, env=app_env_for(d), capture_output=True, text=True)
@@ -495,7 +507,7 @@ def s7_menu_switch_tunnel_to_domain(d: Path):
     print("\n[s7] installed with a tunnel; later: menu → change address → domain")
     reset_tg()
     answers = [
-        (r"Ваш выбор", "9"),
+        (r"Ваш выбор", "10"),
         (r"Ваш выбор", "1"),
         (r"Домен, например", "shop7.example.com"),
         (r"Применить\?", ""),
@@ -515,7 +527,7 @@ def s7_menu_switch_tunnel_to_domain(d: Path):
 def s8_payments_from_menu(d: Path):
     print("\n[s8] menu → payment methods → YooKassa keys")
     answers = [
-        (r"Ваш выбор", "8"),
+        (r"Ваш выбор", "9"),
         (r"Ваш выбор", "2"),
         (r"› shopId", "506751"),
         (r"› Секретный ключ", "live_SandboxSecretKey0123"),
@@ -536,7 +548,7 @@ def s8_payments_from_menu(d: Path):
 
     print("\n[s8b] menu → payment methods → «Мой налог»")
     answers = [
-        (r"Ваш выбор", "8"),
+        (r"Ваш выбор", "9"),
         (r"Ваш выбор", "11"),
         (r"› ИНН", "12345"),                  # too short: asked again
         (r"› ИНН", "500100732259"),
@@ -553,6 +565,127 @@ def s8_payments_from_menu(d: Path):
     check("s8b short INN refused", "ровно 12 цифр" in out)
     check("s8b password not echoed", "Nalog-pass-77" not in out)
 
+
+# ----------------------------------------------------------------- PostgreSQL
+FAKE_PG_URL = os.environ.get("FAKE_PG_URL", "")
+
+
+def _pg_wipe():
+    from sqlalchemy import create_engine
+    sys.path.insert(0, str(ROOT))
+    from app import models  # noqa: F401
+    from app.db import Base
+    eng = create_engine(FAKE_PG_URL)
+    Base.metadata.drop_all(eng)
+    eng.dispose()
+
+
+def _pg_count(table: str) -> int:
+    from sqlalchemy import create_engine, text
+    eng = create_engine(FAKE_PG_URL)
+    with eng.connect() as c:
+        n = c.execute(text(f'SELECT count(*) FROM "{table}"')).scalar()
+    eng.dispose()
+    return n
+
+
+def _add_customers(d: Path, n: int):
+    import sqlite3
+    con = sqlite3.connect(d / "data" / "vpn.db")
+    t = int(time.time())
+    con.executemany("INSERT INTO users (tg_id, username, first_name, lang, sub_token, xui_uuid, xui_sub_id, "
+                    "expires_at, created_at, is_blocked, trial_used, bot_blocked) "
+                    "VALUES (?, '', 'Клиент', 'ru', ?, 'u', 's', ?, ?, 0, 0, 0)",
+                    [(7_000_000 + i, f"tok-{i}", t + 86400, t) for i in range(n)])
+    con.commit()
+    con.close()
+
+
+def s11_install_with_postgres():
+    """--db postgres on a big server: the database service and its settings."""
+    print("\n[s11] unattended install with PostgreSQL")
+    d = fresh_dir("s11")
+    reset_tg()
+    code, out = run_plain(["bash", str(ROOT / "install.sh"), "install", "--domain", "shop11.example.com",
+                           "--token", TOKEN, "--admin-id", str(OWNER), "--yes"],
+                          env_for({}, VPN_SHOP_DIR=str(d), VPN_SHOP_MEM_MB="4096"))
+    save_output("s11", out)
+    check("s11 exit code 0", code == 0, out[-800:])
+    e = read_env(d)
+    pw = e.get("POSTGRES_PASSWORD", "")
+    check("s11 PostgreSQL chosen by itself on 4 GB", e.get("DATABASE_URL") ==
+          f"postgresql+psycopg://vpn:{pw}@vpnseller-db:5432/vpn" and len(pw) == 16, str(e))
+    check("s11 profiles: caddy + postgres", e.get("COMPOSE_PROFILES") == "caddy,postgres", e.get("COMPOSE_PROFILES"))
+    cfg = json.loads((FAKE / "compose.json").read_text())
+    check("s11 compose: app + caddy + db", set(cfg["services"]) == {"app", "caddy", "db"}, str(cfg["services"].keys()))
+    db = cfg["services"].get("db", {})
+    check("s11 db reachable by its own alias, password from .env",
+          "vpnseller-db" in json.dumps(db.get("networks", {})) and db.get("environment", {}).get("POSTGRES_PASSWORD") == pw)
+    check("s11 summary row", "PostgreSQL" in out)
+    # a reinstall keeps the database it has
+    code, out = run_plain(["bash", str(ROOT / "install.sh"), "install", "--domain", "shop11.example.com",
+                           "--token", TOKEN, "--admin-id", str(OWNER), "--db", "sqlite", "--yes"],
+                          env_for({}, VPN_SHOP_DIR=str(d), VPN_SHOP_MEM_MB="512"))
+    check("s11 reinstall keeps PostgreSQL", code == 0 and read_env(d).get("DATABASE_URL", "").startswith("postgres")
+          and read_env(d).get("POSTGRES_PASSWORD") == pw, out[-600:])
+
+
+def s12_move_to_postgres_from_panel():
+    """A shop on SQLite with customers; the panel asks; the data moves and is counted."""
+    print("\n[s12] SQLite → PostgreSQL from the panel, then a failed move that goes back")
+    if not FAKE_PG_URL:
+        print("  skip — FAKE_PG_URL is not set")
+        return
+    _pg_wipe()
+    d = fresh_dir("s12")
+    reset_tg()
+    env = env_for({}, VPN_SHOP_DIR=str(d), FAKE_PG_URL=FAKE_PG_URL)
+    code, out = run_plain(["bash", str(ROOT / "install.sh"), "install", "--domain", "shop12.example.com",
+                           "--token", TOKEN, "--admin-id", str(OWNER), "--yes"], env)
+    check("s12 installed on SQLite", code == 0 and not read_env(d).get("DATABASE_URL", "").startswith("postgres"), out[-600:])
+    _add_customers(d, 1500)
+    profiles_before = read_env(d).get("COMPOSE_PROFILES")
+
+    # a failed move first: PostgreSQL never answers — the shop goes back to SQLite
+    bad = env_for({}, VPN_SHOP_DIR=str(d), FAKE_PG_URL="postgresql+psycopg://nobody@127.0.0.1:1/none",
+                  DBMOVE_WAIT="1")
+    (d / "data" / "update.request").write_text(json.dumps({"action": "postgres", "at": int(time.time()), "by": "admin"}))
+    code, out = run_plain(["bash", str(d / "install.sh"), "update", "--from-panel"], bad)
+    save_output("s12-failed", out)
+    st = json.loads((d / "data" / "db.status").read_text())
+    e = read_env(d)
+    check("s12 failed move reported", code != 0 and st["state"] == "failed" and "проверку" in st["reason"], str(st)[:300])
+    check("s12 back on SQLite, settings as before", not e.get("DATABASE_URL", "").startswith("postgres")
+          and e.get("COMPOSE_PROFILES") == profiles_before, str(e))
+    check("s12 SQLite file untouched", (d / "data" / "vpn.db").exists())
+    check("s12 the shop answers after going back", health_version() != "")
+    check("s12 request taken, no update was run", not (d / "data" / "update.request").exists()
+          and "Обновление" not in out.split("Переход на PostgreSQL")[0])
+
+    # the real move
+    (d / "data" / "update.request").write_text(json.dumps({"action": "postgres", "at": int(time.time()), "by": "admin"}))
+    code, out = run_plain(["bash", str(d / "install.sh"), "update", "--from-panel"], env)
+    save_output("s12-move", out)
+    check("s12 move exit 0", code == 0, out[-1500:])
+    e = read_env(d)
+    st = json.loads((d / "data" / "db.status").read_text())
+    check("s12 status ok with the customers", st["state"] == "ok" and st["users"] == 1500, str(st)[:300])
+    check("s12 .env points to PostgreSQL", e.get("DATABASE_URL", "").startswith("postgresql+psycopg://vpn:")
+          and e.get("COMPOSE_PROFILES") == "caddy,postgres", str(e))
+    check("s12 every customer in PostgreSQL", _pg_count("users") == 1500, str(_pg_count("users")))
+    check("s12 a backup made first", any((d / "data" / "backups").glob("backup-*.zip")))
+    check("s12 old SQLite file kept aside", not (d / "data" / "vpn.db").exists()
+          and any((d / "data").glob("vpn-before-postgres-*.db")))
+    check("s12 the shop answers on PostgreSQL", health_version() != "")
+    import httpx
+    tok = httpx.post("http://127.0.0.1:18000/api/admin/login", trust_env=False,
+                     json={"login": "admin", "password": read_env(d)["ADMIN_PASSWORD"]}).json()["token"]
+    v = httpx.get("http://127.0.0.1:18000/api/admin/database", trust_env=False,
+                  headers={"Authorization": "Bearer " + tok}).json()
+    check("s12 the panel shows PostgreSQL and the customers", v.get("kind") == "postgresql" and v.get("users") == 1500, str(v)[:300])
+    # asked again: nothing to do
+    code, out = run_plain(["bash", str(d / "install.sh"), "postgres"], env)
+    check("s12 second move: already there", code == 0 and "уже работает на PostgreSQL" in out, out[-400:])
 
 # ----------------------------------------------------------------- owner flow
 def init_data(uid: int) -> str:
@@ -699,7 +832,7 @@ def guard(fn, *a):
 
 
 def main(argv: list[str]) -> int:
-    want = set(argv) or {"s1", "s2", "s3", "s3b", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "e2e"}
+    want = set(argv) or {"s1", "s2", "s3", "s3b", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "s12", "e2e"}
     fakes = prepare()
     try:
         d1 = guard(s1_clean_domain_unattended) if want & {"s1", "s5", "s8", "s9", "s10", "e2e"} else None
@@ -724,6 +857,10 @@ def main(argv: list[str]) -> int:
             guard(s3b_broken_caddy_rolls_back)
         if "s4" in want:
             guard(s4_host_nginx)
+        if "s11" in want:
+            guard(s11_install_with_postgres)
+        if "s12" in want:
+            guard(s12_move_to_postgres_from_panel)
     finally:
         stop_app()
         fakes.terminate()

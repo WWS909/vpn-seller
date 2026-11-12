@@ -2738,6 +2738,77 @@ body.resolve .screen.on #quickRows>.row:nth-child(n+3){animation-delay:.22s}
 :root[data-layout="brand"][data-top]:not([data-top="auto"]) :is(.head,.ha-ans,.hc-top) :is(h1,p,.hc-h1,.hc-lead,.hc-st,.hc-st b){color:var(--top-on)}
 
 /* ============================================================
+   Style "ticket" — a boarding pass. Every block is a ticket: notches cut
+   at both sides, perforations (dashes) instead of rules, labels and
+   figures in a mono face like a printed pass. A plan is a ticket with a
+   tear-off stub that carries the price. The shop's colour is the stamp:
+   the chosen ticket, the main button, the paid days.
+   ============================================================ */
+:root[data-layout="ticket"]{
+  --ground:#0D0F12;--card:#1A1D22;--card-2:#22262C;--line:#33383F;--line-soft:#2A2E35;
+  --txt:#EEF0F3;--txt-2:#AEB4BD;--txt-3:#8B929C;--r:14px;--r-m:12px;--r-s:8px;--r-l:20px;
+  --perf:color-mix(in srgb,var(--txt) 24%,transparent);
+  --notch:radial-gradient(circle 8px at 0 50%,#0000 96%,#000) 0 0/51% 100% no-repeat,
+          radial-gradient(circle 8px at 100% 50%,#0000 96%,#000) 100% 0/51% 100% no-repeat;
+  --notch-s:radial-gradient(circle 5px at 0 50%,#0000 94%,#000) 0 0/51% 100% no-repeat,
+            radial-gradient(circle 5px at 100% 50%,#0000 94%,#000) 100% 0/51% 100% no-repeat}
+:root[data-layout="ticket"][data-theme="light"]{
+  --ground:#E7E2D8;--card:#FFFFFF;--card-2:#F5F2EB;--line:#D6CFC1;--line-soft:#E6E0D4;
+  --txt:#16181C;--txt-2:#4B515A;--txt-3:#5F656E;--perf:color-mix(in srgb,var(--txt) 30%,transparent)}
+:root[data-layout="ticket"] .top{border-bottom:1.5px dashed var(--perf)}
+:root[data-layout="ticket"] .brand{font-family:var(--font-d);font-weight:600;letter-spacing:-.01em}
+:root[data-layout="ticket"] .tool{background:var(--card);border:0}
+:root[data-layout="ticket"] :is(.head h1,.ha-ans h1,.hc-h1){font-family:var(--font-d);font-weight:600;letter-spacing:-.025em}
+/* every block a ticket: no outline, notches at the sides */
+:root[data-layout="ticket"] :is(.card,.tile,.ha-grp,.rows,#locList,#devList,#devRemoved,.trial,.deal,.hb-cal,.stepper,.plan,.pay){
+  border:0 !important;box-shadow:none !important;-webkit-mask:var(--notch);mask:var(--notch)}
+:root[data-layout="ticket"] :is(.pay,.tile){-webkit-mask:var(--notch-s);mask:var(--notch-s)}
+/* section titles: a mono label with a perforation running on */
+:root[data-layout="ticket"] :is(.ha-cap,.sec h3){display:flex;align-items:center;gap:10px;font-family:var(--font-d);font-weight:500;font-size:13px;color:var(--txt-2)}
+:root[data-layout="ticket"] :is(.ha-cap,.sec h3)::after{content:"";flex:1;height:0;border-top:1.5px dashed var(--perf)}
+:root[data-layout="ticket"] .sec h3 span{flex:none}
+:root[data-layout="ticket"] :is(.row,.ha-row,.loc,.hc-dev) + :is(.row,.ha-row,.loc,.hc-dev)::before{transform:none;
+  background:repeating-linear-gradient(90deg,var(--perf) 0 6px,transparent 6px 11px)}
+:root[data-layout="ticket"] .hero{background:var(--card)}
+:root[data-layout="ticket"] :is(.days b,.tile .v,.hb-cal .hd b,.total b,.bill .amt){font-family:var(--font-d);font-weight:600;letter-spacing:-.03em}
+:root[data-layout="ticket"] .days b{font-size:48px}
+:root[data-layout="ticket"] .tile + .tile{position:relative}
+/* the calendar: paid days punched through, the last one stamped */
+:root[data-layout="ticket"] .hb-grid i.in{background:color-mix(in srgb,var(--sig) 22%,transparent);border-radius:50%}
+:root[data-layout="ticket"] .hb-grid i:is(.s,.e,.s.e){border-radius:50%}
+:root[data-layout="ticket"] .hb-grid i.end{background:var(--sig);color:var(--on-sig);border-radius:50%}
+/* a plan: the ticket and its tear-off stub with the price */
+:root[data-layout="ticket"] .plan{background:var(--card);padding:16px 18px;gap:14px;border-radius:var(--r)}
+:root[data-layout="ticket"] .plan + .plan{margin-top:10px}
+:root[data-layout="ticket"] .plan .pr{align-self:stretch;display:flex;flex-direction:column;justify-content:center;
+  margin:-16px 0;padding:16px 0 16px 16px;border-left:1.5px dashed var(--perf)}
+:root[data-layout="ticket"] .plan .pr b{font-family:var(--font-d);font-weight:600;font-size:19px;letter-spacing:-.02em}
+:root[data-layout="ticket"] .plan.on{background:color-mix(in srgb,var(--sig) 13%,var(--card))}
+:root[data-layout="ticket"] .plan.on .pr{border-left-color:color-mix(in srgb,var(--sig) 70%,transparent)}
+:root[data-layout="ticket"] .plan.on .pr b{color:var(--sig-txt)}
+:root[data-layout="ticket"] .plan .t b em{background:none;border:1.5px dashed currentColor;color:var(--sig-txt);border-radius:6px}
+:root[data-layout="ticket"] .plan .mark{border-style:dashed}
+:root[data-layout="ticket"] .plan.on .mark{border-style:solid}
+:root[data-layout="ticket"] .pay{background:var(--card)}
+:root[data-layout="ticket"] .pay.on{background:color-mix(in srgb,var(--sig) 13%,var(--card))}
+/* buttons: the main one a small ticket in the shop's colour */
+:root[data-layout="ticket"] .btn{border-radius:10px;font-weight:600}
+:root[data-layout="ticket"] .btn.pri{-webkit-mask:var(--notch-s);mask:var(--notch-s)}
+:root[data-layout="ticket"] .btn.gho{background:none;border:1.5px dashed var(--perf);color:var(--txt)}
+:root[data-layout="ticket"] .chip{border-radius:8px}
+:root[data-layout="ticket"] .chip.on{background:color-mix(in srgb,var(--sig) 16%,var(--card));color:var(--txt);box-shadow:inset 0 0 0 1.5px var(--sig)}
+:root[data-layout="ticket"] .chips.seg{background:var(--card);border-radius:12px}
+:root[data-layout="ticket"] .field{background:var(--card);border:1.5px dashed var(--perf);border-radius:10px}
+:root[data-layout="ticket"] .code{background:var(--card-2);border-radius:10px;font-family:var(--font-d)}
+:root[data-layout="ticket"] .nav{background:var(--ground);border-top:1.5px dashed var(--perf)}
+:root[data-layout="ticket"] .nav button.on{color:var(--txt)}
+:root[data-layout="ticket"] .nav button.on .ni{background:color-mix(in srgb,var(--sig) 18%,transparent);border-radius:8px}
+:root[data-layout="ticket"] .sheet{background:var(--card);border-top:1.5px dashed var(--perf)}
+:root[data-layout="ticket"] .sheet h3{font-family:var(--font-d);font-weight:600;letter-spacing:-.02em}
+:root[data-layout="ticket"] .meter{border-radius:99px;background:var(--card-2)}
+:root[data-layout="ticket"] .art{-webkit-mask:var(--notch);mask:var(--notch)}
+
+/* ============================================================
    A picture at the top of the home screen (data-art): a drawing in the
    shop's colour (drawArt builds it from the theme's own variables, so it
    follows light and dark) or the owner's picture.
@@ -4096,6 +4167,75 @@ function artSvg(kind){
     pts.forEach(([x, y], i) => { if (i !== 5) g += `<circle cx="${x}" cy="${y}" r="${i % 3 ? 2.1 : 2.8}" ${f("var(--txt)")}/>`; });
     const [sx, sy] = pts[5];
     g += `<path d="M${sx} ${sy - 11}Q${sx + 1.6} ${sy - 1.6} ${sx + 11} ${sy}Q${sx + 1.6} ${sy + 1.6} ${sx} ${sy + 11}Q${sx - 1.6} ${sy + 1.6} ${sx - 11} ${sy}Q${sx - 1.6} ${sy - 1.6} ${sx} ${sy - 11}Z" ${f("var(--sig)")}/>`;
+  } else if (kind === "peaks"){
+    // mountains at dusk: three ridges going darker towards us, a full moon, the far ridge lit along its edge
+    g += `<defs><linearGradient id="arSkyP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${mix("var(--sig)", 10, "var(--ground)")}"/><stop offset=".5" style="stop-color:${mix("var(--sig)", 55, "var(--ground)")}"/></linearGradient></defs>`;
+    g += `<rect width="${W}" height="${H}" fill="url(#arSkyP)"/>`;
+    for (let i = 0; i < 30; i++) g += `<circle class="ar-st" cx="${(r() * W).toFixed(1)}" cy="${(r() * 54).toFixed(1)}" r="${(.4 + r() * 1).toFixed(2)}" ${f("var(--txt)")}/>`;
+    g += `<circle class="ar-mn" cx="300" cy="26" r="12" ${f("var(--txt)", ";opacity:.92")}/>`;
+    const ridge = (base, amp, step, fill, edge) => {
+      let x = -10, d = `M-10 ${H}L-10 ${base}`, top = "";
+      while (x < W + 10){
+        x += step * (.6 + r() * .8);
+        const y = base - amp * (.25 + r() * .75);
+        d += `L${x.toFixed(1)} ${y.toFixed(1)}`;
+        top += (top ? "L" : "M") + `${x.toFixed(1)} ${y.toFixed(1)}`;
+      }
+      g += `<path d="${d}L${W + 10} ${H}Z" ${f(fill)}/>`;
+      if (edge) g += `<path d="${top}" style="fill:none;stroke:var(--sig);stroke-width:1.3;opacity:.7;stroke-linejoin:round"/>`;
+    };
+    ridge(80, 46, 34, mix("var(--sig)", 15, "var(--ground)"), true);
+    ridge(104, 34, 26, mix("var(--sig)", 7, "var(--ground)"), false);
+    ridge(124, 20, 20, "var(--ground)", false);
+  } else if (kind === "lighthouse"){
+    // a lighthouse on a rock; its beam in the accent sweeps over a lined sea
+    g += `<defs><linearGradient id="arSkyL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${mix("var(--sig)", 22, "var(--ground)")}"/><stop offset="1" style="stop-color:${mix("var(--sig)", 8, "var(--ground)")}"/></linearGradient>
+      <linearGradient id="arBeam" x1="1" y1="0" x2="0" y2="0"><stop offset="0" style="stop-color:var(--sig);stop-opacity:.55"/><stop offset="1" style="stop-color:var(--sig);stop-opacity:0"/></linearGradient></defs>`;
+    g += `<rect width="${W}" height="${H}" fill="url(#arSkyL)"/>`;
+    for (let i = 0; i < 34; i++) g += `<circle class="ar-st" cx="${(r() * W).toFixed(1)}" cy="${(r() * 84).toFixed(1)}" r="${(.4 + r() * .9).toFixed(2)}" ${f("var(--txt)")}/>`;
+    g += `<path d="M276 40L-20 6L-20 74Z" fill="url(#arBeam)"/>`;
+    g += `<rect y="94" width="${W}" height="${H - 94}" ${f(mix("var(--sig)", 10, "var(--ground)"))}/>`;
+    for (let y = 99, k = 0; y < H; y += 6, k++){
+      for (let x = (k % 2) * 13 - 8; x < W; x += 26 + r() * 22){
+        const w = 6 + r() * 16;
+        g += `<path d="M${x.toFixed(1)} ${y}h${w.toFixed(1)}" style="stroke:${x < 250 && y < 116 ? "var(--sig)" : mix("var(--txt)", 30, "transparent")};stroke-width:1.2;stroke-linecap:round;opacity:${x < 250 && y < 116 ? .55 : 1}"/>`;
+      }
+    }
+    g += `<path d="M232 ${H}C238 108 252 96 270 94C292 92 306 100 316 110C324 118 330 126 334 ${H}Z" ${f("var(--ground)")}/>`;
+    g += `<path d="M266 96L270 46H282L286 96Z" ${f("var(--txt)")}/>`;
+    for (const y of [56, 72, 86]) g += `<path d="M${(269.4 - (y - 46) * .02).toFixed(1)} ${y}H${(282.6 + (y - 46) * .02).toFixed(1)}V${y + 6}H${(269 - (y - 46) * .02).toFixed(1)}Z" ${f("var(--sig)")}/>`;
+    g += `<rect x="268" y="38" width="16" height="8" ${f("var(--sig)")}/><path d="M266 38L276 30L286 38Z" ${f("var(--txt)")}/>`;
+    g += `<rect x="266" y="45" width="20" height="2" ${f("var(--txt)")}/>`;
+  } else if (kind === "planet"){
+    // a ringed planet rising at the right: banded, the ring passing behind and in front of it
+    g += `<defs><clipPath id="arPl"><circle cx="262" cy="118" r="76"/></clipPath></defs>`;
+    g += `<rect width="${W}" height="${H}" ${f("var(--card-2)")}/>`;
+    for (let i = 0; i < 52; i++) g += `<circle cx="${(r() * W).toFixed(1)}" cy="${(r() * H).toFixed(1)}" r="${(.35 + r() * .9).toFixed(2)}" ${f("var(--txt)", ";opacity:.55")}/>`;
+    const ring = (half) => `<path d="M${262 - 128} 118A128 30 -14 0 ${half} ${262 + 128} 118" transform="rotate(-14 262 118)" style="fill:none;stroke:var(--sig);stroke-width:5;opacity:.85"/>
+      <path d="M${262 - 112} 118A112 24 -14 0 ${half} ${262 + 112} 118" transform="rotate(-14 262 118)" style="fill:none;stroke:${mix("var(--sig)", 55, "transparent")};stroke-width:2"/>`;
+    g += ring(1);
+    g += `<circle cx="262" cy="118" r="76" ${f(mix("var(--sig)", 34, "var(--card-2)"))}/>`;
+    g += `<g clip-path="url(#arPl)">`;
+    [[64, 8, 22], [82, 5, 30], [100, 11, 18], [124, 6, 26], [140, 9, 14]].forEach(([y, h, p]) =>
+      g += `<rect x="180" y="${y}" width="170" height="${h}" ${f(mix("var(--sig)", 34 + p, "var(--card-2)"))}/>`);
+    g += `<circle cx="300" cy="98" r="78" ${f("var(--card-2)", ";opacity:.38")}/></g>`;
+    g += ring(0);
+    g += `<circle class="ar-mn" cx="70" cy="38" r="10" ${f("var(--txt)", ";opacity:.9")}/>`;
+    g += `<circle cx="67" cy="35" r="2.2" ${f("var(--card-2)", ";opacity:.35")}/><circle cx="73" cy="42" r="1.6" ${f("var(--card-2)", ";opacity:.35")}/>`;
+  } else if (kind === "dunes"){
+    // dunes under a low sun: each dune lit on one side, its crest a clean line
+    g += `<rect width="${W}" height="${H}" ${f(mix("var(--sig)", 14, "var(--card-2)"))}/>`;
+    g += `<circle cx="252" cy="58" r="26" ${f("var(--sig)")}/>`;
+    for (let i = 0; i < 4; i++) g += `<rect x="220" y="${62 + i * 7}" width="66" height="${1.4 + i * .9}" ${f(mix("var(--sig)", 14, "var(--card-2)"))}/>`;
+    const dune = (y0, a, ph, len, dark, lit) => {
+      let top = "";
+      for (let x = -10; x <= W + 10; x += 6) top += (x === -10 ? "M" : "L") + `${x} ${(y0 + Math.sin(x / len + ph) * a + Math.sin(x / (len * .43) + ph * 2) * a * .3).toFixed(1)}`;
+      g += `<path d="${top}L${W + 10} ${H}L-10 ${H}Z" ${f(dark)}/>`;
+      g += `<path d="${top}" style="fill:none;stroke:${lit};stroke-width:1.4"/>`;
+    };
+    dune(82, 9, 1.2, 48, mix("var(--sig)", 30, "var(--card-2)"), mix("var(--sig)", 70, "var(--card-2)"));
+    dune(100, 8, 3.1, 40, mix("var(--sig)", 20, "var(--card-2)"), mix("var(--sig)", 55, "var(--card-2)"));
+    dune(118, 6, 4.4, 34, "var(--card-2)", mix("var(--sig)", 40, "var(--card-2)"));
   }
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${g}</svg>`;
 }
@@ -5753,12 +5893,14 @@ function startFx(){
   if (!ctx) return;
   const kind = document.documentElement.getAttribute("data-effect");
   ctx.clearRect(0, 0, cv.width, cv.height);
-  if (!["snow", "leaves", "petals"].includes(kind) || MOTION() === "off") return;
+  if (!["snow", "leaves", "petals", "meteors"].includes(kind) || MOTION() === "off") return;
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   let W = 0, H = 0;
   const size = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr;
                        cv.style.width = W + "px"; cv.style.height = H + "px"; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
   size(); addEventListener("resize", size);
+  cv.style.zIndex = kind === "meteors" ? "45" : "";              // a streak is brief: over the cards, never catching a tap
+  if (kind === "meteors") return meteors(run, cv, ctx, () => [W, H]);
   // Leaves of autumn and petals of spring are fewer and larger than the snow, and they turn as they fall.
   const PAL = { leaves:["#D9822B", "#C2502A", "#E3B23C", "#9C5B2E", "#B8442E"], petals:["#F7B6C8", "#F9CFDA", "#FCE4EA", "#F29FB8"] }[kind];
   const flakes = Array.from({ length:kind === "snow" ? 42 : 16 }, () => ({ x:Math.random() * W, y:Math.random() * H,
@@ -5793,6 +5935,47 @@ function startFx(){
           ctx.lineTo(0, -z * .5); ctx.lineTo(-z * .15, -z * .8); ctx.bezierCurveTo(-z * .7, -z, -z * 1.1, z * .2, 0, z); ctx.fill();
         }
         ctx.restore();
+      }
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+/* Falling stars: now and then a streak crosses the top of the screen, its
+   head white, its tail in the shop's colour — never more than two at once,
+   so it stays a moment to notice and not a storm. */
+function meteors(run, cv, ctx, size){
+  const sig = getComputedStyle(document.documentElement).getPropertyValue("--sig-rgb").trim() || "255,255,255";
+  const live = [];
+  let next = performance.now() + 600;
+  const spawn = (W, H) => {
+    // shallow and in the upper part of the screen
+    const a = (158 + Math.random() * 10) * Math.PI / 180;           // down and to the left
+    live.push({ x:W * (.45 + Math.random() * .65), y:H * (.06 + Math.random() * .3), a, v:8 + Math.random() * 5,
+                len:70 + Math.random() * 70, life:0, max:30 + Math.random() * 18 });
+  };
+  const tick = now => {
+    if (run !== fxRun) return;
+    const [W, H] = size();
+    if (document.visibilityState === "visible"){
+      const light = document.documentElement.getAttribute("data-theme") === "light";
+      ctx.clearRect(0, 0, W, H);
+      if (now > next && live.length < 2){ spawn(W, H); next = now + 1600 + Math.random() * 3200; }
+      for (let i = live.length - 1; i >= 0; i--){
+        const m = live[i];
+        m.life++; m.x += Math.cos(m.a) * m.v; m.y += Math.sin(m.a) * m.v;
+        const k = Math.sin(Math.min(1, m.life / m.max) * Math.PI);         // fades in and out
+        const tx = m.x - Math.cos(m.a) * m.len, ty = m.y - Math.sin(m.a) * m.len;
+        const gr = ctx.createLinearGradient(m.x, m.y, tx, ty);
+        gr.addColorStop(0, light ? `rgba(${sig},${.9 * k})` : `rgba(255,255,255,${.95 * k})`);
+        gr.addColorStop(.25, `rgba(${sig},${.55 * k})`);
+        gr.addColorStop(1, `rgba(${sig},0)`);
+        ctx.strokeStyle = gr; ctx.lineWidth = 1.6; ctx.lineCap = "round";
+        ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(tx, ty); ctx.stroke();
+        ctx.fillStyle = light ? `rgba(${sig},${k})` : `rgba(255,255,255,${k})`;
+        ctx.beginPath(); ctx.arc(m.x, m.y, 1.5, 0, 6.283); ctx.fill();
+        if (m.life >= m.max) live.splice(i, 1);
       }
     }
     requestAnimationFrame(tick);

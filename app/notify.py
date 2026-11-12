@@ -90,7 +90,12 @@ def setup(db: Session) -> list[str]:
         "type": "web_app", "text": core.t(env.default_lang, "open_app"),
         "web_app": {"url": app_url()}}})
     done.append(f"menu button: {'ok' if res.get('ok') else res.get('description')}")
-    call("setMyCommands", {"commands": [{"command": "start", "description": brand[:256]}]})
+    for lang in ("ru", "en"):
+        payload = {"commands": [{"command": "start", "description": brand[:256]},
+                                {"command": "support", "description": core.t(lang, "cmd_support")}]}
+        if lang != env.default_lang:
+            payload["language_code"] = lang
+        call("setMyCommands", payload)
     from . import botadmin
     botadmin.setup_commands(env.default_lang)
     done.append(f"admin commands: {len(env.admin_telegram_ids)} admin(s)")

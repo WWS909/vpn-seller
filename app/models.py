@@ -89,6 +89,10 @@ class User(Base):
     support_at = Column(Integer, default=0)
     support_answered_at = Column(Integer, default=0)
     support_human_at = Column(Integer, default=0)        # the AI helper handed the thread to people
+    # Until when the person's messages in the bot go to support. A plain
+    # message to the bot is not a question: the chat opens with the
+    # "Write to support" button or /support, and stays open while it goes on.
+    support_open_until = Column(Integer, default=0)
     # Where the person first came from: the code of a source link
     # (t.me/<bot>?start=src_<code>), set once, on the first contact.
     source = Column(String(40), default="", index=True)

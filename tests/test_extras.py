@@ -112,6 +112,17 @@ def ai(client, admin, env, monkeypatch):
 
 
 def _ask(client, uid, text, mid=1):
+    """A question in the bot: the support chat is opened with its button first
+    (a plain message to the bot is not a question)."""
+    from app import support
+    from app.db import SessionLocal
+    from app.models import User
+    with SessionLocal() as db:
+        u = db.query(User).filter(User.tg_id == uid).first()
+        opened = u is not None and support.is_open(u)
+    if not opened:
+        _bot(client, {"callback_query": {"id": f"open{uid}", "data": "sup:open", "from": {"id": uid},
+                                         "message": {"message_id": 1, "chat": {"id": uid}}}})
     return _bot(client, {"message": {"message_id": mid, "text": text, "chat": {"id": uid, "type": "private"},
                                      "from": {"id": uid, "first_name": "Ann"}}})
 

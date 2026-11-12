@@ -7,7 +7,7 @@
 #  или
 #    wget -qO install.sh https://raw.githubusercontent.com/WWS909/vpn-seller/main/install.sh && bash install.sh
 #
-#  Откроется меню, установщик задаст пять вопросов и сделает всё сам:
+#  Откроется меню, установщик задаст шесть вопросов и сделает всё сам:
 #  Docker, код, настройки, HTTPS (свой Caddy, уже стоящий Caddy/nginx
 #  или временный туннель Cloudflare), бот.
 #
@@ -15,9 +15,10 @@
 #
 #  Без вопросов / unattended:
 #    bash install.sh install --token 123:ABC --admin-id 123456789 \
-#         (--domain vpn.example.com | --tunnel) [--password …] [--currency RUB] [--en] --yes
+#         (--domain vpn.example.com | --tunnel) [--password …] [--currency RUB] \
+#         [--db sqlite|postgres] [--en] --yes
 #  Команды: install | update | status | logs | backup | restore <zip> |
-#           payments | address | settings | uninstall | menu
+#           payments | address | settings | postgres | uninstall | menu
 #
 #  Обновление берёт новую версию с GitHub (git pull или архив репозитория),
 #  делает копию базы и возвращает прежний код, если новая версия не запустилась.
@@ -50,7 +51,7 @@ elif [ -n "$_self" ] && [ -f "$_self" ] && [ -f "$(dirname "$_self")/docker-comp
 elif [ -f /opt/vpn-shop/.env ] && [ ! -e /opt/vpn-seller ]; then DIR=/opt/vpn-shop
 else DIR=/opt/vpn-seller; fi
 
-DOMAIN="" TOKEN="" ADMIN_ID="" PASSWORD="" CURRENCY="" ADDR="" ASSUME_YES=0 FROM_PANEL=0
+DOMAIN="" TOKEN="" ADMIN_ID="" PASSWORD="" CURRENCY="" ADDR="" ASSUME_YES=0 FROM_PANEL=0 DB=
 GENERATED=0 BOT="" MODE="" PROXY_CTR="" PROXY_NET="" PROXY_KIND="" PROXY_NOTE=""
 CADDY_CFG="" CADDY_HOSTFILE="" URL=""
 case "${LANG:-}" in en*) UI=en ;; *) UI=ru ;; esac
@@ -71,7 +72,7 @@ info() { printf '  %s·%s %s\n' "$D" "$N" "$*"; }
 warn() { printf '  %s!%s %s\n' "$Y" "$N" "$*"; }
 die()  { printf '\n  %s✗ %s%s\n\n' "$R" "$*" "$N" >&2; exit 1; }
 hint() { printf '    %s%s%s\n' "$D" "$*" "$N"; }
-step() {  # step "2/5" "Title"
+step() {  # step "2/6" "Title"
   printf '\n  %s%s%s  %s%s%s\n' "$A" "$1" "$N" "$B" "$2" "$N"
 }
 row() {  # row "Label" "value" — a two-column line; pads by characters
@@ -205,6 +206,30 @@ set_env() {  # set_env KEY VALUE — replace the line (also a commented one) or 
 random_hex()  { od -An -tx1 -N"$1" /dev/urandom | tr -d ' \n'; }
 random_pass() { head -c 600 /dev/urandom | LC_ALL=C tr -dc 'A-HJ-NP-Za-km-z2-9' | cut -c1-16; }
 
+# ------------------------------------------------------------------ database
+# SQLite (a file in data/) or PostgreSQL (the "db" service, profile "postgres").
+# The shop reaches PostgreSQL by its own alias, never a plain "db" (see
+# docker-compose.yml). PG_COMFORT_MB: from this much memory PostgreSQL is
+# the default choice.
+SQLITE_URL="sqlite:////app/data/vpn.db"
+PG_HOST="vpnseller-db"
+PG_COMFORT_MB=1900
+mem_mb() {
+  if [ -n "${VPN_SHOP_MEM_MB:-}" ]; then printf '%s' "$VPN_SHOP_MEM_MB"; return; fi
+  awk '/^MemTotal:/{print int($2/1024); f=1} END{if(!f) print 0}' /proc/meminfo 2>/dev/null || printf 0
+}
+mem_human() { awk -v m="$1" 'BEGIN{ if (m >= 1024) printf "%.1f %s", m/1024, (ui=="en"?"GB":"ГБ"); else printf "%d %s", m, (ui=="en"?"MB":"МБ") }' ui="$UI" | sed 's/\.0 / /'; }
+db_kind() { case "$(get_env DATABASE_URL)" in postgres*) echo postgres ;; *) echo sqlite ;; esac; }
+db_label() { if [ "$1" = postgres ]; then echo PostgreSQL; else echo SQLite; fi; }
+pg_url() { printf 'postgresql+psycopg://vpn:%s@%s:5432/vpn' "$1" "$PG_HOST"; }
+# COMPOSE_PROFILES = the address mode (caddy | tunnel | nothing) + postgres when it is the database
+set_profiles() {  # set_profiles "caddy|tunnel|"
+  local p=$1
+  if [ "$(db_kind)" = postgres ]; then p=${p:+$p,}postgres; fi
+  set_env COMPOSE_PROFILES "$p"
+}
+base_profile() { get_env COMPOSE_PROFILES | tr ',' '\n' | grep -v -e '^postgres$' -e '^$' | paste -sd, - || true; }
+
 public_ip() {
   local u ip
   for u in https://api.ipify.org https://ifconfig.me https://icanhazip.com; do
@@ -275,7 +300,7 @@ get_code() {
 
 # --------------------------------------------------------------- questions
 q_token() {
-  step "1/5" "$(t "Токен бота" "Bot token")"
+  step "1/6" "$(t "Токен бота" "Bot token")"
   hint "$(t "Откройте @BotFather → /newbot (или /mybots → бот → API Token) и вставьте токен." \
             "Open @BotFather → /newbot (or /mybots → your bot → API Token) and paste the token.")"
   hint "$(t "При вставке символы не видны — так и задумано." "The token is hidden while you paste it.")"
@@ -368,7 +393,7 @@ check_dns() {  # 0 = points here (or cannot tell), 1 = does not
 }
 
 q_address() {
-  step "3/5" "$(t "Адрес магазина" "Shop address")"
+  step "3/6" "$(t "Адрес магазина" "Shop address")"
   hint "$(t "Telegram открывает мини-приложения только по https — адрес нужен обязательно." \
             "Telegram opens mini apps over https only, so the shop needs an address.")"
   if [ -z "$ADDR" ]; then
@@ -424,7 +449,7 @@ q_address() {
 }
 
 q_password() {
-  step "4/5" "$(t "Пароль админ-панели" "Admin panel password")"
+  step "4/6" "$(t "Пароль админ-панели" "Admin panel password")"
   hint "$(t "Для входа в панель с компьютера. Из бота (/admin) панель открывается без пароля." \
             "For the panel on a computer. From the bot (/admin) it opens without one.")"
   while :; do
@@ -445,7 +470,7 @@ q_password() {
 }
 
 q_currency() {
-  step "5/5" "$(t "Валюта цен" "Price currency")"
+  step "5/6" "$(t "Валюта цен" "Price currency")"
   hint "$(t "Цены тарифов меняются в админке; валюта — одна на магазин." "Plan prices are edited in the panel; one currency per shop.")"
   while :; do
     if [ -z "$CURRENCY" ]; then
@@ -458,6 +483,52 @@ q_currency() {
     [ "$ASSUME_YES" = 1 ] && die "--currency"
     CURRENCY=""
   done
+}
+
+q_database() {
+  step "6/6" "$(t "База данных" "Database")"
+  case "$DB" in ""|sqlite|postgres) ;; *) die "--db sqlite | postgres" ;; esac
+  if installed && [ -n "$(get_env SECRET_KEY)" ]; then
+    # reinstall: the customers stay where they are; the move has its own command
+    DB=$(db_kind)
+    ok "$(t "остаётся как была:" "kept as it is:") $(db_label "$DB")"
+    if [ "$DB" = sqlite ]; then
+      hint "$(t "Перейти на PostgreSQL можно в любой момент: админка → «База данных» или меню vpn-seller." \
+                "Move to PostgreSQL any time: admin → Database or the vpn-seller menu.")"
+    fi
+    return
+  fi
+  local mem rec c memh
+  mem=$(mem_mb); memh=$(mem_human "$mem")
+  if [ "${mem:-0}" -ge "$PG_COMFORT_MB" ]; then rec=postgres; else rec=sqlite; fi
+  if [ -z "$DB" ]; then
+    if [ "$ASSUME_YES" = 1 ]; then DB=$rec
+    else
+      hint "$(t "Где хранить клиентов, подписки и платежи. На сервере $memh памяти." \
+                "Where customers, subscriptions and payments are kept. This server has $memh of memory.")"
+      local l_sq l_pg h_sq h_pg
+      l_sq="$(t "SQLite — встроенная, ничего лишнего" "SQLite — built in, nothing extra")"
+      l_pg="$(t "PostgreSQL — для большого магазина" "PostgreSQL — for a bigger shop")"
+      h_sq="$(t "хватает до ~500 клиентов с подпиской" "enough for ~500 paying customers")"
+      h_pg="$(t "занимает ~100–150 МБ памяти, лучше от 2 ГБ" "takes ~100–150 MB of memory, best with 2 GB+")"
+      if [ "$rec" = postgres ]; then
+        choose c 1 "$l_pg" "$(t "рекомендуем для этого сервера" "recommended for this server") · $h_pg" 2 "$l_sq" "$h_sq"
+        if [ "$c" = 1 ]; then DB=postgres; else DB=sqlite; fi
+      else
+        choose c 1 "$l_sq" "$(t "рекомендуем для этого сервера" "recommended for this server") · $h_sq" 2 "$l_pg" "$h_pg"
+        if [ "$c" = 1 ]; then DB=sqlite; else DB=postgres; fi
+      fi
+    fi
+  fi
+  ok "$(db_label "$DB")"
+  if [ "$DB" = postgres ] && [ "${mem:-0}" -lt "$PG_COMFORT_MB" ]; then
+    warn "$(t "памяти $memh — PostgreSQL заработает, но магазину останется меньше" \
+              "$memh of memory — PostgreSQL works, but leaves the shop less room")"
+  fi
+  if [ "$DB" = sqlite ]; then
+    hint "$(t "Перейти на PostgreSQL можно в любой момент: админка → «База данных»." \
+              "You can move to PostgreSQL any time: admin → Database.")"
+  fi
 }
 
 # ------------------------------------------------------------ who has 80/443
@@ -659,6 +730,11 @@ write_env() {
   set_env ADMIN_TELEGRAM_IDS "$ADMIN_ID"
   set_env CURRENCY "$CURRENCY"
   set_env DEFAULT_LANG "$UI"
+  if [ "$DB" = postgres ] && [ "$(db_kind)" != postgres ]; then
+    local pgp; pgp=$(get_env POSTGRES_PASSWORD); [ -n "$pgp" ] || pgp=$(random_pass)
+    set_env POSTGRES_PASSWORD "$pgp"
+    set_env DATABASE_URL "$(pg_url "$pgp")"
+  fi
   write_address_env
   mkdir -p "$DIR/data"
 }
@@ -670,12 +746,12 @@ write_address_env() {
     set_env DOMAIN ""
     set_env PUBLIC_URL ""
     set_env TUNNEL_METRICS_URL "http://tunnel:2000"
-    set_env COMPOSE_PROFILES tunnel
+    set_profiles tunnel
   else
     set_env DOMAIN "$DOMAIN"
     set_env PUBLIC_URL "https://$DOMAIN"
     set_env TUNNEL_METRICS_URL ""
-    if [ "$MODE" = caddy ]; then set_env COMPOSE_PROFILES caddy; else set_env COMPOSE_PROFILES ""; fi
+    if [ "$MODE" = caddy ]; then set_profiles caddy; else set_profiles ""; fi
   fi
 }
 
@@ -833,7 +909,7 @@ cmd_install() {
   ensure_tools
   install_docker
   get_code
-  q_token; q_admin; q_address; q_password; q_currency
+  q_token; q_admin; q_address; q_password; q_currency; q_database
   step "·" "$(t "Как магазин будет доступен" "How the shop will be reached")"
   decide_mode
   review
@@ -859,6 +935,7 @@ review() {
   row "$(t "Админ" "Admin")" "$ADMIN_ID"
   row "$(t "Адрес" "Address")" "$how"
   row "$(t "Валюта" "Currency")" "$CURRENCY"
+  row "$(t "База" "Database")" "$(db_label "${DB:-sqlite}")"
   row "$(t "Папка" "Folder")" "$DIR"
   rule
   confirm "$(t "Всё верно — начинаю?" "All correct — start?")" || die "$(t "остановлено, ничего не изменено" "stopped, nothing changed")"
@@ -1215,6 +1292,12 @@ rollback() {  # rollback "why"
 
 cmd_update() {
   need_root; installed || die "$(t "не установлено в" "not installed in") $DIR"
+  # The panel's database page asks through the same unit as the Update button.
+  if [ "$FROM_PANEL" = 1 ] && grep -qs '"action": *"postgres"' "$DIR/data/update.request"; then
+    rm -f "$DIR/data/update.request"
+    cmd_db_postgres
+    return
+  fi
   load_env
   step "·" "$(t "Обновление" "Update")"
   [ "$FROM_PANEL" = 1 ] && info "$(t "запущено кнопкой «Обновить»" "started with the Update button")"
@@ -1249,8 +1332,8 @@ cmd_update() {
   if [ -n "$FROM_VER" ] && [ "$TO_VER" = "$FROM_VER" ]; then info "$(t "версия" "version") $TO_VER"
   else info "$(t "версия" "version") ${FROM_VER:-?} → ${TO_VER:-?}"; fi
   # Older installs: no INSTALL_MODE/COMPOSE_PROFILES in .env yet.
-  [ -n "$(get_env INSTALL_MODE)" ] || { set_env INSTALL_MODE "$MODE"; [ "$MODE" = caddy ] && set_env COMPOSE_PROFILES caddy; }
-  grep -q '^COMPOSE_PROFILES=' "$DIR/.env" || { [ "$MODE" = caddy ] && set_env COMPOSE_PROFILES caddy || set_env COMPOSE_PROFILES ""; }
+  [ -n "$(get_env INSTALL_MODE)" ] || { set_env INSTALL_MODE "$MODE"; [ "$MODE" = caddy ] && set_profiles caddy; }
+  grep -q '^COMPOSE_PROFILES=' "$DIR/.env" || { [ "$MODE" = caddy ] && set_profiles caddy || set_profiles ""; }
   spin "$(t "Пересобираю и перезапускаю" "Rebuilding and restarting")" compose up -d --build --remove-orphans \
     || rollback "$(t "новая версия не собралась" "the new version did not build")"
   spin "$(t "Жду ответа" "Waiting for an answer")" wait_app \
@@ -1261,6 +1344,125 @@ cmd_update() {
   install_updater
   upd_status ok
   ok "$(t "обновлено" "updated")${TO_VER:+ — $TO_VER}"
+}
+
+# ------------------------------------------------------------------ SQLite → PostgreSQL
+# Asked from the panel (admin → Database: data/update.request with
+# "action":"postgres", taken by the Update button's unit), the menu or
+# `vpn-seller postgres`. The SQLite file is only read; a backup comes first;
+# the copy is counted table by table; on any failure the shop starts again
+# on SQLite as it was. Progress goes to data/db.status for the panel.
+db_status() {  # db_status state [reason] [customers]
+  local f="$DIR/data/db.status" reason log
+  mkdir -p "$DIR/data" 2>/dev/null || return 0
+  reason=$(printf '%s' "${2:-}" | json_str_esc)
+  log=$(tail -n 40 "$LOG" 2>/dev/null | json_str_esc || true)
+  printf '{"state":"%s","at":%s,"reason":"%s","users":%s,"log":"%s"}\n' \
+    "$1" "$(date +%s)" "$reason" "${3:-0}" "$log" > "$f.tmp" 2>/dev/null \
+    && chmod 644 "$f.tmp" && mv -f "$f.tmp" "$f" || true
+}
+db_fail() {  # nothing was changed yet: just say why
+  db_status failed "$1"
+  die "$1"
+}
+db_back() {  # the shop was stopped or switched: back to SQLite, untouched
+  warn "$1"
+  set_env DATABASE_URL "$DB_OLD_URL"
+  set_env COMPOSE_PROFILES "$DB_OLD_PROF"
+  compose rm -sf db >> "$LOG" 2>&1 || true          # its volume stays: the next try starts it over
+  if spin "$(t "Возвращаю магазин на SQLite" "Putting the shop back on SQLite")" compose up -d --force-recreate app \
+     && spin "$(t "Жду ответа" "Waiting for an answer")" wait_app; then
+    db_status failed "$1"
+    die "$(t "переход не удался — магазин работает на SQLite, как раньше, данные не тронуты. Подробности: $LOG" \
+             "the move failed — the shop works on SQLite as before, nothing was lost. Details: $LOG")"
+  fi
+  db_status failed "$1; $(t "магазин на SQLite тоже не ответил" "the shop on SQLite did not answer either")"
+  die "$(t "переход не удался, и магазин не отвечает. Журнал: $LOG" "the move failed and the shop does not answer. Log: $LOG")"
+}
+pg_ready() {
+  local i
+  for i in $(seq 1 "${VPN_SHOP_PG_TRIES:-45}"); do
+    compose exec -T db pg_isready -U vpn -d vpn >/dev/null 2>&1 && return 0
+    sleep 2
+  done
+  return 1
+}
+db_copy() {  # db_copy URL OUTFILE — one-off container, the shop stopped
+  compose run --rm --no-deps -T -e "DATABASE_URL=$SQLITE_URL" app \
+    python -m app.dbmove copy --to "$1" --force > "$2"
+}
+
+cmd_db_postgres() {
+  need_root; installed || die "$(t "не установлено в" "not installed in") $DIR"
+  load_env
+  step "·" "$(t "Переход на PostgreSQL" "Moving to PostgreSQL")"
+  [ "$FROM_PANEL" = 1 ] && info "$(t "запущено из админ-панели" "started from the admin panel")"
+  if [ "$(db_kind)" = postgres ]; then ok "$(t "магазин уже работает на PostgreSQL" "the shop already runs on PostgreSQL")"; return 0; fi
+  local mem; mem=$(mem_mb)
+  if [ "$FROM_PANEL" != 1 ]; then
+    say "  $(t "Что будет:" "What happens:")"
+    say "   · $(t "копия базы (как каждый день)" "a database backup (as every day)")"
+    say "   · $(t "запуск PostgreSQL рядом с магазином" "PostgreSQL starts next to the shop")"
+    say "   · $(t "пауза магазина на время переноса — обычно меньше минуты" "the shop pauses during the copy — usually under a minute")"
+    say "   · $(t "проверка: в новой базе столько же записей, сколько в старой" "a check: the new database holds as many rows as the old one")"
+    say "   · $(t "если что-то не так — магазин сам вернётся на SQLite" "if anything is off, the shop goes back to SQLite by itself")"
+    if [ "${mem:-0}" -lt "$PG_COMFORT_MB" ]; then
+      warn "$(t "на сервере $(mem_human "$mem") памяти — PostgreSQL займёт около 100–150 МБ" \
+                "this server has $(mem_human "$mem") of memory — PostgreSQL takes about 100–150 MB")"
+    fi
+    printf '\n'
+    confirm "$(t "Перейти на PostgreSQL?" "Move to PostgreSQL?")" || return 0
+  fi
+  DB_OLD_URL=$(get_env DATABASE_URL) DB_OLD_PROF=$(get_env COMPOSE_PROFILES)
+  db_status running
+  local sq="$DIR/data/vpn.db" need free
+  # PostgreSQL holds about as much as the file, the backup about as much again
+  need=$(( $(stat -c %s "$sq" 2>/dev/null || echo 0) * 3 / 1024 + 300 * 1024 ))
+  free=$(df -Pk "$DIR" 2>/dev/null | awk 'NR==2{print $4}')
+  if [ -n "$free" ] && [ "$free" -lt "$need" ]; then
+    db_fail "$(t "мало места на диске: нужно около $((need / 1024)) МБ, свободно $((free / 1024)) МБ" \
+                 "not enough disk space: about $((need / 1024)) MB needed, $((free / 1024)) MB free")"
+  fi
+  spin "$(t "Резервная копия базы" "Database backup")" compose exec -T -u app app python -m app.backup make \
+    || db_fail "$(t "не получилась резервная копия — ничего не менял" "the backup failed — nothing was changed")"
+  local pgp url base out res users
+  pgp=$(get_env POSTGRES_PASSWORD)
+  if [ -z "$pgp" ]; then pgp=$(random_pass); set_env POSTGRES_PASSWORD "$pgp"; fi
+  url=$(pg_url "$pgp")
+  base=$(base_profile)
+  set_env COMPOSE_PROFILES "${base:+$base,}postgres"
+  spin "$(t "Запускаю PostgreSQL" "Starting PostgreSQL")" compose up -d db \
+    || db_back "$(t "PostgreSQL не запустился" "PostgreSQL did not start")"
+  spin "$(t "Жду, пока PostgreSQL ответит" "Waiting for PostgreSQL to answer")" pg_ready \
+    || db_back "$(t "PostgreSQL не отвечает" "PostgreSQL does not answer")"
+  spin "$(t "Ставлю магазин на паузу" "Pausing the shop")" compose stop app \
+    || db_back "$(t "магазин не остановился" "the shop did not stop")"
+  out=$(mktemp)
+  if ! spin "$(t "Переношу данные и сверяю" "Copying the data and checking it")" db_copy "$url" "$out"; then
+    res=$(tail -n 1 "$out" 2>/dev/null || true); rm -f "$out"
+    db_back "$(t "перенос не прошёл проверку" "the copy did not pass the check"): $(printf '%s' "$res" | sed -n 's/.*"error": *"\([^"]*\)".*"detail": *"\([^"]*\)".*/\1 \2/p' | cut -c1-200)"
+  fi
+  res=$(tail -n 1 "$out"); rm -f "$out"
+  users=$(printf '%s' "$res" | sed -n 's/.*"users": *\([0-9]*\).*/\1/p')
+  users=${users:-0}
+  info "$(t "перенесено клиентов:" "customers moved:") $users"
+  set_env DATABASE_URL "$url"
+  spin "$(t "Запускаю магазин на PostgreSQL" "Starting the shop on PostgreSQL")" compose up -d --force-recreate app \
+    || db_back "$(t "магазин не запустился на PostgreSQL" "the shop did not start on PostgreSQL")"
+  spin "$(t "Жду ответа" "Waiting for an answer")" wait_app \
+    || db_back "$(t "магазин не ответил на PostgreSQL" "the shop did not answer on PostgreSQL")"
+  local k
+  k=$(compose exec -T -u app app python -m app.dbmove kind 2>/dev/null | tail -n 1 | tr -d '\r' || true)
+  [ "$k" = postgresql ] || db_back "$(t "магазин запустился не на PostgreSQL" "the shop did not start on PostgreSQL")"
+  # The old file stays, renamed: kept for safety, never read by mistake.
+  local stamp f; stamp=$(date +%Y%m%d-%H%M%S)
+  for f in vpn.db vpn.db-wal vpn.db-shm; do
+    if [ -f "$DIR/data/$f" ]; then mv -f "$DIR/data/$f" "$DIR/data/vpn-before-postgres-$stamp.${f#vpn.}"; fi
+  done
+  db_status ok "" "$users"
+  ok "$(t "магазин работает на PostgreSQL" "the shop runs on PostgreSQL")"
+  hint "$(t "Прежний файл SQLite сохранён: $DIR/data/vpn-before-postgres-$stamp.db" \
+            "The old SQLite file is kept: $DIR/data/vpn-before-postgres-$stamp.db")"
 }
 
 cmd_status() {
@@ -1284,6 +1486,7 @@ cmd_restore() {
   mkdir -p "$DIR/data"
   cp "$file" "$DIR/data/restore.zip"
   compose stop app
+  if [ "$(db_kind)" = postgres ]; then compose up -d db && pg_ready || die "$(t "PostgreSQL не отвечает" "PostgreSQL does not answer")"; fi
   compose run --rm app python -m app.backup restore /app/data/restore.zip --force
   compose start app
   rm -f "$DIR/data/restore.zip"
@@ -1299,6 +1502,7 @@ cmd_uninstall() {
   remove_updater
   rm -f "$BIN_LINK" "$OLD_LINK"
   if confirm "$(t "Удалить и ВСЕ данные (клиенты, заказы, бэкапы) в $DIR?" "Also delete ALL data (customers, orders, backups) in $DIR?")" n; then
+    compose down -v >> "$LOG" 2>&1 || true            # the PostgreSQL volume, if any
     rm -rf "$DIR"; ok "$(t "удалено вместе с данными" "removed with the data")"
   else
     ok "$(t "контейнеры удалены, данные остались в $DIR/data" "containers removed, data kept in $DIR/data")"
@@ -1316,6 +1520,10 @@ menu() {
       [ -n "$M_LATEST" ] && upd_hint="$(t "вышла версия" "version") $M_LATEST$(t "" " is out")"
       if [ "$M_AUTO" = 1 ]; then auto_label="$(t "Автообновление ночью: включено" "Night auto-update: on") ($(printf '%02d' "${M_HOUR:-1}"):00)"
       else auto_label="$(t "Автообновление ночью: выключено" "Night auto-update: off")"; fi
+      local db_item db_hint=""
+      if [ "$(db_kind)" = postgres ]; then db_item="$(t "База данных: PostgreSQL" "Database: PostgreSQL")"
+      else db_item="$(t "Перейти на PostgreSQL" "Move to PostgreSQL")"
+        db_hint="$(t "сейчас SQLite · для большого магазина" "now SQLite · for a bigger shop")"; fi
       choose c \
         -- "$(t "Магазин" "Shop")" "" \
         1 "$(t "Обновить до новой версии" "Update to the latest version")" "$upd_hint" \
@@ -1326,16 +1534,17 @@ menu() {
         5 "$(t "Резервная копия базы" "Database backup")" "" \
         6 "$(t "Восстановить из копии" "Restore from a backup")" "" \
         7 "$(t "Итоги за сутки — прислать в Telegram" "The last 24 hours — send to Telegram")" "" \
+        8 "$db_item" "$db_hint" \
         -- "$(t "Настройки" "Settings")" "" \
-        8 "$(t "Способы оплаты (карты, крипта, Stars)" "Payment methods (cards, crypto, Stars)")" "" \
-        9 "$(t "Сменить адрес (домен / временный)" "Change address (domain / temporary)")" "" \
-        10 "$(t "Сменить токен, ID или пароль" "Change token, IDs or password")" "" \
-        11 "$auto_label" "" \
+        9 "$(t "Способы оплаты (карты, крипта, Stars)" "Payment methods (cards, crypto, Stars)")" "" \
+        10 "$(t "Сменить адрес (домен / временный)" "Change address (domain / temporary)")" "" \
+        11 "$(t "Сменить токен, ID или пароль" "Change token, IDs or password")" "" \
+        12 "$auto_label" "" \
         -- "$(t "Прочее" "Other")" "" \
-        12 "$(t "Что нового" "What's new")" "" \
-        13 "$(t "Очистить место на диске" "Free up disk space")" "" \
-        14 "$( [ "$UI" = ru ] && echo English || echo Русский)" "" \
-        15 "$(t "Удалить" "Uninstall")" "" \
+        13 "$(t "Что нового" "What's new")" "" \
+        14 "$(t "Очистить место на диске" "Free up disk space")" "" \
+        15 "$( [ "$UI" = ru ] && echo English || echo Русский)" "" \
+        16 "$(t "Удалить" "Uninstall")" "" \
         0 "$(t "Выход" "Exit")" ""
       case "$c" in
         1) menu_sure "$(t "Обновить магазин сейчас? Сначала будет копия базы, перерыв 1–2 минуты." "Update the shop now? A backup comes first, 1–2 minutes of downtime.")" && cmd_update ;;
@@ -1345,12 +1554,14 @@ menu() {
         5) compose exec -T -u app app python -m app.backup make; ok "$(t "архив в $DIR/data/backups" "archive in $DIR/data/backups")" ;;
         6) menu_restore ;;
         7) menu_report ;;
-        8) cmd_payments ;; 9) cmd_address ;; 10) cmd_settings ;;
-        11) menu_auto ;;
-        12) menu_news ;;
-        13) menu_sure "$(t "Удалить старые образы Docker и копии базы старше 30 дней?" "Remove old Docker images and backups older than 30 days?")" && menu_clean ;;
-        14) if [ "$UI" = ru ]; then UI=en; else UI=ru; fi; continue ;;
-        15) cmd_uninstall; installed || return 0 ;;
+        8) if [ "$(db_kind)" = postgres ]; then ok "$(t "магазин работает на PostgreSQL" "the shop runs on PostgreSQL")"
+           else ( cmd_db_postgres ) || true; fi ;;
+        9) cmd_payments ;; 10) cmd_address ;; 11) cmd_settings ;;
+        12) menu_auto ;;
+        13) menu_news ;;
+        14) menu_sure "$(t "Удалить старые образы Docker и копии базы старше 30 дней?" "Remove old Docker images and backups older than 30 days?")" && menu_clean ;;
+        15) if [ "$UI" = ru ]; then UI=en; else UI=ru; fi; continue ;;
+        16) cmd_uninstall; installed || return 0 ;;
         0) printf '\n'; return 0 ;;
       esac
     else
@@ -1393,6 +1604,7 @@ menu_head() {
   printf '\n'
   addr=$(get_env PUBLIC_URL); [ -n "$addr" ] || addr="https://$(get_env DOMAIN)"
   head_line "$(t "адрес" "address")" "$addr"
+  head_line "$(t "база" "database")" "$(db_label "$(db_kind)")"
   if [ -n "$s" ]; then
     head_line "$(t "сегодня" "today")" "$(t "покупок" "purchases"): $(kv_ orders) · $(kv_ revenue) · $(t "новых" "new"): $(kv_ new)"
     head_line "$(t "клиенты" "customers")" "$(t "всего" "in total"): $(kv_ users) · $(t "с подпиской" "subscribed"): $(kv_ active)"
@@ -1497,7 +1709,7 @@ menu_clean() {
 
 main() {
   local cmd=""
-  case "${1:-}" in install|update|status|logs|backup|restore|address|settings|payments|uninstall|menu) cmd=$1; shift ;; esac
+  case "${1:-}" in install|update|status|logs|backup|restore|address|settings|payments|postgres|uninstall|menu) cmd=$1; shift ;; esac
   while [ $# -gt 0 ]; do
     case "$1" in
       --domain) DOMAIN=$2; ADDR=domain; shift 2 ;;
@@ -1506,11 +1718,12 @@ main() {
       --admin-id) ADMIN_ID=$2; shift 2 ;;
       --password) PASSWORD=$2; shift 2 ;;
       --currency) CURRENCY=$2; shift 2 ;;
+      --db) DB=$2; shift 2 ;;
       --dir) DIR=$2; shift 2 ;;
       --yes|-y) ASSUME_YES=1; shift ;;
       --from-panel) FROM_PANEL=1; shift ;;
       --en|--ru) shift ;;
-      -h|--help) sed -n '2,26p' "$0" 2>/dev/null || true; exit 0 ;;
+      -h|--help) sed -n '2,27p' "$0" 2>/dev/null || true; exit 0 ;;
       *) ARGS+=("$1"); shift ;;
     esac
   done
@@ -1527,6 +1740,7 @@ main() {
     address) cmd_address ;;
     settings) cmd_settings ;;
     payments) cmd_payments ;;
+    postgres) cmd_db_postgres ;;
     uninstall) cmd_uninstall ;;
   esac
 }

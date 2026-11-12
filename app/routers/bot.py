@@ -2,12 +2,17 @@
 Telegram updates (webhook). There is no bot process — Telegram posts
 updates here: /start, the two steps of a Stars payment (and the monthly
 charges of a Stars subscription), admin commands and the support chat.
+
+A plain message to the bot is not a support request: the bot answers it with
+the way into the app and a "Write to support" button. Support takes the
+person's messages only after that button or /support (app/support.py).
 """
 
 from __future__ import annotations
 
 import hmac
 import threading
+import time
 from collections import OrderedDict
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
@@ -105,6 +110,8 @@ def _handle(db: Session, upd: dict) -> None:
     if cq:
         if str(cq.get("data", "")).startswith("cap:"):
             _captcha_answer(db, cq)
+        elif str(cq.get("data", "")).startswith("sup:"):
+            _support_button(db, cq)
         else:
             botadmin.handle_callback(db, cq)
         return
@@ -143,28 +150,93 @@ def _handle(db: Session, upd: dict) -> None:
     if text.startswith("/start") and chat.get("type") == "private":
         _start(db, sender, text[6:].strip())
         return
+    if text.split("@")[0] == "/support" and chat.get("type") == "private" and sender.get("id"):
+        _support_open(db, sender, chat.get("id"))
+        return
 
-    # Anything else a person writes goes to support; an admin's reply to a
-    # forwarded question goes back to the customer.
+    # A message in an open support chat goes to support; an admin's reply to
+    # a forwarded question goes back to the customer.
     from .. import support
     if support.handle_bot_message(db, msg):
         return
-    # Nobody took it (support is off, an unknown command): the bot never
-    # stays silent — it shows the way into the app.
+    # Anything else is not a question: the bot never stays silent — it shows
+    # the way into the app and, when support is on, the button to it.
     if chat.get("type") == "private" and sender.get("id") and not botadmin.is_admin(sender.get("id")):
-        _welcome(db, sender)
+        _plain(db, sender)
 
 
-def _welcome(db: Session, sender: dict) -> None:
+# A person typing many messages gets one answer, not one per message.
+_PLAIN_EVERY = 60
+_plain_at: OrderedDict = OrderedDict()
+
+
+def _plain(db: Session, sender: dict) -> None:
+    uid = sender["id"]
+    t = time.monotonic()
+    with _seen_lock:
+        if t - _plain_at.get(uid, -1e9) < _PLAIN_EVERY:
+            return
+        _plain_at[uid] = t
+        _plain_at.move_to_end(uid)
+        while len(_plain_at) > 5000:
+            _plain_at.popitem(last=False)
+    from .. import support
     from .app_api import current_user
     user = current_user(db, sender)
     lang = user.lang or core.lang_of(sender.get("language_code"))
-    text = core.get(db, f"welcome_{lang}") or core.t(lang, "welcome", brand=core.get(db, "brand_name"))
-    text += emergency.bot_line(db, lang)
-    try:
-        notify.send(sender["id"], text, core.t(lang, "open_app"))
-    except notify.Blocked:
-        pass
+    on = support.enabled(db)
+    text = core.t(lang, "bot_plain" if on else "bot_plain_nosup") + emergency.bot_line(db, lang)
+    rows = []
+    if env.https:
+        rows.append([{"text": core.t(lang, "open_app"), "web_app": {"url": notify.app_url()}}])
+    if on:
+        rows.append([{"text": core.t(lang, "sup_write"), "callback_data": "sup:open"}])
+    payload = {"chat_id": uid, "text": text, "parse_mode": "HTML", "disable_web_page_preview": True}
+    if rows:
+        payload["reply_markup"] = {"inline_keyboard": rows}
+    res = notify.call("sendMessage", payload)
+    if res.get("error_code") == 403:
+        user.bot_blocked = True
+        db.commit()
+
+
+def _support_open(db: Session, sender: dict, chat_id) -> None:
+    """The "Write to support" button or /support: the next messages go to support."""
+    from .. import support
+    from .app_api import current_user
+    user = current_user(db, sender)
+    lang = user.lang or core.lang_of(sender.get("language_code"))
+    if not support.enabled(db):
+        with _seen_lock:
+            _plain_at.pop(sender["id"], None)
+        _plain(db, sender)
+        return
+    support.open_chat(db, user)
+    notify.call("sendMessage", {"chat_id": chat_id, "text": core.t(lang, "sup_open"), "parse_mode": "HTML",
+                                "reply_markup": {"inline_keyboard": [[
+                                    {"text": core.t(lang, "sup_cancel"), "callback_data": "sup:cancel"}]]}})
+
+
+def _support_button(db: Session, cq: dict) -> None:
+    from .. import support
+    from .app_api import current_user
+    sender = cq.get("from") or {}
+    msg = cq.get("message") or {}
+    notify.call("answerCallbackQuery", {"callback_query_id": cq.get("id")})
+    if not sender.get("id"):
+        return
+    data = str(cq.get("data") or "")
+    if data == "sup:open":
+        _support_open(db, sender, (msg.get("chat") or {}).get("id") or sender["id"])
+    elif data == "sup:cancel":
+        user = current_user(db, sender)
+        lang = user.lang or core.lang_of(sender.get("language_code"))
+        support.close_chat(db, user)
+        if msg.get("message_id"):
+            notify.call("editMessageText", {"chat_id": (msg.get("chat") or {}).get("id"),
+                                            "message_id": msg["message_id"], "text": core.t(lang, "sup_cancelled"),
+                                            "reply_markup": {"inline_keyboard": [[
+                                                {"text": core.t(lang, "sup_write"), "callback_data": "sup:open"}]]}})
 
 
 def _start(db: Session, sender: dict, param: str) -> None:

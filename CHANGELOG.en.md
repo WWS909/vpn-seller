@@ -3,6 +3,14 @@
 Each version is a `## X.Y.Z — date` heading with one change per "-" line.
 The shop reads this file to tell the owner what is new.
 
+## 1.8.0 — 2026-11-09
+- Choose the database: the installer asks a sixth question — SQLite (built in) or PostgreSQL (for a bigger shop). It looks at the server's memory and suggests one.
+- Move to PostgreSQL at any time: admin → Database → one button (or the `vpn-seller` menu). A backup comes first, then the copy with every table counted; on any error the shop goes back to SQLite by itself and nothing is touched. The pause is usually under a minute, and a Telegram message tells how it went.
+- A new Database page in the panel: which database, how many customers, its size, the server's memory. When the shop has many paying customers, the overview suggests the move.
+- The `vpn-seller` menu shows which database the shop runs on.
+- Look: a new Ticket style (a boarding pass: notched edges, perforations, the price on a tear-off stub), four new home pictures — Mountains, Lighthouse, Planet, Dunes — and a Falling stars effect. All in the shop's colour, dark and light.
+- Plain messages to the bot no longer become support requests. The bot answers them with Open and "Write to support" buttons; only what is written after that button or the `/support` command goes to support. After support answers, the customer can just reply — the chat stays open for 12 more hours.
+
 ## 1.7.1 — 2026-11-09
 - Three new styles that change more than colours. Newspaper: ink on newsprint, rules instead of cards, plans as a dotted price list, a hatched calendar, solid-ink buttons. Brutal: thick outlines, hard shadows, sticker labels, buttons that sink into their shadow, a tilted tag on the best-value plan. Terminal: a console — monospace in your colour, dashed frames, a cursor after the headline, [ buttons ]. All light and dark.
 - Choosing a style sets a heading font that suits it: Old Standard for Newspaper, Dela Gothic for Brutal, DotGothic16 for Terminal. A font you picked yourself stays.
