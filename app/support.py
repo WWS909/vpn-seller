@@ -1,8 +1,14 @@
 """
 Support chat inside the bot.
 
-A customer writes to the bot (or from the app's Support sheet) — the message
-goes to every admin from ADMIN_TELEGRAM_IDS with the customer's card. An
+A customer writes from the app's Support sheet, or in the bot after opening
+the chat there (the "Write to support" button or /support) — the message
+goes to every admin from ADMIN_TELEGRAM_IDS with the customer's card. A plain
+message to the bot is not a question: the bot answers it with the way into
+the app and the support button, and nothing reaches the admins.
+While the chat is open (SESSION after the customer's last message,
+AFTER_ANSWER after support's answer) the customer simply writes on.
+ An
 admin answers by REPLYING to that message in the bot: the answer goes to the
 customer from the bot, no personal account is exposed. The whole thread is
 kept and can be read and answered in the admin panel too.
@@ -22,12 +28,28 @@ from .config import settings as env
 from .models import SupportMessage, User, now
 
 MAX_PER_HOUR = 20
+SESSION = 30 * 60          # the chat stays open this long after the customer's message
+AFTER_ANSWER = 12 * 3600   # …and this long after support answered: the customer may reply
 ACK_EVERY = 600            # tell the customer "sent" at most once per 10 minutes
 MEDIA = ("photo", "document", "video", "voice", "audio", "sticker", "animation", "video_note")
 
 
 def enabled(db: Session) -> bool:
     return core.get(db, "support_enabled") == "1" and bool(env.admin_telegram_ids)
+
+
+def is_open(user: User) -> bool:
+    return (user.support_open_until or 0) > now()
+
+
+def open_chat(db: Session, user: User, seconds: int = SESSION) -> None:
+    user.support_open_until = max(user.support_open_until or 0, now() + seconds)
+    db.commit()
+
+
+def close_chat(db: Session, user: User) -> None:
+    user.support_open_until = 0
+    db.commit()
 
 
 def _media_of(msg: dict) -> str:
@@ -89,6 +111,7 @@ def incoming(db: Session, user: User, *, text: str = "", msg: dict | None = None
                            source=source)
     db.add(entry)
     user.support_at = entry.at
+    user.support_open_until = max(user.support_open_until or 0, entry.at + SESSION)
     db.commit()
     from . import support_ai
     if support_ai.take(db, user, entry):
@@ -173,6 +196,7 @@ def answer(db: Session, user: User, *, text: str = "", admin_id: int = 0, msg: d
     db.add(entry)
     if answered:
         user.support_answered_at = entry.at
+    user.support_open_until = max(user.support_open_until or 0, entry.at + AFTER_ANSWER)
     db.commit()
     return True
 
@@ -207,6 +231,8 @@ def handle_bot_message(db: Session, msg: dict) -> bool:
         return False            # a contact, a location…: not a question
     from .routers.app_api import current_user
     user = current_user(db, sender)
+    if not is_open(user):
+        return False            # a plain message to the bot: not a question (the bot shows the way)
     incoming(db, user, msg=msg)  # stored and passed on, or refused with "too many"
     return True
 
@@ -244,4 +270,5 @@ def history(db: Session, user: User, limit: int = 100) -> list[dict]:
 def close(db: Session, user: User) -> None:
     """Mark as answered without writing (the question was solved elsewhere)."""
     user.support_answered_at = now()
+    user.support_open_until = 0
     db.commit()

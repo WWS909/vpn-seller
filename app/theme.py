@@ -220,9 +220,10 @@ ICONS = ("thin", "regular", "bold", "badge", "tiles", "ring", "duo", "3d", "neon
 # colour, glass cards, gradient prices — after the VPN landing pages), "paper"
 # (a newspaper: ink on newsprint, rules instead of cards, a price list with
 # dotted leaders), "brutal" (thick outlines, hard offset shadows, flat bold
-# colour) or "terminal" (a console: monospace, a phosphor colour, [ buttons ]).
+# colour), "terminal" (a console: monospace, a phosphor colour, [ buttons ]) or
+# "ticket" (a boarding pass: notched blocks, perforations, a price on a tear-off stub).
 # The new ones follow Telegram light/dark and paint their own background and cards.
-LAYOUTS = ("classic", "clean", "tonal", "brand", "large", "cosmos", "paper", "brutal", "terminal")
+LAYOUTS = ("classic", "clean", "tonal", "brand", "large", "cosmos", "paper", "brutal", "terminal", "ticket")
 # What the home screen is built around: the classic card, a plain answer
 # ("works until …"), the calendar of the term with renewal, or the devices.
 HOMES = ("classic", "answer", "term", "devices")
@@ -230,13 +231,13 @@ MOTIONS = ("lively", "calm", "off")
 # How the blocks of a screen come in (when the motion is lively): rise from
 # below, spring in, slide from the side, come out of a blur, or unfold downwards.
 ENTERS = ("rise", "spring", "slide", "blur", "unfold")
-EFFECTS = ("none", "snow", "leaves", "petals")
+EFFECTS = ("none", "snow", "leaves", "petals", "meteors")
 # The bar at the top with the logo: as the style paints it, the shop's colour,
 # a colour of its own (top_color), a gradient of the shop's colour, or a picture.
 TOPS = ("auto", "accent", "custom", "gradient", "image")
 # A picture at the top of the home screen: none, one of the drawings (they take
 # the shop's colour and follow light/dark), or the owner's own (art_image).
-ARTS = ("none", "city", "bauhaus", "contours", "waves", "stars", "own")
+ARTS = ("none", "city", "bauhaus", "contours", "waves", "stars", "peaks", "lighthouse", "planet", "dunes", "own")
 # The buttons: as the style draws them, or a shape of their own — a key that
 # presses down, a stamp with a hard shadow, a label with an arrow, cut corners,
 # stepped pixel corners, or an outline.

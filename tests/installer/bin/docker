@@ -9,6 +9,10 @@ pulled. What it does for real:
   * `docker exec <proxy> caddy validate|reload` runs the REAL caddy binary
     against the Caddyfile on disk.
 
+  * the "db" service (PostgreSQL) is FAKE_PG_URL, a real database outside:
+    when .env says PostgreSQL the shop runs on it, and `compose run` (the
+    database move) talks to it.
+
 Everything else (ps, inspect, networks) answers from the scenario in
 $FAKE_DIR/scenario.json.
 """
@@ -51,11 +55,18 @@ def env_file(d: Path) -> dict:
     return out
 
 
+def local_url(d: Path, url: str) -> str:
+    """A database URL as seen inside the container → the one on this machine."""
+    if url.startswith("postgres"):
+        return os.environ.get("FAKE_PG_URL") or url
+    return f"sqlite:///{d}/data/vpn.db"
+
+
 def app_env(d: Path) -> dict:
     e = dict(os.environ)
     e.update(env_file(d))
     e["DATA_DIR"] = str(d / "data")
-    e["DATABASE_URL"] = f"sqlite:///{d}/data/vpn.db"
+    e["DATABASE_URL"] = local_url(d, e.get("DATABASE_URL", ""))
     e["TG_API_BASE"] = "http://127.0.0.1:18081"
     if e.get("TUNNEL_METRICS_URL"):
         e["TUNNEL_METRICS_URL"] = "http://127.0.0.1:18082"
@@ -123,8 +134,28 @@ def compose(args: list[str]) -> int:
             start_app(d)
         return 0
     if sub in ("down", "stop"):
-        stop_app()
+        if sub == "down" or not args[1:] or "app" in args[1:]:
+            stop_app()
         return 0
+    if sub == "run":
+        # compose run --rm --no-deps -T -e K=V app python …
+        rest, extra, i = args[1:], {}, 0
+        while i < len(rest) and rest[i].startswith("-"):
+            if rest[i] == "-e":
+                k, _, v = rest[i + 1].partition("=")
+                extra[k] = v
+                i += 2
+            else:
+                i += 1
+        service, cmd = rest[i], rest[i + 1:]
+        if service != "app" or cmd[:1] != ["python"]:
+            return 0
+        e = app_env(d)
+        if "DATABASE_URL" in extra:
+            e["DATABASE_URL"] = local_url(d, extra.pop("DATABASE_URL"))
+        e.update(extra)
+        cmd = [local_url(d, a) if a.startswith(("postgres", "sqlite:")) else a for a in cmd]
+        return subprocess.run([sys.executable] + cmd[1:], cwd=d, env=e).returncode
     if sub == "start":
         if not app_running():
             start_app(d)

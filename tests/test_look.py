@@ -452,7 +452,7 @@ def test_colour_tiles_and_ring_icons(client, admin):
 # ---------------------------------------------------------------- style and home screen
 def test_style_and_home_screen(client, admin):
     from app import theme
-    assert theme.LAYOUTS == ("classic", "clean", "tonal", "brand", "large", "cosmos", "paper", "brutal", "terminal") and theme.HOMES == ("classic", "answer", "term", "devices")
+    assert theme.LAYOUTS == ("classic", "clean", "tonal", "brand", "large", "cosmos", "paper", "brutal", "terminal", "ticket") and theme.HOMES == ("classic", "answer", "term", "devices")
     page = client.get("/app").text
     tag = re.search(r"<html[^>]*>", page).group(0)
     assert 'data-layout="classic"' in tag and 'data-home="classic"' in tag
@@ -500,13 +500,13 @@ def test_every_new_style_paints_its_own_surfaces(client, admin):
 
 
 def test_newspaper_brutal_and_terminal_styles(client, admin):
-    for k in ("paper", "brutal", "terminal"):
+    for k in ("paper", "brutal", "terminal", "ticket"):
         r = client.post("/api/admin/settings", headers=admin, json={"layout": k, "backdrop": "stars", "cards": "neon"})
         assert r.status_code == 200, r.text
         tag = re.search(r"<html[^>]*>", client.get("/app").text).group(0)
         assert f'data-layout="{k}"' in tag and 'data-backdrop="plain"' in tag and 'data-cards="solid"' in tag, tag
     page = client.get("/app").text
-    for k in ("paper", "brutal", "terminal"):
+    for k in ("paper", "brutal", "terminal", "ticket"):
         assert f':root[data-layout="{k}"]' in page and f':root[data-layout="{k}"][data-theme="light"]' in page
 
 

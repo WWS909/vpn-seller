@@ -228,6 +228,7 @@ h1,h2,.h{font-family:var(--font-d);font-weight:500;letter-spacing:-.01em}
 .lcard input:focus{outline:none;border-color:var(--accent-brd)}
 .lcard .btn{justify-content:center;padding:12px}
 .lnote{min-height:17px;font-size:12.5px;color:var(--danger);text-align:center}
+
 .lrule{font-size:11.5px;line-height:1.45;color:var(--muted2);border-top:1px solid var(--brd);padding-top:10px;margin-top:2px}
 
 /* ============ UI ============ */
@@ -334,6 +335,13 @@ a.alert{color:var(--txt);text-decoration:none}a.alert:hover{border-color:var(--a
 .updv ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:13px;line-height:1.45}
 .updok{border-color:var(--ok);margin-bottom:14px}.updok h3{color:var(--ok)}
 .updrun .ic{animation:spvSpin 1.4s linear infinite}
+.dbnow{display:flex;align-items:baseline;gap:4px 10px;flex-wrap:wrap;margin:2px 0 12px}.dbnow .updcur{margin:0}
+.dbnow small{color:var(--muted);font-size:12.5px}
+.dbcmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 14px}
+.dbcmp>div{border:1px solid var(--brd);border-radius:11px;padding:11px 12px;background:var(--surface2)}
+.dbcmp>div.on{border-color:rgba(var(--accent-rgb),.55)}
+.dbcmp b{display:block;font-size:13px;margin-bottom:4px}.dbcmp span{display:block;font-size:12px;color:var(--muted);line-height:1.45;text-wrap:pretty}
+@media(max-width:560px){.dbcmp{grid-template-columns:1fr}}
 .updlog{margin:8px 0 0;max-height:260px;overflow:auto;white-space:pre-wrap;word-break:break-word;font-size:11.5px;
   background:var(--surface2);border:1px solid var(--brd);border-radius:9px;padding:10px;color:var(--muted)}
 
@@ -606,6 +614,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:12.5px;font-weight:6
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M7 7l1 12.5A1.5 1.5 0 0 0 9.5 21h5a1.5 1.5 0 0 0 1.5-1.5L17 7"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 6.5"/></symbol>
+  <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="2.6"/><path d="M5 6v12c0 1.45 3.13 2.6 7 2.6s7-1.15 7-2.6V6"/><path d="M5 12c0 1.45 3.13 2.6 7 2.6s7-1.15 7-2.6"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.6L4 15.5M4 20v-4.5h4.5"/></symbol>
   <symbol id="i-money" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6.5 9v6M17.5 9v6"/></symbol>
   <symbol id="i-check2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.2 11 14.7l4.5-5"/></symbol>
@@ -689,7 +698,7 @@ ru: {
   stArppuN:"средняя выручка за период", stLtv:"LTV", stLtvN:"выручка на клиента за всё время", stChurn:"Отток",
   stChurnN:"закончилась: {n} · активны: {a}",
   supWaiting:"Ждут ответа в поддержке: {n}", supOn:"Чат поддержки в боте",
-  supOnHint:"Клиенты пишут боту или в приложении — сообщения приходят администраторам, ответ — реплаем в боте или здесь.",
+  supOnHint:"Клиенты пишут в приложении или в боте после кнопки «Написать в поддержку» (или /support) — обычные сообщения боту обращениями не считаются. Ответ — реплаем в боте или здесь.",
   supOffNote:"Чат поддержки выключен в настройках — новые сообщения не принимаются.",
   supLast:"Последнее сообщение", supMsgs:"Сообщений", when:"Когда", supNew:"ждёт ответа", supYou:"Вы", supThem:"Клиент",
   supEmpty:"Вопросов пока не было", supBlocked:"Клиент заблокировал бота — ответ не дойдёт.",
@@ -764,6 +773,30 @@ ru: {
   payTestMode:"Включён тестовый режим (PAYMENTS_TEST_MODE): все заказы бесплатные.",
   payTunnel:"Магазин работает через временный туннель: его адрес меняется после перезапуска сервера, и адреса уведомлений в кабинетах касс перестанут работать. Для касс подключите домен: на сервере vpn-seller address. Telegram Stars работают и так.",
   casts:"Рассылки", reviews:"Отзывы", gifts:"Подарки", pay:"Оплата", updates:"Обновления", settings:"Настройки", logs:"Журнал", look:"Оформление",
+  database:"База данных", dbSub:"где хранятся клиенты, подписки и платежи", dbNow:"Сейчас", dbWorks:"работает",
+  dbSqliteN:"встроенная, файл на сервере", dbPgN:"отдельная служба рядом с магазином",
+  dbUsers:"Клиентов", dbActive:"С подпиской", dbSize:"Размер базы", dbRam:"Память сервера", dbDisk:"Свободно на диске",
+  dbMoveT:"Переход на PostgreSQL", dbSqT:"SQLite", dbSqC:"Записывает по очереди. Для начала и до ~500 клиентов с подпиской — с запасом.",
+  dbPgT:"PostgreSQL", dbPgC:"Обслуживает много запросов сразу. Для большого магазина: оплаты, рассылки и проверки не ждут друг друга.",
+  dbWhat:"Что произойдёт", dbStep1:"Копия базы — как каждый день, на сервере и в Telegram.",
+  dbStep2:"Рядом с магазином запустится PostgreSQL (около 100–150 МБ памяти).",
+  dbStep3:"Магазин встанет на паузу, пока данные переносятся, — обычно меньше минуты. Оплаты за это время не теряются: кассы пришлют уведомление повторно.",
+  dbStep4:"Проверка: в новой базе столько же записей, сколько в старой, — по каждой таблице.",
+  dbStep5:"Магазин запустится на PostgreSQL и пришлёт сообщение в Telegram.",
+  dbSafe:"Старый файл SQLite не меняется и остаётся на сервере. Если что-то пойдёт не так — магазин сам вернётся на SQLite, данные не пострадают.",
+  dbGo:"Перейти на PostgreSQL", dbAsk:"Перейти на PostgreSQL? Магазин встанет на паузу примерно на минуту. Перед этим будет сделана копия базы.",
+  dbByHand:"Кнопка заработает после первого обновления на сервере. Или выполните там:",
+  dbRamLow:"На сервере {ram} памяти. PostgreSQL заработает, но магазину останется меньше — лучше от 2 ГБ.",
+  dbRec:"Клиентов с подпиской уже {n} — пора переходить на PostgreSQL",
+  dbRecDash:"переход в разделе «База данных»",
+  dbBusyUpd:"Сейчас идёт обновление магазина — переход будет доступен после него.",
+  dbRunning:"Идёт переход на PostgreSQL", dbRunningN:"Магазин на минуту встанет на паузу — эта страница обновится сама.",
+  dbQueued:"Ждём, когда сервер возьмёт задание…", dbQueuedLong:"Сервер долго не берёт задание. Выполните на сервере vpn-seller postgres.",
+  dbRestart:"Магазин перезапускается…", dbFailed:"Переход не удался — магазин остался на SQLite и работает", dbReason:"Причина",
+  dbDone:"Магазин перешёл на PostgreSQL", dbDoneN:"Перенесено клиентов: {n}. Старый файл SQLite сохранён на сервере.",
+  dbOnPgT:"Всё на месте", dbOnPg:"Магазин работает на PostgreSQL. Копия базы каждый день уходит вам в Telegram — из неё магазин восстанавливается на любой сервер.",
+  dbLog:"Журнал перехода", dbStarted:"Переход запущен",
+  dbErr_already:"Магазин уже на PostgreSQL", dbErr_running:"Уже идёт обновление или переход", dbErr_no_updater:"Кнопка не настроена на сервере — выполните vpn-seller postgres",
   warm:"Прогрев", warmSub:"распродажа, уведомления, кампании", newCampaign:"Новая кампания",
   warmLead:"После установки работают только два служебных уведомления без скидок: «подписка скоро закончится» и «трафик на исходе». Всё со скидкой выключено, пока вы сами не включите. Здесь настраиваются системные уведомления и ваши рекламные кампании. Скидка из уведомления или кампании — персональная: применяется у клиента сама и сгорает после покупки или по сроку. Со скидкой распродажи она не складывается — действует большая.",
   ordersRev:"заказов: {n} · {m}", sale:"Распродажа", saleRuns:"идёт: −{p}% до {d}", noEnd:"выключения", saleOff:"не идёт", salePct:"Скидка на все тарифы, % (до {m})",
@@ -808,7 +841,7 @@ ru: {
   chAdminHint:"Добавьте бота в администраторы канала — иначе Telegram не покажет, кто подписан. Если сменили тип канала (публичный ↔ приватный), привяжите его заново.",
   chCheck:"Сохранить и проверить", chOk:"Работает: «{t}»", chAdd:"Добавить канал", chEmpty:"Каналов нет — нажмите «Добавить канал». Если каналов несколько, человек должен подписаться на каждый.", chCountN:"каналов: {n}",
   brandT:"Название", brandReset:"Сбросить название и логотип", brandResetQ:"Вернуть стандартное название и щит вместо логотипа?",
-cleanFont:"Для этого стиля поставил шрифт Golos — его можно сменить ниже", fkOdd:"Необычные", layPaper:"Газета", layPaperS:"чернила на газетной бумаге, линейки вместо карточек, тарифы — прайс с точками", layBrutal:"Брутал", layBrutalS:"толстые обводки, жёсткие тени, кнопки вдавливаются, подписи-наклейки", layTerminal:"Терминал", layTerminalS:"консоль: моноширинный шрифт, курсор, [ кнопки ] и прайс с точками", styleFont:"Для этого стиля поставил шрифт {f} — его можно сменить ниже", topT:"Шапка", topSub:"полоса сверху с логотипом и названием", topAuto:"Как в стиле", topAccent:"Цвет магазина", topCustom:"Свой цвет", topGradient:"Градиент", topImage:"Картинка", topColor:"Цвет шапки", topNoImg:"Для шапки-картинки загрузите свою картинку — ниже, в «Картинке на главной».", topHint:"Цвет надписей подбирается сам, чтобы название читалось. Верх Telegram над приложением красится так же.", artT:"Картинка на главной", artSub:"над главным экраном", artNone:"Нет", artCity:"Город", artBauhaus:"Баухаус", artContours:"Карта высот", artWaves:"Волны", artStars:"Звёздная карта", artOwn:"Своя", artUpload:"Загрузить свою", artHint:"Рисунки берут цвет магазина и меняются вместе со светлой и тёмной темой. Своя картинка — PNG, JPEG или WebP до 4 МБ; её же можно поставить в шапку.", artDone:"Картинка загружена", artGone:"Картинка удалена", btnT:"Кнопки", btnSub:"форма главных кнопок", bAuto:"Как в стиле", bKey:"Клавиша", bStamp:"Штамп", bArrow:"Со стрелкой", bNotch:"Билет", bPixel:"Пиксели", bOutline:"Двойной контур", bSample:"Продлить", hapT:"Отклик при нажатии", hapOn:"Вибрация", hapOff:"Без вибрации", hapHint:"Лёгкий толчок телефона при нажатии, как в приложениях банков. Работает в Telegram на телефоне.", enterT:"Появление", eRise:"Снизу", eSpring:"Пружина", eSlide:"Сбоку", eBlur:"Из размытия", eUnfold:"Раскрытие", enterHint:"Как блоки появляются при открытии и при смене вкладки, когда движение «Живые». Выбранное сразу проигрывается в телефоне справа.", efLeaves:"Листопад", efPetals:"Лепестки", celT:"После оплаты", celCheck:"Галочка", celConfetti:"Конфетти", celHint:"Что видит человек, когда оплата прошла. Посмотреть — кнопка «Оплата прошла» под телефоном.", hmT:"Главный экран", hmSub:"с чего начинается приложение", hmAnswer:"Ответ", hmAnswerS:"«Работает до 26 декабря», кнопка и короткий список", hmTerm:"Срок", hmTermS:"календарь до конца подписки и продление сразу", hmDevices:"Устройства", hmDevicesS:"подключённые устройства и свободные места", hmClassic:"Классика", hmClassicS:"карточка с днями и две плитки", layT:"Стиль", laySub:"фон, карточки, шрифт заголовков", layClean:"Чистый", layCleanS:"светлый, как списки Telegram; тёмный, если Telegram тёмный", layTonal:"Мягкий", layTonalS:"фон в оттенке цвета магазина, круглые кнопки — как в Android", layBrand:"Фирменный", layBrandS:"цветная шапка в цвет магазина — как в приложениях банков", layLarge:"Крупный", layLargeS:"крупный текст, контраст и большие кнопки — легко читать", layCosmos:"Космос", layCosmosS:"ночной фон с подсветкой, стеклянные карточки и цены-градиенты — как на сайтах VPN", layClassic:"Тёмная классика", layClassicS:"тёмные карточки, свои фоны и особые наборы", layOwn:"В этом стиле фон и карточки свои — эти настройки работают в «Тёмной классике».", fontT:"Шрифт", fkSans:"Простые", fkSerif:"С засечками", fkChar:"С характером", fkFun:"Для особых оформлений", fkCustom:"Свой шрифт с Google Fonts", fCustomPh:"Название, например Lobster", fCustomHint:"Любое семейство с fonts.google.com для заголовков и цифр, текст останется в Golos. Выбирайте шрифт с кириллицей.", fCustomBad:"Такого шрифта нет на Google Fonts или в нём нет кириллицы", fCustomEmpty:"Впишите название шрифта", fOnlyApp:"только в приложении", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
+cleanFont:"Для этого стиля поставил шрифт Golos — его можно сменить ниже", fkOdd:"Необычные", layPaper:"Газета", layPaperS:"чернила на газетной бумаге, линейки вместо карточек, тарифы — прайс с точками", layBrutal:"Брутал", layBrutalS:"толстые обводки, жёсткие тени, кнопки вдавливаются, подписи-наклейки", layTerminal:"Терминал", layTerminalS:"консоль: моноширинный шрифт, курсор, [ кнопки ] и прайс с точками", layTicket:"Билет", layTicketS:"посадочный талон: вырезы по краям, перфорация, цена на отрывном корешке", styleFont:"Для этого стиля поставил шрифт {f} — его можно сменить ниже", topT:"Шапка", topSub:"полоса сверху с логотипом и названием", topAuto:"Как в стиле", topAccent:"Цвет магазина", topCustom:"Свой цвет", topGradient:"Градиент", topImage:"Картинка", topColor:"Цвет шапки", topNoImg:"Для шапки-картинки загрузите свою картинку — ниже, в «Картинке на главной».", topHint:"Цвет надписей подбирается сам, чтобы название читалось. Верх Telegram над приложением красится так же.", artT:"Картинка на главной", artSub:"над главным экраном", artNone:"Нет", artCity:"Город", artBauhaus:"Баухаус", artContours:"Карта высот", artWaves:"Волны", artStars:"Звёздная карта", artPeaks:"Горы", artLighthouse:"Маяк", artPlanet:"Планета", artDunes:"Дюны", artOwn:"Своя", artUpload:"Загрузить свою", artHint:"Рисунки берут цвет магазина и меняются вместе со светлой и тёмной темой. Своя картинка — PNG, JPEG или WebP до 4 МБ; её же можно поставить в шапку.", artDone:"Картинка загружена", artGone:"Картинка удалена", btnT:"Кнопки", btnSub:"форма главных кнопок", bAuto:"Как в стиле", bKey:"Клавиша", bStamp:"Штамп", bArrow:"Со стрелкой", bNotch:"Билет", bPixel:"Пиксели", bOutline:"Двойной контур", bSample:"Продлить", hapT:"Отклик при нажатии", hapOn:"Вибрация", hapOff:"Без вибрации", hapHint:"Лёгкий толчок телефона при нажатии, как в приложениях банков. Работает в Telegram на телефоне.", enterT:"Появление", eRise:"Снизу", eSpring:"Пружина", eSlide:"Сбоку", eBlur:"Из размытия", eUnfold:"Раскрытие", enterHint:"Как блоки появляются при открытии и при смене вкладки, когда движение «Живые». Выбранное сразу проигрывается в телефоне справа.", efLeaves:"Листопад", efPetals:"Лепестки", efMeteors:"Звездопад", celT:"После оплаты", celCheck:"Галочка", celConfetti:"Конфетти", celHint:"Что видит человек, когда оплата прошла. Посмотреть — кнопка «Оплата прошла» под телефоном.", hmT:"Главный экран", hmSub:"с чего начинается приложение", hmAnswer:"Ответ", hmAnswerS:"«Работает до 26 декабря», кнопка и короткий список", hmTerm:"Срок", hmTermS:"календарь до конца подписки и продление сразу", hmDevices:"Устройства", hmDevicesS:"подключённые устройства и свободные места", hmClassic:"Классика", hmClassicS:"карточка с днями и две плитки", layT:"Стиль", laySub:"фон, карточки, шрифт заголовков", layClean:"Чистый", layCleanS:"светлый, как списки Telegram; тёмный, если Telegram тёмный", layTonal:"Мягкий", layTonalS:"фон в оттенке цвета магазина, круглые кнопки — как в Android", layBrand:"Фирменный", layBrandS:"цветная шапка в цвет магазина — как в приложениях банков", layLarge:"Крупный", layLargeS:"крупный текст, контраст и большие кнопки — легко читать", layCosmos:"Космос", layCosmosS:"ночной фон с подсветкой, стеклянные карточки и цены-градиенты — как на сайтах VPN", layClassic:"Тёмная классика", layClassicS:"тёмные карточки, свои фоны и особые наборы", layOwn:"В этом стиле фон и карточки свои — эти настройки работают в «Тёмной классике».", fontT:"Шрифт", fkSans:"Простые", fkSerif:"С засечками", fkChar:"С характером", fkFun:"Для особых оформлений", fkCustom:"Свой шрифт с Google Fonts", fCustomPh:"Название, например Lobster", fCustomHint:"Любое семейство с fonts.google.com для заголовков и цифр, текст останется в Golos. Выбирайте шрифт с кириллицей.", fCustomBad:"Такого шрифта нет на Google Fonts или в нём нет кириллицы", fCustomEmpty:"Впишите название шрифта", fOnlyApp:"только в приложении", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
   linksT:"Свои кнопки", linksSub:"в профиле клиента, до 6", linkAdd:"Добавить кнопку", linkRu:"Текст (RU)", linkEn:"Текст (EN)",
   linksEmpty:"Например: «Наш канал», «Чат клиентов», «Сайт».", linkBad:"Ссылка должна начинаться с https://, tg:// или mailto:",
   exExcel:"Excel", exOrdersT:"Заказы в Excel", exOrdersHint:"Таблица для учёта и налоговой: дата, клиент, что куплено, сумма, способ оплаты. Внизу — итог.",
@@ -1132,7 +1165,7 @@ en: {
   stArppuN:"average revenue in the period", stLtv:"LTV", stLtvN:"revenue per customer, all time", stChurn:"Churn",
   stChurnN:"ended: {n} · active: {a}",
   supWaiting:"Waiting for a support answer: {n}", supOn:"Support chat in the bot",
-  supOnHint:"Customers write to the bot or in the app — messages go to the admins; answer by replying in the bot or here.",
+  supOnHint:"Customers write in the app, or in the bot after the “Write to support” button (or /support) — plain messages to the bot are not requests. Answer by replying in the bot or here.",
   supOffNote:"The support chat is off in settings — new messages are not accepted.",
   supLast:"Last message", supMsgs:"Messages", when:"When", supNew:"waiting", supYou:"You", supThem:"Customer",
   supEmpty:"No questions yet", supBlocked:"The customer blocked the bot — the answer will not arrive.",
@@ -1207,6 +1240,30 @@ en: {
   payTestMode:"Test mode is on (PAYMENTS_TEST_MODE): every order is free.",
   payTunnel:"The shop runs through a temporary tunnel: its address changes when the server restarts, and the notification addresses in the gateways stop working. Connect a domain for gateways: vpn-seller address on the server. Telegram Stars work anyway.",
   casts:"Broadcasts", reviews:"Reviews", gifts:"Gifts", pay:"Payments", updates:"Updates", settings:"Settings", logs:"Log", look:"Look",
+  database:"Database", dbSub:"where customers, subscriptions and payments are kept", dbNow:"Now", dbWorks:"working",
+  dbSqliteN:"built in, a file on the server", dbPgN:"a separate service next to the shop",
+  dbUsers:"Customers", dbActive:"Subscribed", dbSize:"Database size", dbRam:"Server memory", dbDisk:"Free disk space",
+  dbMoveT:"Move to PostgreSQL", dbSqT:"SQLite", dbSqC:"Writes one at a time. Plenty for a start and up to ~500 paying customers.",
+  dbPgT:"PostgreSQL", dbPgC:"Serves many requests at once. For a bigger shop: payments, broadcasts and checks don't wait for each other.",
+  dbWhat:"What happens", dbStep1:"A database backup — as every day, on the server and in Telegram.",
+  dbStep2:"PostgreSQL starts next to the shop (about 100–150 MB of memory).",
+  dbStep3:"The shop pauses while the data is copied — usually under a minute. Payments are not lost: gateways send the notice again.",
+  dbStep4:"A check: the new database holds as many rows as the old one — table by table.",
+  dbStep5:"The shop starts on PostgreSQL and sends a Telegram message.",
+  dbSafe:"The old SQLite file is not changed and stays on the server. If anything goes wrong, the shop goes back to SQLite by itself and nothing is lost.",
+  dbGo:"Move to PostgreSQL", dbAsk:"Move to PostgreSQL? The shop pauses for about a minute. A database backup is made first.",
+  dbByHand:"The button works after the first update on the server. Or run there:",
+  dbRamLow:"This server has {ram} of memory. PostgreSQL works, but leaves the shop less room — 2 GB or more is better.",
+  dbRec:"{n} customers are subscribed — time to move to PostgreSQL",
+  dbRecDash:"the move is in Database",
+  dbBusyUpd:"The shop is updating right now — the move is available after that.",
+  dbRunning:"Moving to PostgreSQL", dbRunningN:"The shop pauses for a minute — this page refreshes by itself.",
+  dbQueued:"Waiting for the server to take the job…", dbQueuedLong:"The server is not taking the job. Run vpn-seller postgres on the server.",
+  dbRestart:"The shop is restarting…", dbFailed:"The move failed — the shop stayed on SQLite and works", dbReason:"Reason",
+  dbDone:"The shop moved to PostgreSQL", dbDoneN:"Customers moved: {n}. The old SQLite file is kept on the server.",
+  dbOnPgT:"All in place", dbOnPg:"The shop runs on PostgreSQL. A database backup goes to your Telegram every day — the shop restores from it onto any server.",
+  dbLog:"Log of the move", dbStarted:"The move has started",
+  dbErr_already:"The shop is on PostgreSQL already", dbErr_running:"An update or a move is already running", dbErr_no_updater:"The button is not set up on the server — run vpn-seller postgres",
   warm:"Warm-up", warmSub:"sale, notices, campaigns", newCampaign:"New campaign",
   warmLead:"After the install only two service notices without discounts work: “the subscription ends soon” and “traffic runs low”. Everything with a discount stays off until you turn it on. Set up the system notices and your own campaigns here. A discount from a notice or a campaign is personal: it applies by itself and expires after a purchase or on its date. It does not stack with the sale — the bigger one applies.",
   ordersRev:"orders: {n} · {m}", sale:"Sale", saleRuns:"running: −{p}% until {d}", noEnd:"turned off", saleOff:"not running", salePct:"Discount on every plan, % (up to {m})",
@@ -1251,7 +1308,7 @@ en: {
   chAdminHint:"Make the bot an administrator of the channel — otherwise Telegram does not tell who is subscribed. If you changed the channel type (public ↔ private), bind it again.",
   chCheck:"Save and check", chOk:"Works: “{t}”", chAdd:"Add a channel", chEmpty:"No channels — press Add a channel. With several, a person must join each of them.", chCountN:"channels: {n}",
   brandT:"Name", brandReset:"Reset name and logo", brandResetQ:"Restore the standard name and the shield instead of the logo?",
-cleanFont:"Golos is set for this style — you can change it below", fkOdd:"Unusual", layPaper:"Newspaper", layPaperS:"ink on newsprint, rules instead of cards, plans as a price list with dots", layBrutal:"Brutal", layBrutalS:"thick outlines, hard shadows, buttons that press in, sticker labels", layTerminal:"Terminal", layTerminalS:"a console: monospace, a cursor, [ buttons ] and a dotted price list", styleFont:"{f} is set for this style — you can change it below", topT:"Header", topSub:"the bar at the top with the logo and name", topAuto:"As the style", topAccent:"Shop colour", topCustom:"Own colour", topGradient:"Gradient", topImage:"Picture", topColor:"Header colour", topNoImg:"For a picture header, upload your picture below, in “Picture on home”.", topHint:"The text colour is picked for you so the name stays readable. Telegram’s own top bar takes the same colour.", artT:"Picture on home", artSub:"above the home screen", artNone:"None", artCity:"City", artBauhaus:"Bauhaus", artContours:"Contour map", artWaves:"Waves", artStars:"Star chart", artOwn:"Your own", artUpload:"Upload your own", artHint:"The drawings take your colour and follow light and dark. Your own picture: PNG, JPEG or WebP up to 4 MB; it can also go into the header.", artDone:"Picture uploaded", artGone:"Picture removed", btnT:"Buttons", btnSub:"the shape of the main buttons", bAuto:"As the style", bKey:"Key", bStamp:"Stamp", bArrow:"With an arrow", bNotch:"Ticket", bPixel:"Pixels", bOutline:"Double outline", bSample:"Renew", hapT:"Feedback on press", hapOn:"Vibration", hapOff:"No vibration", hapHint:"A light tap of the phone on presses, like banking apps. Works in Telegram on a phone.", enterT:"Entrance", eRise:"From below", eSpring:"Spring", eSlide:"From the side", eBlur:"Out of a blur", eUnfold:"Unfold", enterHint:"How the blocks come in when the app opens and on a tab switch, with lively motion. The phone on the right plays it at once.", efLeaves:"Falling leaves", efPetals:"Petals", celT:"After payment", celCheck:"A tick", celConfetti:"Confetti", celHint:"What the person sees when the payment goes through. See it with the “Payment done” button under the phone.", hmT:"Home screen", hmSub:"what the app opens with", hmAnswer:"Answer", hmAnswerS:"“Works until Dec 26”, a button and a short list", hmTerm:"Term", hmTermS:"a calendar to the end of the subscription, renewal right there", hmDevices:"Devices", hmDevicesS:"connected devices and free places", hmClassic:"Classic", hmClassicS:"a card with the days and two tiles", layT:"Style", laySub:"background, cards, heading font", layClean:"Clean", layCleanS:"light like Telegram’s lists; dark when Telegram is dark", layTonal:"Soft", layTonalS:"surfaces tinted with your colour, pill buttons — like Android", layBrand:"Brand", layBrandS:"your colour across the top — like a bank’s app", layLarge:"Large", layLargeS:"larger text, contrast and big buttons — easy to read", layCosmos:"Cosmos", layCosmosS:"a night ground lit by your colour, glass cards, gradient prices — like VPN sites", layClassic:"Dark classic", layClassicS:"dark cards, own backgrounds and special sets", layOwn:"This style has its own background and cards — these settings work in Dark classic.", fontT:"Font", fkSans:"Plain", fkSerif:"Serif", fkChar:"With character", fkFun:"For special looks", fkCustom:"Your own from Google Fonts", fCustomPh:"A name, like Lobster", fCustomHint:"Any family from fonts.google.com for headings and numbers; the text stays in Golos. Pick one with Cyrillic if you sell in Russian.", fCustomBad:"No such font on Google Fonts, or it has no Cyrillic", fCustomEmpty:"Type the name of the font", fOnlyApp:"app only", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
+cleanFont:"Golos is set for this style — you can change it below", fkOdd:"Unusual", layPaper:"Newspaper", layPaperS:"ink on newsprint, rules instead of cards, plans as a price list with dots", layBrutal:"Brutal", layBrutalS:"thick outlines, hard shadows, buttons that press in, sticker labels", layTerminal:"Terminal", layTerminalS:"a console: monospace, a cursor, [ buttons ] and a dotted price list", layTicket:"Ticket", layTicketS:"a boarding pass: notched edges, perforations, the price on a tear-off stub", styleFont:"{f} is set for this style — you can change it below", topT:"Header", topSub:"the bar at the top with the logo and name", topAuto:"As the style", topAccent:"Shop colour", topCustom:"Own colour", topGradient:"Gradient", topImage:"Picture", topColor:"Header colour", topNoImg:"For a picture header, upload your picture below, in “Picture on home”.", topHint:"The text colour is picked for you so the name stays readable. Telegram’s own top bar takes the same colour.", artT:"Picture on home", artSub:"above the home screen", artNone:"None", artCity:"City", artBauhaus:"Bauhaus", artContours:"Contour map", artWaves:"Waves", artStars:"Star chart", artPeaks:"Mountains", artLighthouse:"Lighthouse", artPlanet:"Planet", artDunes:"Dunes", artOwn:"Your own", artUpload:"Upload your own", artHint:"The drawings take your colour and follow light and dark. Your own picture: PNG, JPEG or WebP up to 4 MB; it can also go into the header.", artDone:"Picture uploaded", artGone:"Picture removed", btnT:"Buttons", btnSub:"the shape of the main buttons", bAuto:"As the style", bKey:"Key", bStamp:"Stamp", bArrow:"With an arrow", bNotch:"Ticket", bPixel:"Pixels", bOutline:"Double outline", bSample:"Renew", hapT:"Feedback on press", hapOn:"Vibration", hapOff:"No vibration", hapHint:"A light tap of the phone on presses, like banking apps. Works in Telegram on a phone.", enterT:"Entrance", eRise:"From below", eSpring:"Spring", eSlide:"From the side", eBlur:"Out of a blur", eUnfold:"Unfold", enterHint:"How the blocks come in when the app opens and on a tab switch, with lively motion. The phone on the right plays it at once.", efLeaves:"Falling leaves", efPetals:"Petals", efMeteors:"Falling stars", celT:"After payment", celCheck:"A tick", celConfetti:"Confetti", celHint:"What the person sees when the payment goes through. See it with the “Payment done” button under the phone.", hmT:"Home screen", hmSub:"what the app opens with", hmAnswer:"Answer", hmAnswerS:"“Works until Dec 26”, a button and a short list", hmTerm:"Term", hmTermS:"a calendar to the end of the subscription, renewal right there", hmDevices:"Devices", hmDevicesS:"connected devices and free places", hmClassic:"Classic", hmClassicS:"a card with the days and two tiles", layT:"Style", laySub:"background, cards, heading font", layClean:"Clean", layCleanS:"light like Telegram’s lists; dark when Telegram is dark", layTonal:"Soft", layTonalS:"surfaces tinted with your colour, pill buttons — like Android", layBrand:"Brand", layBrandS:"your colour across the top — like a bank’s app", layLarge:"Large", layLargeS:"larger text, contrast and big buttons — easy to read", layCosmos:"Cosmos", layCosmosS:"a night ground lit by your colour, glass cards, gradient prices — like VPN sites", layClassic:"Dark classic", layClassicS:"dark cards, own backgrounds and special sets", layOwn:"This style has its own background and cards — these settings work in Dark classic.", fontT:"Font", fkSans:"Plain", fkSerif:"Serif", fkChar:"With character", fkFun:"For special looks", fkCustom:"Your own from Google Fonts", fCustomPh:"A name, like Lobster", fCustomHint:"Any family from fonts.google.com for headings and numbers; the text stays in Golos. Pick one with Cyrillic if you sell in Russian.", fCustomBad:"No such font on Google Fonts, or it has no Cyrillic", fCustomEmpty:"Type the name of the font", fOnlyApp:"app only", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
   linksT:"Own buttons", linksSub:"in the customer's profile, up to 6", linkAdd:"Add a button", linkRu:"Text (RU)", linkEn:"Text (EN)",
   linksEmpty:"For example: “Our channel”, “Customer chat”, “Website”.", linkBad:"A link must start with https://, tg:// or mailto:",
   exExcel:"Excel", exOrdersT:"Orders to Excel", exOrdersHint:"A table for bookkeeping and taxes: date, customer, what was bought, amount, payment method. A total at the bottom.",
@@ -1647,7 +1704,7 @@ function logout(){
 const PAGES = [
   ["dash", "i-grid"], ["setup", "i-flag"], ["stats", "i-chart"], ["sep", "secSales"], ["orders", "i-card"], ["sources", "i-link"], ["plans", "i-tag"], ["warm", "i-flame"], ["promos", "i-ticket"],
   ["gifts", "i-gift"], ["sep", "secPeople"], ["users", "i-users"], ["support", "i-chat"], ["refs", "i-share"], ["casts", "i-send"], ["reviews", "i-star"],
-  ["sep", "secSystem"], ["servers", "i-server"], ["pay", "i-coin"], ["look", "i-palette"], ["docs", "i-doc"], ["settings", "i-gear"], ["updates", "i-refresh"], ["alarm", "i-alert"], ["team", "i-users"], ["logs", "i-list"],
+  ["sep", "secSystem"], ["servers", "i-server"], ["pay", "i-coin"], ["look", "i-palette"], ["docs", "i-doc"], ["settings", "i-gear"], ["updates", "i-refresh"], ["database", "i-db"], ["alarm", "i-alert"], ["team", "i-users"], ["logs", "i-list"],
 ];
 let page = "dash", badges = {};
 /* Which section each page belongs to: a team member sees only theirs (the
@@ -1703,7 +1760,7 @@ function route(){
   ({ dash:pDash, users:pUsers, orders:pOrders, plans:pPlans, promos:pPromos, gifts:pGifts, servers:pServers,
      casts:pCasts, reviews:pReviews, look:pLook, settings:pSettings, logs:pLogs, warm:pWarm, refs:pRefs,
      stats:pStats, support:pSupport, setup:pSetup, docs:pDocs, sources:pSources, alarm:pAlarm, team:pTeam, pay:pPay,
-     updates:pUpdates }[page])();
+     updates:pUpdates, database:pDatabase }[page])();
 }
 window.addEventListener("hashchange", route);
 
@@ -1748,7 +1805,7 @@ async function pDash(){
   const totalPlans = d.plans.reduce((a, p) => a + p.count, 0);
   const pct = v => v == null ? "—" : `${v.toLocaleString(undefined, { maximumFractionDigits:1 })}%`;
   $("content").innerHTML = `
-    <div id="dashUpd"></div>
+    <div id="dashUpd"></div><div id="dashDb"></div>
     ${setupCard(d)}
     ${d.problems.filter(p => !(d.setup && !d.setup_hidden && p.code === "no_servers")).map(problem).join("")}
     ${d.stuck_orders ? `<div class="alert y">${ic("i-alert")}<span>${esc(t("stuck", { n:d.stuck_orders }))}</span></div>` : ""}
@@ -1785,6 +1842,7 @@ async function pDash(){
       </div>
     </div>`;
   dashUpdate();
+  dashDatabase();
 }
 /* Revenue by day as a smooth area: the line, a soft fill under it, a dot on
    the last day; every day can be hovered for its sum. */
@@ -3708,7 +3766,7 @@ async function pLook(){
         <div class="hint" id="motionHint"></div></div>
       <div class="field"><label>${esc(t("enterT"))}</label>${tabsOf("enterTabs", "enter", [["rise", "eRise"], ["spring", "eSpring"], ["slide", "eSlide"], ["blur", "eBlur"], ["unfold", "eUnfold"]])}
         <div class="hint">${esc(t("enterHint"))}</div></div>
-      <div class="field"><label>${esc(t("effectT"))}</label>${tabsOf("effectTabs", "effect", [["none", "efNone"], ["snow", "efSnow"], ["leaves", "efLeaves"], ["petals", "efPetals"]])}
+      <div class="field"><label>${esc(t("effectT"))}</label>${tabsOf("effectTabs", "effect", [["none", "efNone"], ["snow", "efSnow"], ["leaves", "efLeaves"], ["petals", "efPetals"], ["meteors", "efMeteors"]])}
         <div class="hint">${esc(t("effectHint"))}</div></div>
       <div class="field"><label>${esc(t("celT"))}</label>${tabsOf("celTabs", "celebrate", [["check", "celCheck"], ["confetti", "celConfetti"]])}
         <div class="hint">${esc(t("celHint"))}</div></div>
@@ -3867,7 +3925,7 @@ function curColors(){
 // gothic, the terminal with a dot-matrix face. Only the default font or one
 // a style put there is replaced; a font the owner picked stays.
 const STYLE_FONT = { clean:"golos", tonal:"golos", brand:"golos", large:"golos", cosmos:"golos",
-                     paper:"oldstandard", brutal:"dela", terminal:"dotgothic" };
+                     paper:"oldstandard", brutal:"dela", terminal:"dotgothic", ticket:"plexmono" };
 function setLook(key, v){
   LOOK[key] = v;
   if (key === "hapticsV") LOOK.haptics = v === "1";
@@ -3968,6 +4026,11 @@ function styleThumb(k, hex){
     <i style="left:6px;right:6px;top:30px;height:48px;border:1px dashed color-mix(in srgb,${hex} 55%,transparent)"></i>
     ${[38, 52, 66].map(y => `<i style="left:12px;top:${y}px;width:22px;height:5px;background:color-mix(in srgb,${hex} 45%,#ECEFEA)"></i><i style="left:38px;right:32px;top:${y + 2}px;border-top:2px dotted color-mix(in srgb,${hex} 35%,transparent)"></i><i style="right:12px;top:${y}px;width:16px;height:5px;background:${hex}"></i>`).join("")}
     <i style="left:6px;right:6px;top:88px;height:16px;background:${hex}"></i><i style="left:6px;right:6px;top:110px;height:14px;border:1px dashed color-mix(in srgb,${hex} 55%,transparent)"></i></span>`;
+  if (k === "ticket") return `<span class="ph" style="background:#0D0F12">
+    <i style="left:8px;top:10px;width:58px;height:8px;background:#EEF0F3;border-radius:2px"></i>
+    <i style="left:6px;right:6px;top:24px;height:44px;background:#1A1D22;border-radius:8px;-webkit-mask:radial-gradient(circle 5px at 0 50%,#0000 94%,#000) 0 0/51% 100% no-repeat,radial-gradient(circle 5px at 100% 50%,#0000 94%,#000) 100% 0/51% 100% no-repeat"></i>
+    <i style="left:14px;right:14px;top:56px;border-top:1.5px dashed #ffffff40"></i>
+    ${[76, 100].map((y, n) => `<i style="left:6px;right:6px;top:${y}px;height:20px;background:${n ? "#1A1D22" : `color-mix(in srgb,${hex} 18%,#1A1D22)`};border-radius:6px;-webkit-mask:radial-gradient(circle 4px at 0 50%,#0000 94%,#000) 0 0/51% 100% no-repeat,radial-gradient(circle 4px at 100% 50%,#0000 94%,#000) 100% 0/51% 100% no-repeat"></i><i style="left:12px;top:${y + 7}px;width:30px;height:6px;background:#AEB4BD;border-radius:1px"></i><i style="right:30px;top:${y + 3}px;height:14px;border-left:1.5px dashed ${n ? "#ffffff40" : hex}"></i><i style="right:10px;top:${y + 7}px;width:14px;height:6px;background:${n ? "#EEF0F3" : hex};border-radius:1px"></i>`).join("")}</span>`;
   if (k === "cosmos") return `<span class="ph" style="background:radial-gradient(90% 55% at 50% 0%,${hex}77,transparent 65%),radial-gradient(70% 40% at 0% 100%,#EC489944,transparent 60%),#0A0513">
     <i style="left:8px;top:10px;width:62px;height:9px;background:#fff;border-radius:2px"></i>
     <i style="left:6px;right:6px;top:26px;height:50px;border-radius:10px;border:1px solid ${hex}55;background:linear-gradient(160deg,${hex}44,#140C26DD);overflow:hidden"></i>
@@ -4070,6 +4133,75 @@ function artSvg(kind){
     pts.forEach(([x, y], i) => { if (i !== 5) g += `<circle cx="${x}" cy="${y}" r="${i % 3 ? 2.1 : 2.8}" ${f("var(--txt)")}/>`; });
     const [sx, sy] = pts[5];
     g += `<path d="M${sx} ${sy - 11}Q${sx + 1.6} ${sy - 1.6} ${sx + 11} ${sy}Q${sx + 1.6} ${sy + 1.6} ${sx} ${sy + 11}Q${sx - 1.6} ${sy + 1.6} ${sx - 11} ${sy}Q${sx - 1.6} ${sy - 1.6} ${sx} ${sy - 11}Z" ${f("var(--sig)")}/>`;
+  } else if (kind === "peaks"){
+    // mountains at dusk: three ridges going darker towards us, a full moon, the far ridge lit along its edge
+    g += `<defs><linearGradient id="arSkyP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${mix("var(--sig)", 10, "var(--ground)")}"/><stop offset=".5" style="stop-color:${mix("var(--sig)", 55, "var(--ground)")}"/></linearGradient></defs>`;
+    g += `<rect width="${W}" height="${H}" fill="url(#arSkyP)"/>`;
+    for (let i = 0; i < 30; i++) g += `<circle class="ar-st" cx="${(r() * W).toFixed(1)}" cy="${(r() * 54).toFixed(1)}" r="${(.4 + r() * 1).toFixed(2)}" ${f("var(--txt)")}/>`;
+    g += `<circle class="ar-mn" cx="300" cy="26" r="12" ${f("var(--txt)", ";opacity:.92")}/>`;
+    const ridge = (base, amp, step, fill, edge) => {
+      let x = -10, d = `M-10 ${H}L-10 ${base}`, top = "";
+      while (x < W + 10){
+        x += step * (.6 + r() * .8);
+        const y = base - amp * (.25 + r() * .75);
+        d += `L${x.toFixed(1)} ${y.toFixed(1)}`;
+        top += (top ? "L" : "M") + `${x.toFixed(1)} ${y.toFixed(1)}`;
+      }
+      g += `<path d="${d}L${W + 10} ${H}Z" ${f(fill)}/>`;
+      if (edge) g += `<path d="${top}" style="fill:none;stroke:var(--sig);stroke-width:1.3;opacity:.7;stroke-linejoin:round"/>`;
+    };
+    ridge(80, 46, 34, mix("var(--sig)", 15, "var(--ground)"), true);
+    ridge(104, 34, 26, mix("var(--sig)", 7, "var(--ground)"), false);
+    ridge(124, 20, 20, "var(--ground)", false);
+  } else if (kind === "lighthouse"){
+    // a lighthouse on a rock; its beam in the accent sweeps over a lined sea
+    g += `<defs><linearGradient id="arSkyL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${mix("var(--sig)", 22, "var(--ground)")}"/><stop offset="1" style="stop-color:${mix("var(--sig)", 8, "var(--ground)")}"/></linearGradient>
+      <linearGradient id="arBeam" x1="1" y1="0" x2="0" y2="0"><stop offset="0" style="stop-color:var(--sig);stop-opacity:.55"/><stop offset="1" style="stop-color:var(--sig);stop-opacity:0"/></linearGradient></defs>`;
+    g += `<rect width="${W}" height="${H}" fill="url(#arSkyL)"/>`;
+    for (let i = 0; i < 34; i++) g += `<circle class="ar-st" cx="${(r() * W).toFixed(1)}" cy="${(r() * 84).toFixed(1)}" r="${(.4 + r() * .9).toFixed(2)}" ${f("var(--txt)")}/>`;
+    g += `<path d="M276 40L-20 6L-20 74Z" fill="url(#arBeam)"/>`;
+    g += `<rect y="94" width="${W}" height="${H - 94}" ${f(mix("var(--sig)", 10, "var(--ground)"))}/>`;
+    for (let y = 99, k = 0; y < H; y += 6, k++){
+      for (let x = (k % 2) * 13 - 8; x < W; x += 26 + r() * 22){
+        const w = 6 + r() * 16;
+        g += `<path d="M${x.toFixed(1)} ${y}h${w.toFixed(1)}" style="stroke:${x < 250 && y < 116 ? "var(--sig)" : mix("var(--txt)", 30, "transparent")};stroke-width:1.2;stroke-linecap:round;opacity:${x < 250 && y < 116 ? .55 : 1}"/>`;
+      }
+    }
+    g += `<path d="M232 ${H}C238 108 252 96 270 94C292 92 306 100 316 110C324 118 330 126 334 ${H}Z" ${f("var(--ground)")}/>`;
+    g += `<path d="M266 96L270 46H282L286 96Z" ${f("var(--txt)")}/>`;
+    for (const y of [56, 72, 86]) g += `<path d="M${(269.4 - (y - 46) * .02).toFixed(1)} ${y}H${(282.6 + (y - 46) * .02).toFixed(1)}V${y + 6}H${(269 - (y - 46) * .02).toFixed(1)}Z" ${f("var(--sig)")}/>`;
+    g += `<rect x="268" y="38" width="16" height="8" ${f("var(--sig)")}/><path d="M266 38L276 30L286 38Z" ${f("var(--txt)")}/>`;
+    g += `<rect x="266" y="45" width="20" height="2" ${f("var(--txt)")}/>`;
+  } else if (kind === "planet"){
+    // a ringed planet rising at the right: banded, the ring passing behind and in front of it
+    g += `<defs><clipPath id="arPl"><circle cx="262" cy="118" r="76"/></clipPath></defs>`;
+    g += `<rect width="${W}" height="${H}" ${f("var(--card-2)")}/>`;
+    for (let i = 0; i < 52; i++) g += `<circle cx="${(r() * W).toFixed(1)}" cy="${(r() * H).toFixed(1)}" r="${(.35 + r() * .9).toFixed(2)}" ${f("var(--txt)", ";opacity:.55")}/>`;
+    const ring = (half) => `<path d="M${262 - 128} 118A128 30 -14 0 ${half} ${262 + 128} 118" transform="rotate(-14 262 118)" style="fill:none;stroke:var(--sig);stroke-width:5;opacity:.85"/>
+      <path d="M${262 - 112} 118A112 24 -14 0 ${half} ${262 + 112} 118" transform="rotate(-14 262 118)" style="fill:none;stroke:${mix("var(--sig)", 55, "transparent")};stroke-width:2"/>`;
+    g += ring(1);
+    g += `<circle cx="262" cy="118" r="76" ${f(mix("var(--sig)", 34, "var(--card-2)"))}/>`;
+    g += `<g clip-path="url(#arPl)">`;
+    [[64, 8, 22], [82, 5, 30], [100, 11, 18], [124, 6, 26], [140, 9, 14]].forEach(([y, h, p]) =>
+      g += `<rect x="180" y="${y}" width="170" height="${h}" ${f(mix("var(--sig)", 34 + p, "var(--card-2)"))}/>`);
+    g += `<circle cx="300" cy="98" r="78" ${f("var(--card-2)", ";opacity:.38")}/></g>`;
+    g += ring(0);
+    g += `<circle class="ar-mn" cx="70" cy="38" r="10" ${f("var(--txt)", ";opacity:.9")}/>`;
+    g += `<circle cx="67" cy="35" r="2.2" ${f("var(--card-2)", ";opacity:.35")}/><circle cx="73" cy="42" r="1.6" ${f("var(--card-2)", ";opacity:.35")}/>`;
+  } else if (kind === "dunes"){
+    // dunes under a low sun: each dune lit on one side, its crest a clean line
+    g += `<rect width="${W}" height="${H}" ${f(mix("var(--sig)", 14, "var(--card-2)"))}/>`;
+    g += `<circle cx="252" cy="58" r="26" ${f("var(--sig)")}/>`;
+    for (let i = 0; i < 4; i++) g += `<rect x="220" y="${62 + i * 7}" width="66" height="${1.4 + i * .9}" ${f(mix("var(--sig)", 14, "var(--card-2)"))}/>`;
+    const dune = (y0, a, ph, len, dark, lit) => {
+      let top = "";
+      for (let x = -10; x <= W + 10; x += 6) top += (x === -10 ? "M" : "L") + `${x} ${(y0 + Math.sin(x / len + ph) * a + Math.sin(x / (len * .43) + ph * 2) * a * .3).toFixed(1)}`;
+      g += `<path d="${top}L${W + 10} ${H}L-10 ${H}Z" ${f(dark)}/>`;
+      g += `<path d="${top}" style="fill:none;stroke:${lit};stroke-width:1.4"/>`;
+    };
+    dune(82, 9, 1.2, 48, mix("var(--sig)", 30, "var(--card-2)"), mix("var(--sig)", 70, "var(--card-2)"));
+    dune(100, 8, 3.1, 40, mix("var(--sig)", 20, "var(--card-2)"), mix("var(--sig)", 55, "var(--card-2)"));
+    dune(118, 6, 4.4, 34, "var(--card-2)", mix("var(--sig)", 40, "var(--card-2)"));
   }
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${g}</svg>`;
 }
@@ -4092,7 +4224,7 @@ function drawOpts(){
   $("homeOpts").innerHTML = [["answer", "hmAnswer"], ["term", "hmTerm"], ["devices", "hmDevices"], ["classic", "hmClassic"]].map(([k, l]) =>
     `<button class="th lay ${LOOK.home === k ? "on" : ""}" onclick="setLook('home','${k}')">${homeThumb(k, hex)}<b>${esc(t(l))}</b><small>${esc(t(l + "S"))}</small></button>`).join("");
   $("layOpts").innerHTML = [["clean", "layClean"], ["tonal", "layTonal"], ["brand", "layBrand"], ["large", "layLarge"], ["cosmos", "layCosmos"],
-    ["paper", "layPaper"], ["brutal", "layBrutal"], ["terminal", "layTerminal"], ["classic", "layClassic"]].map(([k, l]) =>
+    ["paper", "layPaper"], ["brutal", "layBrutal"], ["terminal", "layTerminal"], ["ticket", "layTicket"], ["classic", "layClassic"]].map(([k, l]) =>
     `<button class="th lay ${LOOK.layout === k ? "on" : ""}" onclick="setLook('layout','${k}')">${styleThumb(k, hex)}<b>${esc(t(l))}</b><small>${esc(t(l + "S"))}</small></button>`).join("");
   const own = LOOK.layout !== "classic";
   $("bdOwn").hidden = !own; $("bdBody").classList.toggle("dimmed", own);
@@ -4103,7 +4235,7 @@ function drawOpts(){
     `<button class="th opt ${LOOK.backdrop === k ? "on" : ""}" onclick="setLook('backdrop','${k}')">
       <span class="sw" style="background:${bdCss(k, rgb, ground)}"></span><b>${esc(t(l))}</b></button>`).join("");
   $("motionHint").textContent = t("mHint_" + LOOK.motion);
-  $("artOpts").innerHTML = [["none", "artNone"], ["city", "artCity"], ["bauhaus", "artBauhaus"], ["contours", "artContours"], ["waves", "artWaves"], ["stars", "artStars"], ["own", "artOwn"]].map(([k, l]) =>
+  $("artOpts").innerHTML = [["none", "artNone"], ["city", "artCity"], ["bauhaus", "artBauhaus"], ["contours", "artContours"], ["waves", "artWaves"], ["stars", "artStars"], ["peaks", "artPeaks"], ["lighthouse", "artLighthouse"], ["planet", "artPlanet"], ["dunes", "artDunes"], ["own", "artOwn"]].map(([k, l]) =>
     `<button class="th opt ${LOOK.art === k ? "on" : ""}" onclick="${k === "own" && !LOOK.artImage ? "$('artIn').click()" : `setLook('art','${k}')`}">${artThumb(k, hex)}<b>${esc(t(l))}</b></button>`).join("");
   $("btnOpts").innerHTML = [["auto", "bAuto"], ["key", "bKey"], ["stamp", "bStamp"], ["arrow", "bArrow"], ["notch", "bNotch"], ["pixel", "bPixel"], ["outline", "bOutline"]].map(([k, l]) =>
     `<button class="th opt ${LOOK.buttons === k ? "on" : ""}" onclick="setLook('buttons','${k}')">${btnThumb(k, hex)}<b>${esc(t(l))}</b></button>`).join("");
@@ -4579,6 +4711,108 @@ async function dashUpdate(){
   if (!box) return;
   if (d.available) box.innerHTML = `<a class="alert y" href="#updates" style="text-decoration:none">${ic("i-upload")}<span><b>${esc(t("updAvail", { v:d.latest }))}</b> · ${esc(t("updDashN"))} →</span></a>`;
   else if (d.fresh.length) box.innerHTML = `<a class="alert y" href="#updates" style="text-decoration:none">${ic("i-check2")}<span><b>${esc(t("updDone", { v:d.current }))}</b> · ${esc(t("updDashFresh"))} →</span></a>`;
+}
+
+/* ============================ database ============================ */
+// SQLite or PostgreSQL, and the move to PostgreSQL at any time. As with
+// updates, the panel only asks: install.sh moves the data on the server and
+// writes how it goes (data/db.status); this page follows it.
+let DBV = null, DB_POLL = 0, DB_KIND = "";
+const DB_NAME = { sqlite:"SQLite", postgresql:"PostgreSQL" };
+function fmtBytes(b){
+  const u = LANG === "ru" ? ["Б", "КБ", "МБ", "ГБ", "ТБ"] : ["B", "KB", "MB", "GB", "TB"];
+  let i = 0; b = Number(b) || 0;
+  while (b >= 1024 && i < u.length - 1){ b /= 1024; i++; }
+  return b.toLocaleString(LANG === "ru" ? "ru-RU" : "en-US", { maximumFractionDigits: i >= 2 ? 1 : 0 }) + " " + u[i];
+}
+const fmtMem = mb => mb ? fmtBytes(mb * 1024 * 1024) : "—";
+async function pDatabase(){
+  head(t("database"), t("dbSub"), `<button class="btn ghost sm" onclick="pDatabase()">${ic("i-refresh", "xs")}${esc(t("refresh"))}</button>`);
+  let d;
+  try { d = await api("/database"); } catch (e){ return fail(e); }
+  DB_KIND = d.kind;
+  drawDatabase(d);
+}
+function dbBusy(d){ const st = d.status; return !!(st && st.state === "running" && Date.now() / 1000 - st.at < 1800); }
+function drawDatabase(d){
+  DBV = d;
+  const st = d.status, busy = dbBusy(d), queued = !!d.requested_at && !busy;
+  const waitLong = queued && Date.now() / 1000 - d.requested_at > 150;
+  const recent = st && Date.now() / 1000 - st.at < 3 * 86400;
+  const sq = d.kind === "sqlite";
+  const n = v => Number(v || 0).toLocaleString(LANG === "ru" ? "ru-RU" : "en-US");
+  const steps = ["dbStep1", "dbStep2", "dbStep3", "dbStep4", "dbStep5"].map(k => `<li>${esc(t(k))}</li>`).join("");
+  const action = !d.updater
+    ? `<div class="hint" style="margin:0">${esc(t("dbByHand"))}</div><div class="keybox" style="margin-top:6px"><span class="mono">vpn-seller postgres</span><button class="copy" onclick="copy('vpn-seller postgres')" aria-label="copy">${ic("i-copy", "xs")}</button></div>`
+    : `<button class="btn" id="dbGo" onclick="dbRun(this)" ${busy || queued || d.update_busy ? "disabled" : ""}>${ic("i-db", "xs")}${esc(t("dbGo"))}</button>
+       ${d.update_busy && !busy ? `<div class="hint">${esc(t("dbBusyUpd"))}</div>` : ""}`;
+  $("content").innerHTML = `
+    ${busy ? `<div class="alert y updrun">${ic("i-sync")}<span><b>${esc(t("dbRunning"))}</b><br>${esc(t("dbRunningN"))}</span></div>` : ""}
+    ${queued ? `<div class="alert y updrun">${ic("i-sync")}<span><b>${esc(t("dbQueued"))}</b>${waitLong ? `<br>${esc(t("dbQueuedLong"))}` : ""}</span></div>` : ""}
+    ${!busy && recent && st.state === "failed" && sq ? `<div class="alert r">${ic("i-alert")}<span><b>${esc(t("dbFailed"))}</b><br>${esc(t("dbReason"))}: ${esc(st.reason || "—")}</span></div>` : ""}
+    ${!busy && recent && st.state === "ok" && !sq ? `<div class="card updok"><h3>${ic("i-check2", "")} ${esc(t("dbDone"))}</h3><div class="hint" style="margin:0;font-size:12.5px">${esc(t("dbDoneN", { n:n(st.users) }))}</div></div>` : ""}
+    ${d.recommend && !busy && !queued ? `<div class="alert y">${ic("i-activity")}<span><b>${esc(t("dbRec", { n:n(d.active) }))}</b></span></div>` : ""}
+    <div class="grid g2" style="align-items:start"><div>
+      <div class="card"><h3>${esc(t("dbNow"))}<span class="tag g"><i class="d"></i>${esc(t("dbWorks"))}</span></h3>
+        <div class="dbnow"><div class="updcur">${esc(DB_NAME[d.kind] || d.kind)}</div><small>${esc(t(sq ? "dbSqliteN" : "dbPgN"))}</small></div>
+        <div class="rows">
+          <div class="r"><span>${esc(t("dbUsers"))}</span><b>${n(d.users)}</b></div>
+          <div class="r"><span>${esc(t("dbActive"))}</span><b>${n(d.active)}</b></div>
+          <div class="r"><span>${esc(t("dbSize"))}</span><b>${d.size ? esc(fmtBytes(d.size)) : "—"}</b></div>
+          <div class="r"><span>${esc(t("dbRam"))}</span><b>${esc(fmtMem(d.ram_mb))}</b></div>
+          <div class="r"><span>${esc(t("dbDisk"))}</span><b>${d.disk_free ? esc(fmtBytes(d.disk_free)) : "—"}</b></div>
+        </div>
+      </div>
+      ${st && st.log ? `<details class="foldbox" style="margin-top:14px"><summary>${esc(t("dbLog"))} · ${esc(dtime(st.at))}</summary><pre class="updlog mono">${esc(st.log)}</pre></details>` : ""}
+    </div><div>
+      ${sq ? `<div class="card"><h3>${esc(t("dbMoveT"))}</h3>
+        <div class="dbcmp">
+          <div><b>${esc(t("dbSqT"))}</b><span>${esc(t("dbSqC"))}</span></div>
+          <div class="on"><b>${esc(t("dbPgT"))}</b><span>${esc(t("dbPgC"))}</span></div>
+        </div>
+        ${d.ram_ok ? "" : `<div class="alert y">${ic("i-alert")}<span>${esc(t("dbRamLow", { ram:fmtMem(d.ram_mb) }))}</span></div>`}
+        <div class="rt" style="font-weight:600;font-size:13px">${esc(t("dbWhat"))}</div>
+        <ol class="how">${steps}</ol>
+        <div style="margin-top:4px">${action}</div>
+        <div class="hint" style="margin-top:10px">${esc(t("dbSafe"))}</div>
+      </div>`
+      : `<div class="card"><h3>${esc(t("dbOnPgT"))}</h3><div class="hint" style="margin:0;font-size:12.5px">${esc(t("dbOnPg"))}</div></div>`}
+    </div></div>`;
+  clearTimeout(DB_POLL);
+  if (busy || queued) DB_POLL = setTimeout(dbPoll, 3000);
+}
+async function dbPoll(){
+  if (page !== "database") return;
+  let d;
+  try { d = await api("/database"); }
+  catch (e){                                   // the shop is paused or restarting: keep asking
+    const box = document.querySelector(".updrun span");
+    if (box) box.innerHTML = `<b>${esc(t("dbRestart"))}</b><br>${esc(t("dbRunningN"))}`;
+    DB_POLL = setTimeout(dbPoll, 3000);
+    return;
+  }
+  if (DB_KIND && d.kind !== DB_KIND){ toast(t("dbDone")); DB_KIND = d.kind; }
+  drawDatabase(d);
+}
+async function dbRun(btn){
+  if (!(await ask(t("dbAsk")))) return;
+  btn.disabled = true;
+  try { drawDatabase(await api("/database/postgres", { method:"POST" })); toast(t("dbStarted")); }
+  catch (e){
+    const code = String((e && e.message) || "");
+    const known = ["already", "running", "no_updater"].find(k => code.includes(k));
+    toast(known ? t("dbErr_" + known) : code, true);
+    btn.disabled = false;
+  }
+}
+// The overview: one line when the shop has grown past SQLite (the owner only).
+async function dashDatabase(){
+  if (!WHO || !WHO.owner) return;
+  let d;
+  try { d = await api("/database"); } catch (e){ return; }
+  const box = $("dashDb");
+  if (!box || !d.recommend) return;
+  box.innerHTML = `<a class="alert y" href="#database">${ic("i-db")}<span><b>${esc(t("dbRec", { n:Number(d.active).toLocaleString(LANG === "ru" ? "ru-RU" : "en-US") }))}</b> · ${esc(t("dbRecDash"))} →</span></a>`;
 }
 
 /* ============================ log ============================ */

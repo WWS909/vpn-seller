@@ -41,6 +41,27 @@ def init_engine(url: str | None = None):
     return engine
 
 
+def wait_ready(seconds: float = 90) -> None:
+    """PostgreSQL starts next to the shop and may answer a little later:
+    wait for it instead of failing the start. SQLite is always ready."""
+    import time
+
+    from sqlalchemy import text
+    from sqlalchemy.exc import OperationalError
+    if engine.dialect.name == "sqlite":
+        return
+    end = time.monotonic() + seconds
+    while True:
+        try:
+            with engine.connect() as c:
+                c.execute(text("SELECT 1"))
+            return
+        except OperationalError:
+            if time.monotonic() >= end:
+                raise
+            time.sleep(2)
+
+
 def create_all() -> None:
     from . import models  # noqa: F401  — registers tables
     Base.metadata.create_all(bind=engine)

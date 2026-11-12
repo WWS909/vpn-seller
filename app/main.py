@@ -66,6 +66,7 @@ def seed(db: Session) -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     dbmod.init_engine()
+    dbmod.wait_ready()                 # PostgreSQL may start a few seconds after the shop
     dbmod.create_all()
     from . import migrate
     migrate.run(dbmod.engine)          # columns added by newer versions

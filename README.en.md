@@ -36,9 +36,9 @@ wget -qO install.sh https://raw.githubusercontent.com/WWS909/vpn-seller/main/ins
 | Look | — | 3 home screens and 9 styles, header and home picture, your colour, logo, 50 fonts, 13 icon styles, 7 button shapes, opening screen |
 | Install and updates | by hand | one command, a guided installer, a new version from GitHub in one click |
 
-### Installing — five questions
+### Installing — six questions
 
-The installer asks for the bot token, your Telegram ID (it can find it itself), the address, a password and the currency. Everything else — Docker, HTTPS, the bot webhook, the "Open" button — is set up for you.
+The installer asks for the bot token, your Telegram ID (it can find it itself), the address, a password, the currency and the database. Everything else — Docker, HTTPS, the bot webhook, the "Open" button — is set up for you.
 
 <table>
 <tr>
@@ -211,13 +211,14 @@ wget -qO install.sh https://raw.githubusercontent.com/WWS909/vpn-seller/main/ins
 
 or `curl -fsSL https://raw.githubusercontent.com/WWS909/vpn-seller/main/install.sh | sudo bash -s -- --en`.
 
-A menu opens, then five questions right in the terminal:
+A menu opens, then six questions right in the terminal:
 
 1. **Bot token** — checked with Telegram at once.
 2. **Your Telegram ID** — the installer can detect it: you send the bot any message.
 3. **Address** — your domain or a temporary Cloudflare address.
 4. **Admin password** — press Enter and a strong one is generated.
 5. **Currency** of prices.
+6. **Database** — SQLite (built in) or PostgreSQL (for a bigger shop). The installer looks at the server's memory and suggests one: PostgreSQL from 2 GB.
 
 The rest is automatic: Docker, the code, `.env` (mode 600), HTTPS, start, linking the bot (webhook and the Open button). At the end: the admin address, the password and what to do next.
 
@@ -336,7 +337,9 @@ When no panel answers (a restart, an outage), the subscription answers 503 inste
 
 ## Support in the bot
 
-Anything a customer writes to the bot (except commands) and questions from the app's Support section go to every admin in `ADMIN_TELEGRAM_IDS` — with the name, ID, subscription and a "Customer card" button. Photos, files and voice messages are passed on as they are. To answer, just **reply to that message** in the bot — the customer gets the answer from the bot and sees it in the app. The whole conversation is in the panel → Support, where you can answer too; waiting threads are marked and shown in the bot's `/admin` menu.
+Questions from the app's Support section and from the bot go to every admin in `ADMIN_TELEGRAM_IDS` — with the name, ID, subscription and a "Customer card" button. Photos, files and voice messages are passed on as they are. To answer, just **reply to that message** in the bot — the customer gets the answer from the bot and sees it in the app. The whole conversation is in the panel → Support, where you can answer too; waiting threads are marked and shown in the bot's `/admin` menu.
+
+**Plain messages to the bot are not requests.** The bot answers them once a minute: "messages are not read here" and two buttons — Open (the app) and "Write to support". Only after that button or the `/support` command do messages go to support: the chat stays open 30 minutes after the customer's last message and 12 hours after support answers (the customer can just reply). Closing the thread in the panel closes the chat in the bot too.
 
 Turned off in Settings → "Support chat in the bot" (then the Support button leads to the contact from settings). Flood protection: 20 messages an hour.
 
@@ -528,7 +531,17 @@ For a private repository put a GitHub token that can read it into `.env`: `GITHU
 
 By hand without the menu: `git pull && docker compose up -d --build`. New database columns are added automatically on start.
 
-The default database is SQLite, enough for thousands of customers. For PostgreSQL, uncomment the `db` service in `docker-compose.yml` and set `DATABASE_URL` in `.env`.
+### Database: SQLite or PostgreSQL
+
+| | SQLite | PostgreSQL |
+|---|---|---|
+| What it is | the file `data/vpn.db` inside the shop | a separate service next to the shop |
+| Memory | nothing extra | about 100–150 MB |
+| Good for | a start, up to ~500 paying customers | a bigger shop: payments, broadcasts and checks don't wait for each other |
+
+You choose on install. You can move from SQLite to PostgreSQL **at any time**: admin → Database → Move to PostgreSQL (or `vpn-seller` → Move to PostgreSQL, or `vpn-seller postgres`). The panel tells you when the shop has grown enough.
+
+How the move goes: a backup → PostgreSQL starts → the shop pauses while the data is copied (usually under a minute) → the rows are counted table by table in the new database → the shop starts on PostgreSQL and messages the owner in Telegram. The SQLite file is only read and stays on the server (`data/vpn-before-postgres-….db`); if anything is off, the shop goes back to SQLite by itself. There is no move back from the panel, and none is needed: backups are portable and restore into either.
 
 ## Without Docker
 

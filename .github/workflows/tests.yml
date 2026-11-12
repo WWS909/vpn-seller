@@ -3,7 +3,8 @@
 #                panels started right on the runner (scripts/dev-*.sh);
 #   installer  — install.sh as a person would run it, in every scenario
 #                (clean server, tunnel, another Caddy, nginx, update, menu,
-#                uninstall) and the owner's path up to a paid order.
+#                uninstall, the move to PostgreSQL and back) and the owner's
+#                path up to a paid order.
 # A red mark here means: do not update the servers until it is green again.
 name: tests
 
@@ -24,6 +25,16 @@ jobs:
     name: Tests, with real panels
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    services:
+      postgres:                           # a real PostgreSQL for the move from SQLite
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: vpn
+          POSTGRES_PASSWORD: vpn
+          POSTGRES_DB: move
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U vpn -d move" --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -50,7 +61,7 @@ jobs:
       - name: Tests
         run: |
           . ./.panels.env
-          python -m pytest -rs
+          TEST_MOVE_URL=postgresql+psycopg://vpn:vpn@127.0.0.1:5432/move python -m pytest -rs
       - name: Panel logs
         if: failure()
         run: tail -n 60 .dev/3xui/*/log/run.out .dev/marzban/marzban.log 2>/dev/null || true
@@ -59,8 +70,24 @@ jobs:
     name: Installer scenarios
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    services:
+      postgres:                           # a real PostgreSQL for the move from SQLite
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: vpn
+          POSTGRES_PASSWORD: vpn
+          POSTGRES_DB: fakepg
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U vpn -d fakepg" --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
+      # The installer copies this checkout and the update scenario runs
+      # `git pull` in it: it must be on a branch, not on the detached merge
+      # commit a pull request is checked out as by default.
       - uses: actions/checkout@v6
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.head_ref || github.ref_name }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -75,4 +102,4 @@ jobs:
       - name: install.sh in every scenario
         run: |
           . ./.panels.env
-          sudo -E env "PATH=$PATH" python tests/installer/run.py
+          sudo -E env "PATH=$PATH" FAKE_PG_URL=postgresql+psycopg://vpn:vpn@127.0.0.1:5432/fakepg python tests/installer/run.py

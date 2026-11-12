@@ -405,11 +405,32 @@ TEXTS: dict[str, dict[str, str]] = {
                          "Причина: {reason}\nПодробности: vpn-seller → «Журнал».",
                    "en": "⚠️ <b>The update to {to} failed</b>\nThe shop went back to {back} and works.\n"
                          "Reason: {reason}\nDetails: vpn-seller → Logs."},
+    "db_done": {"ru": "✅ <b>Магазин перешёл на PostgreSQL</b>\nПеренесено клиентов: {users}. Всё работает как раньше.",
+                "en": "✅ <b>The shop moved to PostgreSQL</b>\nCustomers moved: {users}. Everything works as before."},
+    "db_failed": {"ru": "⚠️ <b>Переход на PostgreSQL не удался</b>\nМагазин остался на SQLite и работает, "
+                        "данные не тронуты.\nПричина: {reason}",
+                  "en": "⚠️ <b>The move to PostgreSQL failed</b>\nThe shop stayed on SQLite and works, "
+                        "nothing was lost.\nReason: {reason}"},
     "sup_sent": {"ru": "Сообщение передано в поддержку. Ответ придёт сюда, в этот чат.",
                  "en": "Your message went to support. The answer will come here, in this chat."},
     "sup_slow": {"ru": "Слишком много сообщений подряд. Подождите немного — мы уже читаем.",
                  "en": "Too many messages in a row. Please wait a little — we are reading."},
     "sup_reply": {"ru": "<b>Поддержка:</b>\n{text}", "en": "<b>Support:</b>\n{text}"},
+    "sup_write": {"ru": "Написать в поддержку", "en": "Write to support"},
+    "sup_open": {"ru": "<b>Поддержка</b>\nНапишите вопрос следующим сообщением — можно с фото или файлом. "
+                       "Ответ придёт сюда, в этот чат.",
+                 "en": "<b>Support</b>\nWrite your question in the next message — a photo or file is fine too. "
+                       "The answer will come here, in this chat."},
+    "sup_cancel": {"ru": "Отмена", "en": "Cancel"},
+    "sup_cancelled": {"ru": "Хорошо, обращение не создано. Если понадобится помощь — нажмите «Написать в поддержку».",
+                      "en": "OK, no request was made. If you need help, tap “Write to support”."},
+    "bot_plain": {"ru": "Сообщения здесь не читаются — всё в приложении: подписка, серверы и настройка.\n"
+                        "Нужна помощь человека — нажмите «Написать в поддержку».",
+                  "en": "Messages here are not read — everything is in the app: subscription, servers and setup.\n"
+                        "Need a person? Tap “Write to support”."},
+    "bot_plain_nosup": {"ru": "Сообщения здесь не читаются — всё в приложении: подписка, серверы и настройка.",
+                        "en": "Messages here are not read — everything is in the app: subscription, servers and setup."},
+    "cmd_support": {"ru": "Написать в поддержку", "en": "Write to support"},
     "ai_reply": {"ru": "<b>{name} · ИИ-помощник:</b>\n{text}\n\n<i>Нужен человек — напишите «оператор».</i>",
                  "en": "<b>{name} · AI helper:</b>\n{text}\n\n<i>Need a person? Write “operator”.</i>"},
     "ai_default_name": {"ru": "Помощник", "en": "Helper"},

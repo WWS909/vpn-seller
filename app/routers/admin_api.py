@@ -1127,6 +1127,22 @@ def updates_auto(body: AutoUpdateBody, db: Session = Depends(get_db), admin=A):
     return updates.view(db)
 
 
+# ================================================================ database (the owner only)
+@router.get("/database")
+def database_view(db: Session = Depends(get_db), _=A):
+    from .. import dbswitch
+    return dbswitch.view(db)
+
+
+@router.post("/database/postgres")
+def database_postgres(db: Session = Depends(get_db), admin=A):
+    from .. import dbswitch
+    try:
+        return dbswitch.request(db, admin)
+    except ValueError as e:
+        raise HTTPException(409, str(e))
+
+
 UNPAID = ("pending", "failed", "cancelled")
 
 

@@ -122,6 +122,16 @@ def requested_at() -> int:
         return 0
 
 
+def request_action() -> str:
+    """What the waiting request asks for: "" — an update, "postgres" — the
+    database move (app/dbswitch.py); both go through the same server unit."""
+    try:
+        d = json.loads(_file(REQUEST).read_text(encoding="utf-8")[:2000])
+    except (OSError, ValueError):
+        return ""
+    return str(d.get("action") or "") if isinstance(d, dict) else ""
+
+
 def running(st: dict | None = None) -> bool:
     st = read_status() if st is None else st
     return bool(st) and st["state"] == "running" and now() - st["at"] < 1800
@@ -140,7 +150,8 @@ def view(db: Session) -> dict:
         "auto": core.get(db, "auto_update") == "1",
         "hour": core.get_int(db, "auto_update_hour", 1) % 24,
         "server_time": dt.datetime.now().strftime("%H:%M"),
-        "updater": updater_ready(), "status": st, "requested_at": requested_at(),
+        "updater": updater_ready(), "status": st,
+        "requested_at": requested_at() if not request_action() else 0,
         # just updated: what this version brought, shown once in the panel
         "fresh": release.notes(release.local_notes("ru"), st["from"], cur) if st and st["state"] == "ok"
         and st["to"] == cur and now() - st["at"] < 3 * 86400 else [],
@@ -170,7 +181,8 @@ def request(db: Session, who: str) -> dict:
     """Ask the server to update. Raises ValueError with a short reason."""
     if not updater_ready():
         raise ValueError("no_updater")
-    if running():
+    from . import dbswitch
+    if running() or dbswitch.running() or (requested_at() and request_action()):
         raise ValueError("running")
     v = view(db)
     payload = {"at": now(), "by": str(who)[:64], "from": v["current"], "to": v["latest"] or v["current"]}
@@ -259,11 +271,14 @@ def tick(db: Session) -> None:
     """The job: check every few hours, tell how an update ended, and update
     by itself at night when the owner allowed it."""
     announce(db)
+    from . import dbswitch
+    dbswitch.announce(db)
     d = info(db)
     if now() - int(d.get("checked_at") or 0) >= CHECK_EVERY:
         check(db)
         d = info(db)
-    if core.get(db, "auto_update") != "1" or not updater_ready() or requested_at() or running():
+    if core.get(db, "auto_update") != "1" or not updater_ready() or requested_at() or running() \
+            or dbswitch.running():
         return
     latest = d.get("latest") or ""
     if not release.newer(latest, release.version()) or core.get(db, "auto_update_tried") == latest:

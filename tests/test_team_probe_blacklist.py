@@ -380,5 +380,5 @@ def test_every_admin_route_has_a_section():
     from app import team
     src = "".join((ROOT / "app" / "routers" / f).read_text() for f in ("admin_api.py", "export.py"))
     firsts = set(_re.findall(r'@router\.(?:get|post|put|delete|patch)\("/([a-z0-9_-]+)', src))
-    owner_only = {"team", "login", "tg-login", "logout", "payments", "updates"}   # payment keys, updates: the owner only
+    owner_only = {"team", "login", "tg-login", "logout", "payments", "updates", "database"}   # payment keys, updates, the database: the owner only
     assert sorted(firsts - set(team.SECTION_OF) - owner_only) == []
