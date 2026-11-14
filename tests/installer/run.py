@@ -242,6 +242,7 @@ def s2_curl_pipe_tunnel_interactive():
     check("s2 admin ID detected from the message", e.get("ADMIN_TELEGRAM_IDS") == str(OWNER), e.get("ADMIN_TELEGRAM_IDS"))
     check("s2 mode tunnel", e.get("INSTALL_MODE") == "tunnel" and e.get("COMPOSE_PROFILES") == "tunnel")
     check("s2 password kept", e.get("ADMIN_PASSWORD") == "Sandbox-Pass-2026")
+    check("s2 every question numbered out of six", all(f"{i}/6  " in out for i in range(1, 7)) and "/5  " not in out)
     check("s2 database question: SQLite recommended on 1 GB", "SQLite — встроенная" in out
           and "PostgreSQL — для большого магазина" in out and not read_env(d).get("DATABASE_URL", "").startswith("postgres"))
     check("s2 PUBLIC_URL left empty (follows tunnel)", e.get("PUBLIC_URL") == "" and e.get("TUNNEL_METRICS_URL") == "http://tunnel:2000")

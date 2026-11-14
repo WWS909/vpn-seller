@@ -63,13 +63,21 @@ And this is the same home screen in five styles:
 
 <p align="center"><img src="docs/screenshots/styles-en.webp" alt="Five styles"></p>
 
-And three more — Newspaper, Brutal and Terminal: they change not only colours but how the cards, buttons and plans are drawn.
+And four more — Newspaper, Brutal, Terminal and Ticket: they change not only colours but how the cards, buttons and plans are drawn.
 
 <p align="center"><img src="docs/screenshots/styles-new-en.webp" alt="Newspaper, Brutal and Terminal"></p>
+
+Ticket is a boarding pass: notches at the sides of every block, perforations instead of rules, and a plan is a ticket with a tear-off stub carrying the price.
+
+<p align="center"><img src="docs/screenshots/styles-ticket-en.webp" alt="The Ticket style: home, plans, light theme"></p>
 
 The header can take a colour, the home screen a picture (a drawing in your colour or your own), and the buttons another shape:
 
 <p align="center"><img src="docs/screenshots/extras-en.webp" alt="Header, pictures and buttons"></p>
+
+There are nine ready pictures for the home screen. All are drawn in your colour and follow the light and dark theme:
+
+<p align="center"><img src="docs/screenshots/pictures-en.webp" alt="Nine home pictures"></p>
 
 ![Look: home screen, style and a live preview](docs/screenshots/admin-layouts.webp)
 
@@ -542,6 +550,8 @@ By hand without the menu: `git pull && docker compose up -d --build`. New databa
 You choose on install. You can move from SQLite to PostgreSQL **at any time**: admin → Database → Move to PostgreSQL (or `vpn-seller` → Move to PostgreSQL, or `vpn-seller postgres`). The panel tells you when the shop has grown enough.
 
 How the move goes: a backup → PostgreSQL starts → the shop pauses while the data is copied (usually under a minute) → the rows are counted table by table in the new database → the shop starts on PostgreSQL and messages the owner in Telegram. The SQLite file is only read and stays on the server (`data/vpn-before-postgres-….db`); if anything is off, the shop goes back to SQLite by itself. There is no move back from the panel, and none is needed: backups are portable and restore into either.
+
+![The Database page: which one now and the move to PostgreSQL](docs/screenshots/admin-database.png)
 
 ## Without Docker
 

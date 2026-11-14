@@ -352,7 +352,7 @@ detect_admin_id() {
 }
 
 q_admin() {
-  step "2/5" "$(t "Ваш Telegram ID" "Your Telegram ID")"
+  step "2/6" "$(t "Ваш Telegram ID" "Your Telegram ID")"
   hint "$(t "Администратор получает уведомления об оплатах и открывает панель прямо из бота (/admin)." \
             "The admin gets payment notices and opens the panel right from the bot (/admin).")"
   if [ -z "$ADMIN_ID" ] && [ "$ASSUME_YES" != 1 ] && [ -n "$BOT" ]; then
