@@ -259,6 +259,10 @@ def _start(db: Session, sender: dict, param: str) -> None:
         code = param[4:12].upper()
         query = f"gift={code}"
         text = core.t(lang, "gift_hint")
+    elif param.startswith("imp"):
+        from .. import billing, importer
+        res = importer.claim(db, user, param[3:])
+        text = core.t(lang, "imp_" + res, brand=brand, date=billing._date(user.expires_at, lang))
     if user.ref_pending and user.captcha:
         return                  # the captcha went out first; the app button follows it
     text += emergency.bot_line(db, lang)

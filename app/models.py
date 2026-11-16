@@ -275,6 +275,24 @@ class PromoUse(Base):
     created_at = Column(Integer, default=now)
 
 
+class ImportClaim(Base):
+    """A customer moved from a panel who has no Telegram ID there: the owner
+    sends them a personal link, and the subscription is attached to whoever
+    opens it first (once)."""
+    __tablename__ = "import_claims"
+
+    id = Column(Integer, primary_key=True)
+    code = Column(String(16), unique=True, index=True)
+    name = Column(String(128), default="")              # the client's name on the panel
+    server = Column(String(64), default="")             # the shop's name of that panel
+    expires_at = Column(Integer, default=0)
+    traffic_limit = Column(BigInteger, default=0)       # bytes left, 0 = unlimited
+    device_limit = Column(Integer, default=0)
+    created_at = Column(Integer, default=now)
+    claimed_by = Column(Integer, nullable=True)         # users.id
+    claimed_at = Column(Integer, default=0)
+
+
 class Gift(Base):
     """A gift code: bought by one person, redeemed by anyone."""
     __tablename__ = "gifts"

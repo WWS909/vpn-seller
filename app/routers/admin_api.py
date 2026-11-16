@@ -1253,6 +1253,58 @@ def updates_auto(body: AutoUpdateBody, db: Session = Depends(get_db), admin=A):
     return updates.view(db)
 
 
+# ================================================================ moving customers in (the owner only)
+class ImportBody(BaseModel):
+    names: list[str] = Field(default_factory=list, max_length=20000)
+    devices: int = 3
+    never_days: int = 30
+
+
+def _import_server(db: Session, server_id: int) -> Server:
+    s = db.get(Server, server_id)
+    if not s:
+        raise HTTPException(404, "server not found")
+    return s
+
+
+@router.get("/import/links")
+def import_links(db: Session = Depends(get_db), _=A):
+    from .. import importer
+    return importer.claims(db)
+
+
+@router.delete("/import/links/{claim_id}")
+def import_link_delete(claim_id: int, db: Session = Depends(get_db), _=A):
+    from ..models import ImportClaim
+    c = db.get(ImportClaim, claim_id)
+    if c and not c.claimed_by:
+        db.delete(c)
+        db.commit()
+    return {"ok": True}
+
+
+@router.get("/import/{server_id}")
+def import_preview(server_id: int, db: Session = Depends(get_db), _=A):
+    from .. import importer
+    s = _import_server(db, server_id)
+    try:
+        return {"server": s.name, **importer.read(db, s)}
+    except PanelError as e:
+        raise HTTPException(502, f"panel: {e}")
+
+
+@router.post("/import/{server_id}")
+def import_run(server_id: int, body: ImportBody, db: Session = Depends(get_db), admin=A):
+    from .. import importer
+    s = _import_server(db, server_id)
+    if not body.names:
+        raise HTTPException(400, "nothing chosen")
+    try:
+        return importer.run(db, s, [str(n)[:128] for n in body.names], body.devices, body.never_days, admin)
+    except PanelError as e:
+        raise HTTPException(502, f"panel: {e}")
+
+
 # ================================================================ database (the owner only)
 @router.get("/database")
 def database_view(db: Session = Depends(get_db), _=A):

@@ -323,6 +323,7 @@ td.num,th.num{text-align:right}
 .tabs button.on{background:var(--surface4);color:var(--txt)}
 .pager{display:flex;align-items:center;gap:10px;justify-content:flex-end;margin-top:14px;color:var(--muted);font-size:12.5px}
 .alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:11px;margin-bottom:14px;font-size:13px;line-height:1.5}
+.alert.g{background:var(--ok-weak);border:1px solid rgba(91,214,160,.32)}
 .alert.r{background:var(--danger-weak);border:1px solid rgba(236,106,86,.35)}
 .alert.y{background:var(--warn-weak);border:1px solid rgba(var(--accent-rgb),.35)}
 .alert .ic{flex:none;margin-top:1px}
@@ -346,6 +347,12 @@ a.alert{color:var(--txt);text-decoration:none}a.alert:hover{border-color:var(--a
   background:var(--surface2);border:1px solid var(--brd);border-radius:9px;padding:10px;color:var(--muted)}
 
 /* KPI */
+.imptbl tr.dim td{color:var(--muted2)}.imptbl tr.dim .uname{font-weight:500}
+.imptbl input[type=checkbox],.impck{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+.improw{align-items:center}.improw > span:first-child{display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-width:0}
+.improw b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.impact{display:inline-flex;align-items:center;gap:4px;flex:none}
+.impgo{margin-top:14px}.impgo .btn{justify-content:center;height:41px}
 .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
 @media(min-width:1251px){.kpis.kpis5{grid-template-columns:repeat(5,1fr)}.kpis.kpis4{grid-template-columns:repeat(4,1fr)}}
 .kpi{background:var(--surface);border:1px solid var(--brd);border-radius:var(--r);padding:14px}
@@ -773,6 +780,21 @@ ru: {
   payTestMode:"Включён тестовый режим (PAYMENTS_TEST_MODE): все заказы бесплатные.",
   payTunnel:"Магазин работает через временный туннель: его адрес меняется после перезапуска сервера, и адреса уведомлений в кабинетах касс перестанут работать. Для касс подключите домен: на сервере vpn-seller address. Telegram Stars работают и так.",
   casts:"Рассылки", reviews:"Отзывы", gifts:"Подарки", pay:"Оплата", updates:"Обновления", settings:"Настройки", logs:"Журнал", look:"Оформление",
+  imp:"Перенос клиентов", impSub:"из панели, где вы продавали ключи вручную", impFrom:"Откуда переносить", impPanel:"Панель",
+  impRead:"Прочитать клиентов", impNoSrv:"Сначала добавьте сервер с этой панелью", copy:"Скопировать",
+  impStep1:"Магазин читает клиентов из панели и ничего в ней не меняет.",
+  impStep2:"У кого в панели есть Telegram ID, подписка появится в магазине сразу — человек откроет бота и увидит её.",
+  impStep3:"Остальным магазин сделает личные ссылки: отправьте каждому его ссылку, по ней дни перейдут к нему.",
+  impSafe:"Переносится ровно столько дней и трафика, сколько осталось. Старый ключ работает до своей даты, в магазине человек получит новый. Если у человека в магазине подписка длиннее — она не меняется.",
+  impLinks:"Личные ссылки", impLinksNone:"Пока нет. Появятся для тех, у кого в панели нет Telegram ID.", impCsv:"Списком",
+  impTill:"до {d}", impTaken:"открыта", impWait:"ждёт", impMore:"и ещё {n} — в списке", impDropQ:"Удалить эту ссылку? Человек по ней ничего не получит.",
+  impName:"Имя в панели", impUntil:"До", impLink:"Ссылка", impLeft:"Трафик", impAll:"выбрать всех",
+  impFromName:"из имени", impByLink:"по ссылке", impNever:"бессрочно",
+  impOk:"можно", impOff:"выключен", impSent:"ссылка готова", impIn:"уже в магазине", impEnded:"закончился",
+  impKAll:"можно перенести", impKId:"с Telegram ID — сразу", impKLink:"без ID — по ссылке", impKSkip:"уже перенесены или закончились",
+  impEmpty:"В панели нет клиентов", impDev:"Устройств на человека", impNeverDays:"Бессрочным — дней",
+  impGo:"Перенести · {n}", impGoN:"Сразу в магазин: {a}. Личных ссылок: {b}.", impAsk:"Перенести {n} клиентов в магазин?",
+  impDone:"Перенесено сразу: {a}, по ссылкам: {b}", impDoneN:"Ссылки — в карточке «Личные ссылки». Отправьте каждому его ссылку.",
   database:"База данных", dbSub:"где хранятся клиенты, подписки и платежи", dbNow:"Сейчас", dbWorks:"работает",
   dbSqliteN:"встроенная, файл на сервере", dbPgN:"отдельная служба рядом с магазином",
   dbUsers:"Клиентов", dbActive:"С подпиской", dbSize:"Размер базы", dbRam:"Память сервера", dbDisk:"Свободно на диске",
@@ -841,7 +863,7 @@ ru: {
   chAdminHint:"Добавьте бота в администраторы канала — иначе Telegram не покажет, кто подписан. Если сменили тип канала (публичный ↔ приватный), привяжите его заново.",
   chCheck:"Сохранить и проверить", chOk:"Работает: «{t}»", chAdd:"Добавить канал", chEmpty:"Каналов нет — нажмите «Добавить канал». Если каналов несколько, человек должен подписаться на каждый.", chCountN:"каналов: {n}",
   brandT:"Название", brandReset:"Сбросить название и логотип", brandResetQ:"Вернуть стандартное название и щит вместо логотипа?",
-cleanFont:"Для этого стиля поставил шрифт Golos — его можно сменить ниже", fkOdd:"Необычные", layPaper:"Газета", layPaperS:"чернила на газетной бумаге, линейки вместо карточек, тарифы — прайс с точками", layBrutal:"Брутал", layBrutalS:"толстые обводки, жёсткие тени, кнопки вдавливаются, подписи-наклейки", layTerminal:"Терминал", layTerminalS:"консоль: моноширинный шрифт, курсор, [ кнопки ] и прайс с точками", layTicket:"Билет", layTicketS:"посадочный талон: вырезы по краям, перфорация, цена на отрывном корешке", styleFont:"Для этого стиля поставил шрифт {f} — его можно сменить ниже", topT:"Шапка", topSub:"полоса сверху с логотипом и названием", topAuto:"Как в стиле", topAccent:"Цвет магазина", topCustom:"Свой цвет", topGradient:"Градиент", topImage:"Картинка", topColor:"Цвет шапки", topNoImg:"Для шапки-картинки загрузите свою картинку — ниже, в «Картинке на главной».", topHint:"Цвет надписей подбирается сам, чтобы название читалось. Верх Telegram над приложением красится так же.", artT:"Картинка на главной", artSub:"над главным экраном", artNone:"Нет", artCity:"Город", artBauhaus:"Баухаус", artContours:"Карта высот", artWaves:"Волны", artStars:"Звёздная карта", artPeaks:"Горы", artLighthouse:"Маяк", artPlanet:"Планета", artDunes:"Дюны", artOwn:"Своя", artUpload:"Загрузить свою", artHint:"Рисунки берут цвет магазина и меняются вместе со светлой и тёмной темой. Своя картинка — PNG, JPEG или WebP до 4 МБ; её же можно поставить в шапку.", artDone:"Картинка загружена", artGone:"Картинка удалена", btnT:"Кнопки", btnSub:"форма главных кнопок", bAuto:"Как в стиле", bKey:"Клавиша", bStamp:"Штамп", bArrow:"Со стрелкой", bNotch:"Билет", bPixel:"Пиксели", bOutline:"Двойной контур", bSample:"Продлить", hapT:"Отклик при нажатии", hapOn:"Вибрация", hapOff:"Без вибрации", hapHint:"Лёгкий толчок телефона при нажатии, как в приложениях банков. Работает в Telegram на телефоне.", enterT:"Появление", eRise:"Снизу", eSpring:"Пружина", eSlide:"Сбоку", eBlur:"Из размытия", eUnfold:"Раскрытие", enterHint:"Как блоки появляются при открытии и при смене вкладки, когда движение «Живые». Выбранное сразу проигрывается в телефоне справа.", efLeaves:"Листопад", efPetals:"Лепестки", efMeteors:"Звездопад", celT:"После оплаты", celCheck:"Галочка", celConfetti:"Конфетти", celHint:"Что видит человек, когда оплата прошла. Посмотреть — кнопка «Оплата прошла» под телефоном.", hmT:"Главный экран", hmSub:"с чего начинается приложение", hmAnswer:"Ответ", hmAnswerS:"«Работает до 26 декабря», кнопка и короткий список", hmTerm:"Срок", hmTermS:"календарь до конца подписки и продление сразу", hmDevices:"Устройства", hmDevicesS:"подключённые устройства и свободные места", hmClassic:"Классика", hmClassicS:"карточка с днями и две плитки", layT:"Стиль", laySub:"фон, карточки, шрифт заголовков", layClean:"Чистый", layCleanS:"светлый, как списки Telegram; тёмный, если Telegram тёмный", layTonal:"Мягкий", layTonalS:"фон в оттенке цвета магазина, круглые кнопки — как в Android", layBrand:"Фирменный", layBrandS:"цветная шапка в цвет магазина — как в приложениях банков", layLarge:"Крупный", layLargeS:"крупный текст, контраст и большие кнопки — легко читать", layCosmos:"Космос", layCosmosS:"ночной фон с подсветкой, стеклянные карточки и цены-градиенты — как на сайтах VPN", layClassic:"Тёмная классика", layClassicS:"тёмные карточки, свои фоны и особые наборы", layOwn:"В этом стиле фон и карточки свои — эти настройки работают в «Тёмной классике».", fontT:"Шрифт", fkSans:"Простые", fkSerif:"С засечками", fkChar:"С характером", fkFun:"Для особых оформлений", fkCustom:"Свой шрифт с Google Fonts", fCustomPh:"Название, например Lobster", fCustomHint:"Любое семейство с fonts.google.com для заголовков и цифр, текст останется в Golos. Выбирайте шрифт с кириллицей.", fCustomBad:"Такого шрифта нет на Google Fonts или в нём нет кириллицы", fCustomEmpty:"Впишите название шрифта", fOnlyApp:"только в приложении", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
+cleanFont:"Для этого стиля поставил шрифт Golos — его можно сменить ниже", fkOdd:"Необычные", layPaper:"Газета", layPaperS:"чернила на газетной бумаге, линейки вместо карточек, тарифы — прайс с точками", layBrutal:"Брутал", layBrutalS:"толстые обводки, жёсткие тени, кнопки вдавливаются, подписи-наклейки", layTerminal:"Терминал", layTerminalS:"консоль: моноширинный шрифт, курсор, [ кнопки ] и прайс с точками", layTicket:"Билет", layTicketS:"посадочный талон: вырезы по краям, перфорация, цена на отрывном корешке", layPoster:"Плакат", layPosterS:"швейцарский плакат: без карточек, толстые линейки, огромная цифра дней", layNotebook:"Тетрадь", layNotebookS:"бумага в клетку, рисунок от руки, рукописные заголовки и маркер", styleFont:"Для этого стиля поставил шрифт {f} — его можно сменить ниже", topT:"Шапка", topSub:"полоса сверху с логотипом и названием", topAuto:"Как в стиле", topAccent:"Цвет магазина", topCustom:"Свой цвет", topGradient:"Градиент", topImage:"Картинка", topColor:"Цвет шапки", topNoImg:"Для шапки-картинки загрузите свою картинку — ниже, в «Картинке на главной».", topHint:"Цвет надписей подбирается сам, чтобы название читалось. Верх Telegram над приложением красится так же.", artT:"Картинка на главной", artSub:"над главным экраном", artNone:"Нет", artCity:"Город", artBauhaus:"Баухаус", artContours:"Карта высот", artWaves:"Волны", artStars:"Звёздная карта", artPeaks:"Горы", artLighthouse:"Маяк", artPlanet:"Планета", artDunes:"Дюны", artAurora:"Северное сияние", artTaiga:"Тайга", artOwn:"Своя", artUpload:"Загрузить свою", artHint:"Рисунки берут цвет магазина и меняются вместе со светлой и тёмной темой. Своя картинка — PNG, JPEG или WebP до 4 МБ; её же можно поставить в шапку.", artDone:"Картинка загружена", artGone:"Картинка удалена", btnT:"Кнопки", btnSub:"форма главных кнопок", bAuto:"Как в стиле", bKey:"Клавиша", bStamp:"Штамп", bArrow:"Со стрелкой", bNotch:"Билет", bPixel:"Пиксели", bOutline:"Двойной контур", bSample:"Продлить", hapT:"Отклик при нажатии", hapOn:"Вибрация", hapOff:"Без вибрации", hapHint:"Лёгкий толчок телефона при нажатии, как в приложениях банков. Работает в Telegram на телефоне.", enterT:"Появление", eRise:"Снизу", eSpring:"Пружина", eSlide:"Сбоку", eBlur:"Из размытия", eUnfold:"Раскрытие", enterHint:"Как блоки появляются при открытии и при смене вкладки, когда движение «Живые». Выбранное сразу проигрывается в телефоне справа.", efLeaves:"Листопад", efPetals:"Лепестки", efMeteors:"Звездопад", celT:"После оплаты", celCheck:"Галочка", celConfetti:"Конфетти", celHint:"Что видит человек, когда оплата прошла. Посмотреть — кнопка «Оплата прошла» под телефоном.", hmT:"Главный экран", hmSub:"с чего начинается приложение", hmAnswer:"Ответ", hmAnswerS:"«Работает до 26 декабря», кнопка и короткий список", hmTerm:"Срок", hmTermS:"календарь до конца подписки и продление сразу", hmDevices:"Устройства", hmDevicesS:"подключённые устройства и свободные места", hmClassic:"Классика", hmClassicS:"карточка с днями и две плитки", layT:"Стиль", laySub:"фон, карточки, шрифт заголовков", layClean:"Чистый", layCleanS:"светлый, как списки Telegram; тёмный, если Telegram тёмный", layTonal:"Мягкий", layTonalS:"фон в оттенке цвета магазина, круглые кнопки — как в Android", layBrand:"Фирменный", layBrandS:"цветная шапка в цвет магазина — как в приложениях банков", layLarge:"Крупный", layLargeS:"крупный текст, контраст и большие кнопки — легко читать", layCosmos:"Космос", layCosmosS:"ночной фон с подсветкой, стеклянные карточки и цены-градиенты — как на сайтах VPN", layClassic:"Тёмная классика", layClassicS:"тёмные карточки, свои фоны и особые наборы", layOwn:"В этом стиле фон и карточки свои — эти настройки работают в «Тёмной классике».", fontT:"Шрифт", fkSans:"Простые", fkSerif:"С засечками", fkChar:"С характером", fkFun:"Для особых оформлений", fkCustom:"Свой шрифт с Google Fonts", fCustomPh:"Название, например Lobster", fCustomHint:"Любое семейство с fonts.google.com для заголовков и цифр, текст останется в Golos. Выбирайте шрифт с кириллицей.", fCustomBad:"Такого шрифта нет на Google Fonts или в нём нет кириллицы", fCustomEmpty:"Впишите название шрифта", fOnlyApp:"только в приложении", radiusT:"Скругление углов", rSquare:"Квадрат", rSharp:"Строгое", rNormal:"Обычное", rRound:"Мягкое",
   linksT:"Свои кнопки", linksSub:"в профиле клиента, до 6", linkAdd:"Добавить кнопку", linkRu:"Текст (RU)", linkEn:"Текст (EN)",
   linksEmpty:"Например: «Наш канал», «Чат клиентов», «Сайт».", linkBad:"Ссылка должна начинаться с https://, tg:// или mailto:",
   exExcel:"Excel", exOrdersT:"Заказы в Excel", exOrdersHint:"Таблица для учёта и налоговой: дата, клиент, что куплено, сумма, способ оплаты. Внизу — итог.",
@@ -1256,6 +1278,21 @@ en: {
   payTestMode:"Test mode is on (PAYMENTS_TEST_MODE): every order is free.",
   payTunnel:"The shop runs through a temporary tunnel: its address changes when the server restarts, and the notification addresses in the gateways stop working. Connect a domain for gateways: vpn-seller address on the server. Telegram Stars work anyway.",
   casts:"Broadcasts", reviews:"Reviews", gifts:"Gifts", pay:"Payments", updates:"Updates", settings:"Settings", logs:"Log", look:"Look",
+  imp:"Move customers in", impSub:"from a panel where you sold keys by hand", impFrom:"Move from", impPanel:"Panel",
+  impRead:"Read customers", impNoSrv:"Add a server with that panel first", copy:"Copy",
+  impStep1:"The shop reads the customers from the panel and changes nothing in it.",
+  impStep2:"Those with a Telegram ID on the panel get the subscription in the shop at once — they open the bot and find it there.",
+  impStep3:"For the rest the shop makes personal links: send each person theirs, and the days move to whoever opens it.",
+  impSafe:"Exactly the days and traffic that were left are moved. The old key works until its date; in the shop the person gets a new one. A longer subscription already in the shop is not changed.",
+  impLinks:"Personal links", impLinksNone:"None yet. They appear for customers without a Telegram ID on the panel.", impCsv:"As a list",
+  impTill:"until {d}", impTaken:"opened", impWait:"waiting", impMore:"and {n} more — in the list", impDropQ:"Delete this link? Nobody will get anything by it.",
+  impName:"Name on the panel", impUntil:"Until", impLink:"Link", impLeft:"Traffic", impAll:"choose all",
+  impFromName:"from the name", impByLink:"by link", impNever:"no end",
+  impOk:"ready", impOff:"disabled", impSent:"link made", impIn:"already in the shop", impEnded:"ended",
+  impKAll:"can be moved", impKId:"with a Telegram ID — at once", impKLink:"without an ID — by link", impKSkip:"already moved or ended",
+  impEmpty:"No customers on this panel", impDev:"Devices per person", impNeverDays:"No-end ones — days",
+  impGo:"Move · {n}", impGoN:"Straight to the shop: {a}. Personal links: {b}.", impAsk:"Move {n} customers into the shop?",
+  impDone:"Moved at once: {a}, by link: {b}", impDoneN:"The links are in “Personal links”. Send each person theirs.",
   database:"Database", dbSub:"where customers, subscriptions and payments are kept", dbNow:"Now", dbWorks:"working",
   dbSqliteN:"built in, a file on the server", dbPgN:"a separate service next to the shop",
   dbUsers:"Customers", dbActive:"Subscribed", dbSize:"Database size", dbRam:"Server memory", dbDisk:"Free disk space",
@@ -1324,7 +1361,7 @@ en: {
   chAdminHint:"Make the bot an administrator of the channel — otherwise Telegram does not tell who is subscribed. If you changed the channel type (public ↔ private), bind it again.",
   chCheck:"Save and check", chOk:"Works: “{t}”", chAdd:"Add a channel", chEmpty:"No channels — press Add a channel. With several, a person must join each of them.", chCountN:"channels: {n}",
   brandT:"Name", brandReset:"Reset name and logo", brandResetQ:"Restore the standard name and the shield instead of the logo?",
-cleanFont:"Golos is set for this style — you can change it below", fkOdd:"Unusual", layPaper:"Newspaper", layPaperS:"ink on newsprint, rules instead of cards, plans as a price list with dots", layBrutal:"Brutal", layBrutalS:"thick outlines, hard shadows, buttons that press in, sticker labels", layTerminal:"Terminal", layTerminalS:"a console: monospace, a cursor, [ buttons ] and a dotted price list", layTicket:"Ticket", layTicketS:"a boarding pass: notched edges, perforations, the price on a tear-off stub", styleFont:"{f} is set for this style — you can change it below", topT:"Header", topSub:"the bar at the top with the logo and name", topAuto:"As the style", topAccent:"Shop colour", topCustom:"Own colour", topGradient:"Gradient", topImage:"Picture", topColor:"Header colour", topNoImg:"For a picture header, upload your picture below, in “Picture on home”.", topHint:"The text colour is picked for you so the name stays readable. Telegram’s own top bar takes the same colour.", artT:"Picture on home", artSub:"above the home screen", artNone:"None", artCity:"City", artBauhaus:"Bauhaus", artContours:"Contour map", artWaves:"Waves", artStars:"Star chart", artPeaks:"Mountains", artLighthouse:"Lighthouse", artPlanet:"Planet", artDunes:"Dunes", artOwn:"Your own", artUpload:"Upload your own", artHint:"The drawings take your colour and follow light and dark. Your own picture: PNG, JPEG or WebP up to 4 MB; it can also go into the header.", artDone:"Picture uploaded", artGone:"Picture removed", btnT:"Buttons", btnSub:"the shape of the main buttons", bAuto:"As the style", bKey:"Key", bStamp:"Stamp", bArrow:"With an arrow", bNotch:"Ticket", bPixel:"Pixels", bOutline:"Double outline", bSample:"Renew", hapT:"Feedback on press", hapOn:"Vibration", hapOff:"No vibration", hapHint:"A light tap of the phone on presses, like banking apps. Works in Telegram on a phone.", enterT:"Entrance", eRise:"From below", eSpring:"Spring", eSlide:"From the side", eBlur:"Out of a blur", eUnfold:"Unfold", enterHint:"How the blocks come in when the app opens and on a tab switch, with lively motion. The phone on the right plays it at once.", efLeaves:"Falling leaves", efPetals:"Petals", efMeteors:"Falling stars", celT:"After payment", celCheck:"A tick", celConfetti:"Confetti", celHint:"What the person sees when the payment goes through. See it with the “Payment done” button under the phone.", hmT:"Home screen", hmSub:"what the app opens with", hmAnswer:"Answer", hmAnswerS:"“Works until Dec 26”, a button and a short list", hmTerm:"Term", hmTermS:"a calendar to the end of the subscription, renewal right there", hmDevices:"Devices", hmDevicesS:"connected devices and free places", hmClassic:"Classic", hmClassicS:"a card with the days and two tiles", layT:"Style", laySub:"background, cards, heading font", layClean:"Clean", layCleanS:"light like Telegram’s lists; dark when Telegram is dark", layTonal:"Soft", layTonalS:"surfaces tinted with your colour, pill buttons — like Android", layBrand:"Brand", layBrandS:"your colour across the top — like a bank’s app", layLarge:"Large", layLargeS:"larger text, contrast and big buttons — easy to read", layCosmos:"Cosmos", layCosmosS:"a night ground lit by your colour, glass cards, gradient prices — like VPN sites", layClassic:"Dark classic", layClassicS:"dark cards, own backgrounds and special sets", layOwn:"This style has its own background and cards — these settings work in Dark classic.", fontT:"Font", fkSans:"Plain", fkSerif:"Serif", fkChar:"With character", fkFun:"For special looks", fkCustom:"Your own from Google Fonts", fCustomPh:"A name, like Lobster", fCustomHint:"Any family from fonts.google.com for headings and numbers; the text stays in Golos. Pick one with Cyrillic if you sell in Russian.", fCustomBad:"No such font on Google Fonts, or it has no Cyrillic", fCustomEmpty:"Type the name of the font", fOnlyApp:"app only", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
+cleanFont:"Golos is set for this style — you can change it below", fkOdd:"Unusual", layPaper:"Newspaper", layPaperS:"ink on newsprint, rules instead of cards, plans as a price list with dots", layBrutal:"Brutal", layBrutalS:"thick outlines, hard shadows, buttons that press in, sticker labels", layTerminal:"Terminal", layTerminalS:"a console: monospace, a cursor, [ buttons ] and a dotted price list", layTicket:"Ticket", layTicketS:"a boarding pass: notched edges, perforations, the price on a tear-off stub", layPoster:"Poster", layPosterS:"a Swiss poster: no cards, heavy rules, a huge figure of days", layNotebook:"Notebook", layNotebookS:"squared paper, drawn by hand, handwritten titles and a highlighter", styleFont:"{f} is set for this style — you can change it below", topT:"Header", topSub:"the bar at the top with the logo and name", topAuto:"As the style", topAccent:"Shop colour", topCustom:"Own colour", topGradient:"Gradient", topImage:"Picture", topColor:"Header colour", topNoImg:"For a picture header, upload your picture below, in “Picture on home”.", topHint:"The text colour is picked for you so the name stays readable. Telegram’s own top bar takes the same colour.", artT:"Picture on home", artSub:"above the home screen", artNone:"None", artCity:"City", artBauhaus:"Bauhaus", artContours:"Contour map", artWaves:"Waves", artStars:"Star chart", artPeaks:"Mountains", artLighthouse:"Lighthouse", artPlanet:"Planet", artDunes:"Dunes", artAurora:"Northern lights", artTaiga:"Taiga", artOwn:"Your own", artUpload:"Upload your own", artHint:"The drawings take your colour and follow light and dark. Your own picture: PNG, JPEG or WebP up to 4 MB; it can also go into the header.", artDone:"Picture uploaded", artGone:"Picture removed", btnT:"Buttons", btnSub:"the shape of the main buttons", bAuto:"As the style", bKey:"Key", bStamp:"Stamp", bArrow:"With an arrow", bNotch:"Ticket", bPixel:"Pixels", bOutline:"Double outline", bSample:"Renew", hapT:"Feedback on press", hapOn:"Vibration", hapOff:"No vibration", hapHint:"A light tap of the phone on presses, like banking apps. Works in Telegram on a phone.", enterT:"Entrance", eRise:"From below", eSpring:"Spring", eSlide:"From the side", eBlur:"Out of a blur", eUnfold:"Unfold", enterHint:"How the blocks come in when the app opens and on a tab switch, with lively motion. The phone on the right plays it at once.", efLeaves:"Falling leaves", efPetals:"Petals", efMeteors:"Falling stars", celT:"After payment", celCheck:"A tick", celConfetti:"Confetti", celHint:"What the person sees when the payment goes through. See it with the “Payment done” button under the phone.", hmT:"Home screen", hmSub:"what the app opens with", hmAnswer:"Answer", hmAnswerS:"“Works until Dec 26”, a button and a short list", hmTerm:"Term", hmTermS:"a calendar to the end of the subscription, renewal right there", hmDevices:"Devices", hmDevicesS:"connected devices and free places", hmClassic:"Classic", hmClassicS:"a card with the days and two tiles", layT:"Style", laySub:"background, cards, heading font", layClean:"Clean", layCleanS:"light like Telegram’s lists; dark when Telegram is dark", layTonal:"Soft", layTonalS:"surfaces tinted with your colour, pill buttons — like Android", layBrand:"Brand", layBrandS:"your colour across the top — like a bank’s app", layLarge:"Large", layLargeS:"larger text, contrast and big buttons — easy to read", layCosmos:"Cosmos", layCosmosS:"a night ground lit by your colour, glass cards, gradient prices — like VPN sites", layClassic:"Dark classic", layClassicS:"dark cards, own backgrounds and special sets", layOwn:"This style has its own background and cards — these settings work in Dark classic.", fontT:"Font", fkSans:"Plain", fkSerif:"Serif", fkChar:"With character", fkFun:"For special looks", fkCustom:"Your own from Google Fonts", fCustomPh:"A name, like Lobster", fCustomHint:"Any family from fonts.google.com for headings and numbers; the text stays in Golos. Pick one with Cyrillic if you sell in Russian.", fCustomBad:"No such font on Google Fonts, or it has no Cyrillic", fCustomEmpty:"Type the name of the font", fOnlyApp:"app only", radiusT:"Corner roundness", rSquare:"Square", rSharp:"Sharp", rNormal:"Normal", rRound:"Soft",
   linksT:"Own buttons", linksSub:"in the customer's profile, up to 6", linkAdd:"Add a button", linkRu:"Text (RU)", linkEn:"Text (EN)",
   linksEmpty:"For example: “Our channel”, “Customer chat”, “Website”.", linkBad:"A link must start with https://, tg:// or mailto:",
   exExcel:"Excel", exOrdersT:"Orders to Excel", exOrdersHint:"A table for bookkeeping and taxes: date, customer, what was bought, amount, payment method. A total at the bottom.",
@@ -1738,6 +1775,8 @@ const PAGES = [
   ["gifts", "i-gift"], ["sep", "secPeople"], ["users", "i-users"], ["support", "i-chat"], ["refs", "i-share"], ["casts", "i-send"], ["reviews", "i-star"],
   ["sep", "secSystem"], ["servers", "i-server"], ["pay", "i-coin"], ["look", "i-palette"], ["docs", "i-doc"], ["settings", "i-gear"], ["updates", "i-refresh"], ["database", "i-db"], ["alarm", "i-alert"], ["team", "i-users"], ["logs", "i-list"],
 ];
+// Pages reached from another page, not from the menu.
+const SUBPAGES = { import:"servers" };
 let page = "dash", badges = {};
 /* Which section each page belongs to: a team member sees only theirs (the
    server checks it too, for every request — this only tidies the menu). */
@@ -1756,7 +1795,7 @@ function drawNav(){
   const keep = PAGES.filter(([id]) => id === "sep" || pageAllowed(id));
   const vis = keep.filter((p, i) => p[0] !== "sep" || (keep[i + 1] && keep[i + 1][0] !== "sep"));
   $("nav").innerHTML = vis.map(([id, x]) => id === "sep" ? `<div class="sep">${esc(t(x))}</div>`
-    : `<a href="#${id}" class="${page === id ? "on" : ""}">${ic(x, "")}<span class="tx">${esc(t(id))}</span>${
+    : `<a href="#${id}" class="${page === id || SUBPAGES[page] === id ? "on" : ""}">${ic(x, "")}<span class="tx">${esc(t(id))}</span>${
         badges[id] ? `<span class="cnt">${badges[id]}</span>` : ""}</a>`).join("");
   document.querySelectorAll(".langs button").forEach(b => b.classList.toggle("on", b.dataset.l === LANG));
 }
@@ -1778,7 +1817,7 @@ function route(){
   ROUTE_SEQ++;
   toggleNav(false);
   page = (location.hash || "#dash").slice(1).split("?")[0];
-  if (!PAGES.some(p => p[0] === page)) page = "dash";
+  if (!PAGES.some(p => p[0] === page) && !SUBPAGES[page]) page = "dash";
   if (!TOKEN){ drawNav(); showLogin(); return; }
   if (!WHO){ const seq = ROUTE_SEQ; loadWho().then(() => { if (seq === ROUTE_SEQ) route(); }); return; }
   if (!pageAllowed(page)){
@@ -1792,7 +1831,7 @@ function route(){
   ({ dash:pDash, users:pUsers, orders:pOrders, plans:pPlans, promos:pPromos, gifts:pGifts, servers:pServers,
      casts:pCasts, reviews:pReviews, look:pLook, settings:pSettings, logs:pLogs, warm:pWarm, refs:pRefs,
      stats:pStats, support:pSupport, setup:pSetup, docs:pDocs, sources:pSources, alarm:pAlarm, team:pTeam, pay:pPay,
-     updates:pUpdates, database:pDatabase }[page])();
+     updates:pUpdates, database:pDatabase, import:pImport }[page])();
 }
 window.addEventListener("hashchange", route);
 
@@ -2414,7 +2453,7 @@ async function pGifts(){
 /* ============================ servers ============================ */
 let SERVERS = [];
 async function pServers(){
-  head(t("servers"), t("serversSub"), `<button class="btn" onclick="serverModal()">${ic("i-plus", "xs")}${esc(t("addServer"))}</button>`);
+  head(t("servers"), t("serversSub"), `${!WHO || WHO.owner ? `<a class="btn ghost" href="#import">${ic("i-download", "xs")}${esc(t("imp"))}</a>` : ""}<button class="btn" onclick="serverModal()">${ic("i-plus", "xs")}${esc(t("addServer"))}</button>`);
   try { SERVERS = await api("/servers"); } catch (e){ return fail(e); }
   $("content").innerHTML = SERVERS.length ? SERVERS.map(s => `<div class="card"><div class="srv">
       <span class="fl">${flag(s.country)}</span>
@@ -4060,7 +4099,8 @@ function curColors(){
 // gothic, the terminal with a dot-matrix face. Only the default font or one
 // a style put there is replaced; a font the owner picked stays.
 const STYLE_FONT = { clean:"golos", tonal:"golos", brand:"golos", large:"golos", cosmos:"golos",
-                     paper:"oldstandard", brutal:"dela", terminal:"dotgothic", ticket:"plexmono" };
+                     paper:"oldstandard", brutal:"dela", terminal:"dotgothic", ticket:"plexmono",
+                     swiss:"geologica", notebook:"caveat" };
 function setLook(key, v){
   LOOK[key] = v;
   if (key === "hapticsV") LOOK.haptics = v === "1";
@@ -4166,6 +4206,19 @@ function styleThumb(k, hex){
     <i style="left:6px;right:6px;top:24px;height:44px;background:#1A1D22;border-radius:8px;-webkit-mask:radial-gradient(circle 5px at 0 50%,#0000 94%,#000) 0 0/51% 100% no-repeat,radial-gradient(circle 5px at 100% 50%,#0000 94%,#000) 100% 0/51% 100% no-repeat"></i>
     <i style="left:14px;right:14px;top:56px;border-top:1.5px dashed #ffffff40"></i>
     ${[76, 100].map((y, n) => `<i style="left:6px;right:6px;top:${y}px;height:20px;background:${n ? "#1A1D22" : `color-mix(in srgb,${hex} 18%,#1A1D22)`};border-radius:6px;-webkit-mask:radial-gradient(circle 4px at 0 50%,#0000 94%,#000) 0 0/51% 100% no-repeat,radial-gradient(circle 4px at 100% 50%,#0000 94%,#000) 100% 0/51% 100% no-repeat"></i><i style="left:12px;top:${y + 7}px;width:30px;height:6px;background:#AEB4BD;border-radius:1px"></i><i style="right:30px;top:${y + 3}px;height:14px;border-left:1.5px dashed ${n ? "#ffffff40" : hex}"></i><i style="right:10px;top:${y + 7}px;width:14px;height:6px;background:${n ? "#EEF0F3" : hex};border-radius:1px"></i>`).join("")}</span>`;
+  if (k === "swiss") return `<span class="ph" style="background:#F1EFE8">
+    <i style="left:8px;top:9px;width:40px;height:8px;background:#111110"></i><i style="left:0;right:0;top:22px;height:2px;background:#111110"></i>
+    <i style="left:8px;top:30px;width:40px;height:36px;font:800 40px/36px system-ui,sans-serif;color:#111110;letter-spacing:-3px" aria-hidden="true">24</i>
+    <i style="left:8px;top:70px;width:52px;height:6px;background:#111110"></i>
+    <i style="left:8px;right:8px;top:82px;height:14px;background:${hex}"></i>
+    <i style="left:8px;right:8px;top:104px;height:2px;background:#111110"></i><i style="left:8px;top:111px;width:6px;height:6px;background:${hex}"></i><i style="left:18px;top:111px;width:40px;height:6px;background:#111110"></i></span>`;
+  if (k === "notebook") return `<span class="ph" style="background:linear-gradient(90deg,transparent 9px,#D9666A 9px 10px,transparent 10px),linear-gradient(#6E9BD13d 1px,transparent 1px) 0 0/8px 8px,linear-gradient(90deg,#6E9BD13d 1px,transparent 1px) 0 0/8px 8px,#FBFAF5">
+    <i style="left:14px;top:10px;width:52px;height:7px;background:#1E2733;border-radius:4px 2px 5px 2px;transform:rotate(-1.5deg)"></i>
+    <i style="left:12px;right:8px;top:26px;height:44px;background:#fff;border:1.5px solid #1E273399;border-radius:255px 15px 225px 15px/15px 225px 15px 255px;transform:rotate(-1deg)"></i>
+    <i style="left:20px;top:40px;width:26px;height:9px;background:color-mix(in srgb,${hex} 55%,transparent);transform:rotate(-3deg)"></i>
+    <i style="left:20px;right:16px;top:56px;height:9px;background:${hex};border:1.5px solid #1E2733;border-radius:255px 15px 225px 15px/15px 225px 15px 255px"></i>
+    <i style="left:12px;top:80px;width:44px;height:6px;border-bottom:2px wavy ${hex}"></i>
+    <i style="left:12px;right:8px;top:94px;height:28px;background:#fff;border:1.5px solid #1E273399;border-radius:15px 255px 15px 225px/225px 15px 255px 15px;transform:rotate(.8deg)"></i></span>`;
   if (k === "cosmos") return `<span class="ph" style="background:radial-gradient(90% 55% at 50% 0%,${hex}77,transparent 65%),radial-gradient(70% 40% at 0% 100%,#EC489944,transparent 60%),#0A0513">
     <i style="left:8px;top:10px;width:62px;height:9px;background:#fff;border-radius:2px"></i>
     <i style="left:6px;right:6px;top:26px;height:50px;border-radius:10px;border:1px solid ${hex}55;background:linear-gradient(160deg,${hex}44,#140C26DD);overflow:hidden"></i>
@@ -4337,6 +4390,55 @@ function artSvg(kind){
     dune(82, 9, 1.2, 48, mix("var(--sig)", 30, "var(--card-2)"), mix("var(--sig)", 70, "var(--card-2)"));
     dune(100, 8, 3.1, 40, mix("var(--sig)", 20, "var(--card-2)"), mix("var(--sig)", 55, "var(--card-2)"));
     dune(118, 6, 4.4, 34, "var(--card-2)", mix("var(--sig)", 40, "var(--card-2)"));
+  } else if (kind === "aurora"){
+    // northern lights: curtains of the accent hanging over snowy hills with a few firs
+    g += `<defs><linearGradient id="arSkyA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${mix("var(--sig)", 8, "var(--ground)")}"/><stop offset="1" style="stop-color:${mix("var(--sig)", 22, "var(--ground)")}"/></linearGradient>
+      <linearGradient id="arCur" x1="0" y1="1" x2="0" y2="0"><stop offset="0" style="stop-color:var(--sig);stop-opacity:0"/><stop offset=".22" style="stop-color:var(--sig);stop-opacity:.75"/><stop offset="1" style="stop-color:var(--sig);stop-opacity:0"/></linearGradient>
+      <filter id="arSoft" x="-5%" y="-20%" width="110%" height="140%"><feGaussianBlur stdDeviation="2.2 1.4"/></filter></defs>`;
+    g += `<rect width="${W}" height="${H}" fill="url(#arSkyA)"/>`;
+    for (let i = 0; i < 40; i++) g += `<circle class="ar-st" cx="${(r() * W).toFixed(1)}" cy="${(r() * 96).toFixed(1)}" r="${(.35 + r() * .8).toFixed(2)}" ${f("var(--txt)", ";opacity:.8")}/>`;
+    const curtain = (base, amp, len, ph, hgt, op) => {
+      g += `<g filter="url(#arSoft)">`;
+      for (let x = -6; x < W + 6; x += 1.8){
+        const y = base + Math.sin(x / len + ph) * amp + Math.sin(x / (len * .37) + ph * 1.7) * amp * .35;
+        const h = hgt * (.55 + .45 * Math.abs(Math.sin(x / (len * .8) + ph * 3)));
+        g += `<rect x="${x.toFixed(1)}" y="${(y - h).toFixed(1)}" width="2.4" height="${h.toFixed(1)}" fill="url(#arCur)" style="opacity:${(op * (.55 + r() * .45)).toFixed(2)}"/>`;
+      }
+      g += `</g>`;
+    };
+    curtain(70, 12, 46, .4, 58, .55);
+    curtain(84, 9, 34, 2.2, 44, .85);
+    g += `<path d="M-10 ${H}L-10 106C40 96 82 100 130 108C178 116 214 98 262 100C300 102 334 110 370 104L370 ${H}Z" ${f(mix("var(--txt)", 18, "var(--ground)"))}/>`;
+    g += `<path d="M-10 ${H}L-10 118C50 112 110 122 170 118C230 114 290 124 370 116L370 ${H}Z" ${f(mix("var(--txt)", 10, "var(--ground)"))}/>`;
+    const fir = (x, y, h) => {
+      const w = h * .42;
+      let d = "";
+      for (let k = 0; k < 3; k++){ const t = y - h + k * h * .28, b = t + h * .45; d += `M${x} ${t.toFixed(1)}L${(x + w * (.5 + k * .25)).toFixed(1)} ${b.toFixed(1)}L${(x - w * (.5 + k * .25)).toFixed(1)} ${b.toFixed(1)}Z`; }
+      g += `<path d="${d}" ${f("var(--ground)")}/><rect x="${x - .8}" y="${y - h * .14}" width="1.6" height="${h * .16}" ${f("var(--ground)")}/>`;
+    };
+    [[30, 112, 22], [44, 114, 15], [238, 106, 26], [256, 108, 18], [322, 112, 20]].forEach(([x, y, h]) => fir(x, y, h));
+  } else if (kind === "taiga"){
+    // a fir forest in fog under the moon: three rows going darker towards us
+    g += `<rect width="${W}" height="${H}" ${f(mix("var(--sig)", 12, "var(--card-2)"))}/>`;
+    g += `<circle cx="272" cy="40" r="22" ${f(mix("var(--sig)", 80, "var(--txt)"))}/>`;
+    g += `<circle cx="272" cy="40" r="34" ${f("var(--sig)", ";opacity:.12")}/>`;
+    for (let i = 0; i < 18; i++) g += `<circle class="ar-st" cx="${(r() * W).toFixed(1)}" cy="${(r() * 50).toFixed(1)}" r="${(.35 + r() * .7).toFixed(2)}" ${f("var(--txt)", ";opacity:.7")}/>`;
+    const row = (base, hmin, hmax, step, fill) => {
+      let d = `M-10 ${H}`;
+      for (let x = -10; x < W + 14; x += step * (.7 + r() * .6)){
+        const h = hmin + r() * (hmax - hmin), w = h * .34;
+        d += `L${(x - w).toFixed(1)} ${base}L${(x - w * .55).toFixed(1)} ${(base - h * .45).toFixed(1)}L${(x - w * .75).toFixed(1)} ${(base - h * .45).toFixed(1)}`
+          + `L${(x - w * .35).toFixed(1)} ${(base - h * .75).toFixed(1)}L${(x - w * .5).toFixed(1)} ${(base - h * .75).toFixed(1)}L${x.toFixed(1)} ${(base - h).toFixed(1)}`
+          + `L${(x + w * .5).toFixed(1)} ${(base - h * .75).toFixed(1)}L${(x + w * .35).toFixed(1)} ${(base - h * .75).toFixed(1)}L${(x + w * .75).toFixed(1)} ${(base - h * .45).toFixed(1)}`
+          + `L${(x + w * .55).toFixed(1)} ${(base - h * .45).toFixed(1)}L${(x + w).toFixed(1)} ${base}`;
+      }
+      g += `<path d="${d}L${W + 10} ${H}Z" ${f(fill)}/>`;
+    };
+    row(92, 16, 30, 12, mix("var(--sig)", 30, "var(--card-2)"));
+    g += `<rect y="80" width="${W}" height="16" ${f(mix("var(--sig)", 12, "var(--card-2)"), ";opacity:.6")}/>`;
+    row(112, 22, 40, 16, mix("var(--sig)", 18, "var(--card-2)"));
+    g += `<rect y="100" width="${W}" height="14" ${f(mix("var(--sig)", 10, "var(--card-2)"), ";opacity:.55")}/>`;
+    row(136, 30, 54, 22, "var(--ground)");
   }
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${g}</svg>`;
 }
@@ -4359,7 +4461,7 @@ function drawOpts(){
   $("homeOpts").innerHTML = [["answer", "hmAnswer"], ["term", "hmTerm"], ["devices", "hmDevices"], ["classic", "hmClassic"]].map(([k, l]) =>
     `<button class="th lay ${LOOK.home === k ? "on" : ""}" onclick="setLook('home','${k}')">${homeThumb(k, hex)}<b>${esc(t(l))}</b><small>${esc(t(l + "S"))}</small></button>`).join("");
   $("layOpts").innerHTML = [["clean", "layClean"], ["tonal", "layTonal"], ["brand", "layBrand"], ["large", "layLarge"], ["cosmos", "layCosmos"],
-    ["paper", "layPaper"], ["brutal", "layBrutal"], ["terminal", "layTerminal"], ["ticket", "layTicket"], ["classic", "layClassic"]].map(([k, l]) =>
+    ["paper", "layPaper"], ["brutal", "layBrutal"], ["terminal", "layTerminal"], ["ticket", "layTicket"], ["swiss", "layPoster"], ["notebook", "layNotebook"], ["classic", "layClassic"]].map(([k, l]) =>
     `<button class="th lay ${LOOK.layout === k ? "on" : ""}" onclick="setLook('layout','${k}')">${styleThumb(k, hex)}<b>${esc(t(l))}</b><small>${esc(t(l + "S"))}</small></button>`).join("");
   const own = LOOK.layout !== "classic";
   $("bdOwn").hidden = !own; $("bdBody").classList.toggle("dimmed", own);
@@ -4370,7 +4472,7 @@ function drawOpts(){
     `<button class="th opt ${LOOK.backdrop === k ? "on" : ""}" onclick="setLook('backdrop','${k}')">
       <span class="sw" style="background:${bdCss(k, rgb, ground)}"></span><b>${esc(t(l))}</b></button>`).join("");
   $("motionHint").textContent = t("mHint_" + LOOK.motion);
-  $("artOpts").innerHTML = [["none", "artNone"], ["city", "artCity"], ["bauhaus", "artBauhaus"], ["contours", "artContours"], ["waves", "artWaves"], ["stars", "artStars"], ["peaks", "artPeaks"], ["lighthouse", "artLighthouse"], ["planet", "artPlanet"], ["dunes", "artDunes"], ["own", "artOwn"]].map(([k, l]) =>
+  $("artOpts").innerHTML = [["none", "artNone"], ["city", "artCity"], ["bauhaus", "artBauhaus"], ["contours", "artContours"], ["waves", "artWaves"], ["stars", "artStars"], ["peaks", "artPeaks"], ["lighthouse", "artLighthouse"], ["planet", "artPlanet"], ["dunes", "artDunes"], ["aurora", "artAurora"], ["taiga", "artTaiga"], ["own", "artOwn"]].map(([k, l]) =>
     `<button class="th opt ${LOOK.art === k ? "on" : ""}" onclick="${k === "own" && !LOOK.artImage ? "$('artIn').click()" : `setLook('art','${k}')`}">${artThumb(k, hex)}<b>${esc(t(l))}</b></button>`).join("");
   $("btnOpts").innerHTML = [["auto", "bAuto"], ["key", "bKey"], ["stamp", "bStamp"], ["arrow", "bArrow"], ["notch", "bNotch"], ["pixel", "bPixel"], ["outline", "bOutline"]].map(([k, l]) =>
     `<button class="th opt ${LOOK.buttons === k ? "on" : ""}" onclick="setLook('buttons','${k}')">${btnThumb(k, hex)}<b>${esc(t(l))}</b></button>`).join("");
@@ -4948,6 +5050,120 @@ async function dashDatabase(){
   const box = $("dashDb");
   if (!box || !d.recommend) return;
   box.innerHTML = `<a class="alert y" href="#database">${ic("i-db")}<span><b>${esc(t("dbRec", { n:Number(d.active).toLocaleString(LANG === "ru" ? "ru-RU" : "en-US") }))}</b> · ${esc(t("dbRecDash"))} →</span></a>`;
+}
+
+/* ============================ moving customers in ============================ */
+let IMP = null, IMP_SRV = 0;
+async function pImport(){
+  head(t("imp"), t("impSub"), `<a class="btn ghost sm" href="#servers">← ${esc(t("servers"))}</a>`);
+  let srv, links;
+  try { [srv, links] = await Promise.all([api("/servers"), api("/import/links")]); } catch (e){ return fail(e); }
+  if (!IMP_SRV || !srv.some(x => x.id === IMP_SRV)) IMP_SRV = srv[0] ? srv[0].id : 0;
+  const steps = ["impStep1", "impStep2", "impStep3"].map(k => `<li>${esc(t(k))}</li>`).join("");
+  $("content").innerHTML = `
+    <div class="grid g2" style="align-items:start"><div>
+      <div class="card"><h3>${esc(t("impFrom"))}</h3>
+        ${srv.length ? `<div class="field"><label>${esc(t("impPanel"))}</label>
+          <div class="inrow"><select id="impSrv" onchange="IMP_SRV=+this.value;IMP=null;$('impList').innerHTML=''">${srv.map(x =>
+            `<option value="${x.id}" ${x.id === IMP_SRV ? "selected" : ""}>${esc(x.name)} · ${esc(x.kind === "marzban" ? "Marzban" : x.kind === "remnawave" ? "Remnawave" : "3x-ui")}</option>`).join("")}</select>
+          <button class="btn" onclick="impRead(this)">${ic("i-download", "xs")}${esc(t("impRead"))}</button></div></div>`
+        : `<div class="empty">${ic("i-server", "")}${esc(t("impNoSrv"))}</div>`}
+        <ol class="how">${steps}</ol>
+        <div class="hint">${esc(t("impSafe"))}</div>
+      </div>
+    </div><div>
+      <div class="card" id="impLinks">${impLinks(links)}</div>
+    </div></div>
+    <div id="impList" style="margin-top:14px"></div>`;
+  IMP_LINKS = links;
+  if (IMP && IMP.srv === IMP_SRV) drawImport();
+}
+let IMP_LINKS = [];
+function impLinks(links){
+  const h = `<h3>${esc(t("impLinks"))}${links.length ? `<button class="btn ghost sm" onclick="impCsv()">${ic("i-download", "xs")}${esc(t("impCsv"))}</button>` : ""}</h3>`;
+  if (!links.length) return h + `<div class="hint" style="margin:0;font-size:12.5px">${esc(t("impLinksNone"))}</div>`;
+  return h + `<div class="rows">${links.slice(0, 60).map(l => `<div class="r improw"><span><b>${esc(l.name)}</b><span class="usub">${esc(l.server)} · ${esc(t("impTill", { d:date(l.expires) }))}</span></span>
+    ${l.claimed ? `<span class="tag g"><i class="d"></i>${esc(t("impTaken"))}</span>`
+      : `<span class="impact"><span class="tag m">${esc(t("impWait"))}</span><button class="copy" onclick="copy(${esc(JSON.stringify(l.link))})" aria-label="${esc(t("copy"))}" title="${esc(t("copy"))}">${ic("i-copy", "xs")}</button><button class="act dgr" onclick="impDrop(${l.id})" aria-label="${esc(t("delete"))}" title="${esc(t("delete"))}">${ic("i-trash", "xs")}</button></span>`}</div>`).join("")}</div>
+    ${links.length > 60 ? `<div class="hint">${esc(t("impMore", { n:links.length - 60 }))}</div>` : ""}`;
+}
+async function impDrop(id){
+  if (!(await ask(t("impDropQ")))) return;
+  try { await api(`/import/links/${id}`, { method:"DELETE" }); IMP_LINKS = await api("/import/links"); $("impLinks").innerHTML = impLinks(IMP_LINKS); }
+  catch (e){ fail(e); }
+}
+function impCsv(){
+  const q = v => `"${String(v).replace(/"/g, '""')}"`;
+  const rows = [[t("impName"), t("impUntil"), t("impLink"), t("status")]].concat(IMP_LINKS.map(l =>
+    [l.name, date(l.expires), l.link, l.claimed ? t("impTaken") : t("impWait")]));
+  const blob = new Blob(["﻿" + rows.map(r => r.map(q).join(";")).join("\n")], { type:"text/csv" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "links.csv"; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+async function impRead(btn){
+  btn.disabled = true;
+  const label = btn.innerHTML; btn.textContent = t("checking");
+  try {
+    const d = await api(`/import/${IMP_SRV}`);
+    IMP = { srv:IMP_SRV, ...d, pick:new Set(d.clients.filter(c => c.state === "ok").map(c => c.name)), done:null };
+    drawImport();
+  } catch (e){ fail(e); }
+  finally { btn.disabled = false; btn.innerHTML = label; }
+}
+const IMP_STATE = { ok:["g", "impOk"], off:["y", "impOff"], link:["y", "impSent"], in_shop:["m", "impIn"], ended:["m", "impEnded"] };
+const impCan = x => x.state === "ok" || x.state === "off" || x.state === "link";
+function drawImport(){
+  const d = IMP, c = d.counts, n = v => Number(v || 0).toLocaleString(LANG === "ru" ? "ru-RU" : "en-US");
+  const never = d.clients.some(x => !x.expires && d.pick.has(x.name));
+  const kpi = (v, l) => `<div class="kpi"><div class="v">${n(v)}</div><div class="l">${esc(t(l))}</div></div>`;
+  const row = x => {
+    const can = impCan(x), [cl, lb] = IMP_STATE[x.state];
+    return `<tr class="${can ? "" : "dim"}">
+      <td style="width:34px"><input type="checkbox" class="impck" ${can ? "" : "disabled"} ${d.pick.has(x.name) ? "checked" : ""} onchange="impPick(${esc(JSON.stringify(x.name))}, this.checked)" aria-label="${esc(x.name)}"></td>
+      <td><div class="uname">${esc(x.name)}</div></td>
+      <td>${x.tg_id ? `<span class="mono">${x.tg_id}</span>${x.id_from === "name" ? `<div class="usub">${esc(t("impFromName"))}</div>` : ""}` : `<span class="usub">${esc(t("impByLink"))}</span>`}</td>
+      <td>${x.expires ? date(x.expires) : esc(t("impNever"))}</td>
+      <td class="num">${x.total ? gbf(x.left) : "∞"}</td>
+      <td><span class="tag ${cl}">${esc(t(lb))}</span></td></tr>`;
+  };
+  const chosen = d.clients.filter(x => d.pick.has(x.name));
+  const byId = chosen.filter(x => x.tg_id).length;
+  $("impList").innerHTML = `
+    ${d.done ? `<div class="alert g">${ic("i-check2")}<span><b>${esc(t("impDone", { a:n(d.done.added), b:n(d.done.links.length) }))}</b>${d.done.links.length ? `<br>${esc(t("impDoneN"))}` : ""}</span></div>` : ""}
+    <div class="kpis kpis4">${kpi(c.active, "impKAll")}${kpi(c.with_id, "impKId")}${kpi(c.no_id, "impKLink")}${kpi(c.in_shop + c.ended, "impKSkip")}</div>
+    <div class="card" style="padding:12px 5px">
+      ${d.clients.length ? `<div class="tblwrap"><table class="tight imptbl"><thead><tr>
+        <th><input type="checkbox" aria-label="${esc(t("impAll"))}" ${chosen.length && chosen.length === d.clients.filter(impCan).length ? "checked" : ""} onchange="impPickAll(this.checked)"></th>
+        <th>${esc(t("impName"))}</th><th>Telegram ID</th><th>${esc(t("impUntil"))}</th><th class="num">${esc(t("impLeft"))}</th><th>${esc(t("status"))}</th></tr></thead>
+        <tbody>${d.clients.map(row).join("")}</tbody></table></div>`
+      : `<div class="empty">${ic("i-users", "")}${esc(t("impEmpty"))}</div>`}
+    </div>
+    ${d.clients.length ? `<div class="card impgo">
+      <div class="${never ? "three" : "two"}" style="align-items:end">
+        <div class="field" style="margin:0"><label>${esc(t("impDev"))}</label><input id="impDev" type="number" min="0" max="50" value="${IMP.devices ?? 3}" oninput="IMP.devices=+this.value"></div>
+        ${never ? `<div class="field" style="margin:0"><label>${esc(t("impNeverDays"))}</label><input id="impNever" type="number" min="1" max="3650" value="${IMP.never ?? 30}" oninput="IMP.never=+this.value"></div>` : ""}
+        <button class="btn" ${chosen.length ? "" : "disabled"} onclick="impRun(this)">${esc(t("impGo", { n:n(chosen.length) }))}</button>
+      </div>
+      <div class="hint">${esc(t("impGoN", { a:n(byId), b:n(chosen.length - byId) }))}</div></div>` : ""}`;
+}
+function impPick(name, on){ on ? IMP.pick.add(name) : IMP.pick.delete(name); drawImport(); }
+function impPickAll(on){
+  IMP.pick = new Set(on ? IMP.clients.filter(impCan).map(x => x.name) : []);
+  drawImport();
+}
+async function impRun(btn){
+  const names = [...IMP.pick];
+  if (!(await ask(t("impAsk", { n:names.length })))) return;
+  btn.disabled = true; btn.textContent = t("checking");
+  try {
+    const r = await api(`/import/${IMP.srv}`, { method:"POST", body:{ names, devices:+(IMP.devices ?? 3), never_days:+(IMP.never ?? 30) } });
+    const d = await api(`/import/${IMP.srv}`);
+    IMP = { ...IMP, ...d, pick:new Set(), done:r };
+    IMP_LINKS = await api("/import/links");
+    $("impLinks").innerHTML = impLinks(IMP_LINKS);
+    drawImport();
+    toast(t("impDone", { a:r.added, b:r.links.length }));
+  } catch (e){ fail(e); drawImport(); }
 }
 
 /* ============================ log ============================ */

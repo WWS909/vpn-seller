@@ -341,6 +341,49 @@ class XuiPanel:
                     out[email] = int(st.get("up") or 0) + int(st.get("down") or 0)
         return out
 
+    def clients(self) -> list[dict]:
+        """Every client on the panel, for moving them into the shop: one row
+        per person — the same subscription id on several inbounds (or the
+        same name, 3.x) is one person."""
+        people: dict[str, dict] = {}
+        used: dict[str, int] = {}
+        found: list[dict] = []
+        for ib in self._ok("GET", "panel/api/inbounds/list") or []:
+            for st in ib.get("clientStats") or []:
+                if st.get("email"):
+                    used[st["email"]] = int(st.get("up") or 0) + int(st.get("down") or 0)
+            found += [c for c in _as_obj(ib.get("settings")).get("clients") or [] if isinstance(c, dict)]
+        if self.version() == "3":
+            # 3.x keeps clients apart from inbounds; the list may come bare or wrapped
+            obj = self._ok("GET", "panel/api/clients/list") or []
+            if isinstance(obj, dict):
+                obj = next((obj[k] for k in ("clients", "items", "list", "rows") if isinstance(obj.get(k), list)), [])
+            for c in obj:
+                if isinstance(c, dict):
+                    found.append(c)
+                    t = c.get("traffic") if isinstance(c.get("traffic"), dict) else c
+                    if c.get("email") and (t.get("up") is not None or t.get("down") is not None):
+                        used.setdefault(c["email"], int(t.get("up") or 0) + int(t.get("down") or 0))
+        for c in found:
+            email = str(c.get("email") or "").strip()
+            if not email:
+                continue
+            key = str(c.get("subId") or "").strip() or email
+            exp = int(c.get("expiryTime") or 0)
+            if exp < 0:                     # "starts on first use": the length, not a date
+                exp = int(time.time() * 1000) - exp
+            row = people.setdefault(key, {"name": email, "tg_id": 0, "expires": -1, "total": 0,
+                                          "used": 0, "enabled": False})
+            tg = str(c.get("tgId") or "").strip()
+            if tg.isdigit() and int(tg) and not row["tg_id"]:
+                row["tg_id"] = int(tg)
+            exp_s = exp // 1000
+            row["expires"] = 0 if exp_s == 0 or row["expires"] == 0 else max(row["expires"], exp_s)
+            row["total"] = max(row["total"], int(c.get("totalGB") or 0))
+            row["used"] = max(row["used"], used.get(email, 0))
+            row["enabled"] = row["enabled"] or bool(c.get("enable", True))
+        return list(people.values())
+
     def reset_traffic(self, spec: ClientSpec) -> None:
         """Zero the traffic counter — done when a new period with a limit starts."""
         if self.version() == "3":
