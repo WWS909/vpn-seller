@@ -367,6 +367,22 @@ def server_script(name: str):
                              headers={"Cache-Control": "no-cache"})
 
 
+@app.get("/node-files/{name}", include_in_schema=False)
+def node_file(name: str):
+    """Xray for the shop's own servers when GitHub does not answer from
+    them (scripts/node.sh asks here second). Public: it is the official
+    release, checked by its SHA-256 on the server."""
+    from . import nodefiles
+    try:
+        path = nodefiles.file_for(name)
+    except FileNotFoundError:
+        raise HTTPException(404)
+    except nodefiles.Unavailable:
+        raise HTTPException(503, "GitHub is not reachable from the shop either")
+    return FileResponse(path, media_type="text/plain" if name.endswith(".dgst") else "application/zip",
+                        headers={"Cache-Control": "no-cache"})
+
+
 @app.get("/health", include_in_schema=False)
 def health():
     return {"ok": True, "version": VERSION}

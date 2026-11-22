@@ -63,6 +63,7 @@ def start() -> list[asyncio.Task]:
         (300, job_tg_only, 75),
         (60, job_updates, 30),
         (300, job_report, 100),
+        (21600, job_node_files, 900),
     ]
     from .config import settings as env
     if env.tunnel_metrics_url:
@@ -134,6 +135,18 @@ def job_backup(db: Session) -> None:
     """The daily archive to the admins, at the hour set in the panel."""
     from . import backup
     backup.run_daily(db)
+
+
+def job_node_files(db: Session) -> None:
+    """Keep a copy of Xray for the own servers while GitHub answers, so a
+    server that cannot reach GitHub can still be installed from the shop."""
+    from . import nodefiles
+    from .models import Server
+    if db.query(Server).filter(Server.kind == "node").count():
+        try:
+            nodefiles.file_for(nodefiles.NAMES[0])
+        except nodefiles.Unavailable:
+            pass
 
 
 def job_cleanup(db: Session) -> None:

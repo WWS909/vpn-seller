@@ -462,3 +462,41 @@ def test_agent_updates_itself_from_the_shop(tmp_path):
         httpd.shutdown()
     finally:
         ag.stop()
+
+
+def test_shop_keeps_xray_for_servers_without_github(client, env, monkeypatch):
+    """node.sh asks the shop for Xray when GitHub does not answer: the shop
+    fetches the release once, checks it against its .dgst and hands it out;
+    with GitHub gone later, the kept copy is still given."""
+    import hashlib
+
+    import httpx
+
+    from app import nodefiles
+    zip_body = b"PK-fake-xray-zip"
+    dgst = f"MD5= x\nSHA2-256= {hashlib.sha256(zip_body).hexdigest()}\n".encode()
+    calls = []
+
+    def fake_get(url, limit):
+        calls.append(url)
+        if not fake_get.up:
+            raise httpx.HTTPError("down")
+        return dgst if url.endswith(".dgst") else zip_body
+    fake_get.up = True
+    monkeypatch.setattr(nodefiles, "_get", fake_get)
+    r = client.get("/node-files/Xray-linux-64.zip")
+    assert r.status_code == 200 and r.content == zip_body
+    assert client.get("/node-files/Xray-linux-64.zip.dgst").content == dgst
+    assert len(calls) == 2                        # fetched once, then kept
+    fake_get.up = False
+    import os
+    old = time.time() - 8 * 86400
+    os.utime(nodefiles.folder() / "Xray-linux-64.zip", (old, old))
+    assert client.get("/node-files/Xray-linux-64.zip").content == zip_body   # stale but given
+    assert client.get("/node-files/Xray-linux-arm64-v8a.zip").status_code == 503
+    assert client.get("/node-files/evil.sh").status_code == 404
+    assert client.get("/node-files/..%2Fsecret").status_code == 404
+    # a release whose file does not match its checksum is not kept
+    fake_get.up = True
+    monkeypatch.setattr(nodefiles, "_get", lambda url, limit: dgst if url.endswith(".dgst") else b"tampered")
+    assert client.get("/node-files/Xray-linux-arm64-v8a.zip").status_code == 503
