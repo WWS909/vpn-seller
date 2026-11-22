@@ -3,6 +3,10 @@
 Each version is a `## X.Y.Z — date` heading with one change per "-" line.
 The shop reads this file to tell the owner what is new.
 
+## 1.9.1 — 2026-11-22
+- An own server installs even when GitHub does not open from it (it happens with some hosters). The installer takes Xray from GitHub first and, failing that, from the shop: the shop keeps a copy of Xray and hands it to its servers. The file is checked against the release checksum.
+- The installer no longer downloads the official XTLS script: it installs Xray itself, with the same systemd service.
+
 ## 1.9.0 — 2026-11-22
 - Own servers without 3x-ui (VPN Seller Node). Servers → Add → Own server: one command on a fresh server installs Xray, VLESS Reality (XHTTP on 8443 and TCP Vision on 443), turns on BBR, fixes DNS and prints a `vsnode://…` line to paste into the shop. Everything else is done from the panel: customers are added and removed without restarting Xray, traffic is counted, and the server itself stops people whose time or gigabytes ran out.
 - The Node button of such a server: the site it poses as (SNI), the browser fingerprint, ports, XHTTP and TCP on/off, new Reality keys, torrent blocking, restart. New keys reach customers through the subscription at once.

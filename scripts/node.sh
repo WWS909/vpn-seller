@@ -4,7 +4,8 @@
 #   curl -fsSL https://YOUR-SHOP/scripts/node.sh -o node.sh && sudo bash node.sh --shop https://YOUR-SHOP
 #
 # What it does: fixes DNS if it is broken, turns on BBR, installs Xray
-# (official XTLS installer), installs the agent from the shop, makes a
+# (from GitHub, or from the shop when GitHub does not answer), installs
+# the agent from the shop, makes a
 # VLESS Reality server on 443 (TCP) and 8443 (XHTTP) and prints ONE line
 # to paste into the shop: Servers → Add → Own server.
 #
@@ -103,23 +104,66 @@ EOF
 fi
 
 # ---------------------------------------------------------------- Xray
-if [ ! -x /usr/local/bin/xray ]; then
-  say "Ставлю Xray (официальный установщик XTLS)"
-  INST=$(mktemp)
-  retry curl -fsSL --connect-timeout 15 -o "$INST" https://github.com/XTLS/Xray-install/raw/main/install-release.sh \
-    || die "не скачался установщик Xray с GitHub — проверьте интернет/DNS на сервере"
-  retry bash "$INST" install >/dev/null || die "Xray не установился"
-  rm -f "$INST"
-else
-  say "Xray уже стоит: $(/usr/local/bin/xray version | head -1)"
+# Straight from the Xray releases on GitHub; when GitHub does not answer
+# from this server (it happens with some hosters), from the shop, which
+# keeps a copy. Either way the file is checked against the SHA-256 of
+# the release (.dgst).
+case "$(uname -m)" in
+  x86_64|amd64) XZ=Xray-linux-64.zip ;;
+  aarch64|arm64) XZ=Xray-linux-arm64-v8a.zip ;;
+  *) die "процессор $(uname -m) не поддерживается" ;;
+esac
+get_xray() {
+  local tmp src want have
+  tmp=$(mktemp -d)
+  for src in "https://github.com/XTLS/Xray-core/releases/latest/download" ${SHOP:+"$SHOP/node-files"}; do
+    say "Скачиваю Xray: $src"
+    if curl -fsSL --connect-timeout 15 --retry 3 --retry-delay 3 -o "$tmp/x.zip" "$src/$XZ" \
+       && curl -fsSL --connect-timeout 15 --retry 3 --retry-delay 3 -o "$tmp/x.dgst" "$src/$XZ.dgst"; then
+      want=$(grep -i '^SHA2-256' "$tmp/x.dgst" | awk '{print $NF}' | tr 'A-F' 'a-f')
+      have=$(sha256sum "$tmp/x.zip" | cut -d' ' -f1)
+      if [ -n "$want" ] && [ "$want" = "$have" ]; then
+        break
+      fi
+      warn "контрольная сумма не сошлась — пробую другой источник"
+    else
+      warn "не скачалось — пробую другой источник"
+    fi
+    rm -f "$tmp/x.zip"
+  done
+  [ -s "$tmp/x.zip" ] || die "Xray не скачался ни с GitHub, ни с магазина. Проверьте интернет на сервере: curl -sI https://github.com"
+  unzip -oq "$tmp/x.zip" -d "$tmp/x"
+  install -m 755 "$tmp/x/xray" /usr/local/bin/xray
+  mkdir -p /usr/local/share/xray /usr/local/etc/xray
+  cp -f "$tmp/x/geoip.dat" "$tmp/x/geosite.dat" /usr/local/share/xray/ 2>/dev/null || true
+  [ -f /usr/local/etc/xray/config.json ] || echo '{}' > /usr/local/etc/xray/config.json
+  rm -rf "$tmp"
+}
+if [ ! -x /usr/local/bin/xray ] || [ ! -f /usr/local/share/xray/geoip.dat ]; then
+  get_xray
 fi
-# geoip/geosite for routing Russian addresses past the chain
-if [ ! -f /usr/local/share/xray/geoip.dat ]; then
-  INST=$(mktemp)
-  if curl -fsSL --connect-timeout 15 -o "$INST" https://github.com/XTLS/Xray-install/raw/main/install-release.sh; then
-    bash "$INST" install-geodata >/dev/null 2>&1 || true
-  fi
-  rm -f "$INST"
+say "Xray: $(/usr/local/bin/xray version | head -1)"
+if [ ! -f /etc/systemd/system/xray.service ] && [ ! -f /lib/systemd/system/xray.service ]; then
+  cat > /etc/systemd/system/xray.service <<'UNIT'
+[Unit]
+Description=Xray Service
+After=network.target nss-lookup.target
+
+[Service]
+User=nobody
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+ExecStart=/usr/local/bin/xray run -config /usr/local/etc/xray/config.json
+Restart=on-failure
+RestartPreventExitStatus=23
+LimitNPROC=10000
+LimitNOFILE=1000000
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+  systemctl daemon-reload
 fi
 
 # ---------------------------------------------------------------- agent
