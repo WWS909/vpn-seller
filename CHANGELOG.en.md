@@ -4,11 +4,13 @@ Each version is a `## X.Y.Z — date` heading with one change per "-" line.
 The shop reads this file to tell the owner what is new.
 
 ## 1.9.0 — 2026-11-22
-- Our own server panel, Bridge Node, instead of 3x-ui. Servers → Add → Bridge Node: one command on a fresh server installs Xray, VLESS Reality (XHTTP on 8443 and TCP Vision on 443), turns on BBR, fixes DNS and prints a `bridge://…` line to paste into the shop. Everything else is done from the panel: customers are added and removed without restarting Xray, traffic is counted, and the server itself stops people whose time or gigabytes ran out.
+- Own servers without 3x-ui (VPN Seller Node). Servers → Add → Own server: one command on a fresh server installs Xray, VLESS Reality (XHTTP on 8443 and TCP Vision on 443), turns on BBR, fixes DNS and prints a `vsnode://…` line to paste into the shop. Everything else is done from the panel: customers are added and removed without restarting Xray, traffic is counted, and the server itself stops people whose time or gigabytes ran out.
 - The Node button of such a server: the site it poses as (SNI), the browser fingerprint, ports, XHTTP and TCP on/off, new Reality keys, torrent blocking, restart. New keys reach customers through the subscription at once.
 - A chain for the whitelists: a server in Russia becomes a bridge and sends all traffic on to an exit server abroad (VLESS Reality XHTTP between them). The bridge opens Russian sites directly itself. One choice in the Node window turns it on.
 - The shop talks to the server over HTTPS with the server's certificate fingerprint and a token; the server needs no domain.
-- A 3x-ui server can be moved to Bridge Node: `sudo bash node.sh --shop https://your-shop --takeover`, then add it in the shop and press "Push customers".
+- The server watches Xray itself and restarts it when it stops answering. The Node window shows CPU, memory, disk and the server's traffic; a new agent goes to the servers with one button from the shop, customers stay connected.
+- Servers from the chat with the bot: /servers → ⚙ on an own server — status, restart Xray, update the agent, turn the chain on and off.
+- A 3x-ui server can be moved to an own server: `sudo bash node.sh --shop https://your-shop --takeover`, then add it in the shop and press "Push customers".
 
 ## 1.8.0 — 2026-11-09
 - Choose the database: the installer asks a sixth question — SQLite (built in) or PostgreSQL (for a bigger shop). It looks at the server's memory and suggests one.

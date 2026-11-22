@@ -352,7 +352,7 @@ def vendor_file(name: str):
 
 
 SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
-PUBLIC_SCRIPTS = ("tune.sh", "node.sh", "bridge-node.py")
+PUBLIC_SCRIPTS = ("tune.sh", "node.sh", "vpn-seller-node.py")
 
 
 @app.get("/scripts/{name}", include_in_schema=False)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Bridge Node — the shop's own VPN server agent (instead of 3x-ui).
+VPN Seller Node — the shop's own VPN server agent (instead of 3x-ui).
 
 One small program on each VPN server. It owns Xray there: writes its
 config, adds and removes customers live through Xray's API, counts their
@@ -36,16 +36,18 @@ import shlex
 import ssl
 import subprocess
 import sys
+import shutil
 import tempfile
 import threading
 import time
 import uuid as uuidlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
+from urllib.request import urlopen
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 
-STATE_DIR = os.environ.get("BN_STATE_DIR", "/etc/bridge-node")
+STATE_DIR = os.environ.get("BN_STATE_DIR", "/etc/vpn-seller-node")
 XRAY_BIN = os.environ.get("BN_XRAY_BIN", "/usr/local/bin/xray")
 XRAY_CONF = os.environ.get("BN_XRAY_CONF", "/usr/local/etc/xray/config.json")
 XRAY_ASSETS = os.environ.get("BN_XRAY_ASSETS", "/usr/local/share/xray")
@@ -358,6 +360,8 @@ class Node:
         self.started = time.time()
         self.last_poll = 0.0
         self.last_error = ""
+        self.fails = 0                  # stats calls that failed in a row (Xray down?)
+        self.restarts = 0               # Xray restarted by the watchdog
 
     # ---------------------------------------------------------- apply
     def write_config(self) -> dict:
@@ -427,7 +431,21 @@ class Node:
                            "-reset", timeout=8)
             except AgentError as e:
                 self.last_error = str(e)
+                self.fails += 1
+                # Xray does not answer for a few rounds in a row: it crashed
+                # or hangs. Start it again from the config we keep.
+                if self.fails >= 3:
+                    log("xray is not answering, restarting it")
+                    self.fails = 0
+                    try:
+                        self.write_config()
+                        restart_xray()
+                        self.live = desired_users(self.state)
+                        self.restarts += 1
+                    except AgentError as e2:
+                        self.last_error = f"xray restart failed: {e2}"
                 return
+            self.fails = 0
             stats = parse_stats(out)
             touched = set()
             for (email, direction), value in stats.items():
@@ -497,6 +515,8 @@ class Node:
             "uptime": int(time.time() - self.started),
             "last_poll": int(self.last_poll), "last_error": self.last_error,
             "geo": has_geo(),
+            "watchdog_restarts": self.restarts,
+            "system": system_stats(),
         }
 
     def ensure(self, body: dict) -> dict:
@@ -631,6 +651,77 @@ class Node:
             return self.info()
 
 
+def system_stats() -> dict:
+    """How the machine itself is doing — for the shop's server card."""
+    out = {}
+    try:
+        out["load"] = round(os.getloadavg()[0], 2)
+        out["cpus"] = os.cpu_count() or 1
+    except OSError:
+        pass
+    try:
+        mem = {}
+        with open("/proc/meminfo") as f:
+            for ln in f:
+                k, v = ln.split(":", 1)
+                mem[k] = int(v.split()[0]) * 1024
+        out["mem_total"] = mem.get("MemTotal", 0)
+        out["mem_used"] = mem.get("MemTotal", 0) - mem.get("MemAvailable", 0)
+    except (OSError, ValueError, IndexError):
+        pass
+    try:
+        du = shutil.disk_usage("/")
+        out["disk_total"], out["disk_used"] = du.total, du.used
+    except OSError:
+        pass
+    try:
+        rx = tx = 0
+        with open("/proc/net/dev") as f:
+            for ln in f.readlines()[2:]:
+                name, data = ln.split(":", 1)
+                if name.strip() == "lo":
+                    continue
+                cols = data.split()
+                rx += int(cols[0])
+                tx += int(cols[8])
+        out["net_rx"], out["net_tx"] = rx, tx
+    except (OSError, ValueError, IndexError):
+        pass
+    try:
+        with open("/proc/uptime") as f:
+            out["uptime"] = int(float(f.read().split()[0]))
+    except (OSError, ValueError):
+        pass
+    return out
+
+
+def self_update(body: dict) -> dict:
+    """Replace this program with a newer one from the shop. The shop sends
+    the address and the SHA-256 of the file; anything else is refused.
+    systemd starts the new one after this process exits."""
+    url = str(body.get("url") or "")
+    want = str(body.get("sha256") or "").lower()
+    if not url.startswith(("https://", "http://")) or not re.match(r"^[0-9a-f]{64}$", want):
+        raise AgentError("bad update request")
+    try:
+        with urlopen(url, timeout=30) as r:          # noqa: S310 — checked by the hash below
+            data = r.read(2_000_000)
+    except OSError as e:
+        raise AgentError(f"download failed: {e.__class__.__name__}") from e
+    if hashlib.sha256(data).hexdigest() != want:
+        raise AgentError("the file does not match its checksum")
+    text = data.decode("utf-8")
+    try:
+        compile(text, "agent", "exec")
+    except SyntaxError as e:
+        raise AgentError("the new agent does not compile") from e
+    m = re.search(r'^VERSION = "([^"]+)"', text, re.M)
+    write_atomic(os.path.abspath(__file__), text, mode=0o755)
+    log("updated to", m.group(1) if m else "?", "— restarting")
+    threading.Timer(0.5, lambda: os._exit(0)).start()
+    return {"ok": True, "version": m.group(1) if m else ""}
+
+
 def parse_stats(out: str) -> dict[tuple[str, str], int]:
     """`xray api statsquery` → {(email, "uplink"|"downlink"): bytes}."""
     try:
@@ -657,7 +748,7 @@ _bad_auth: dict[str, list[float]] = {}
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "bridge-node"
+    server_version = "vpn-seller-node"
     sys_version = ""
 
     def log_message(self, fmt, *args):  # quiet: no access log with addresses
@@ -738,6 +829,8 @@ class Handler(BaseHTTPRequestHandler):
                 with node.lock:
                     node.apply_full()
                 return self._send(200, {"ok": True})
+            if method == "POST" and url.path == "/api/update":
+                return self._send(200, self_update(self._body()))
             if method == "POST" and url.path == "/api/poll":
                 node.poll()
                 return self._send(200, {"ok": True})
@@ -793,7 +886,7 @@ def serve() -> None:
     ctx.minimum_version = ssl.TLSVersion.TLSv1_2
     ctx.load_cert_chain(CERT_FILE, KEY_FILE)
     httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True)
-    log(f"bridge-node {VERSION} on {host}:{port}")
+    log(f"vpn-seller-node {VERSION} on {host}:{port}")
     httpd.serve_forever()
 
 
@@ -813,7 +906,7 @@ def connect_line() -> str:
     if ":" in host and not host.startswith("["):
         host = f"[{host}]"
     _h, port = listen_addr()
-    return f"bridge://{s['token']}@{host}:{port}#{cert_fingerprint()}"
+    return f"vsnode://{s['token']}@{host}:{port}#{cert_fingerprint()}"
 
 
 def cmd_init(args: list[str]) -> None:

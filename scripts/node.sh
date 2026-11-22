@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Bridge Node — turns a clean Ubuntu/Debian server into a VPN server of the shop.
+# VPN Seller Node — turns a clean Ubuntu/Debian server into a VPN server of the shop.
 #
 #   curl -fsSL https://YOUR-SHOP/scripts/node.sh -o node.sh && sudo bash node.sh --shop https://YOUR-SHOP
 #
 # What it does: fixes DNS if it is broken, turns on BBR, installs Xray
 # (official XTLS installer), installs the agent from the shop, makes a
 # VLESS Reality server on 443 (TCP) and 8443 (XHTTP) and prints ONE line
-# to paste into the shop: Servers → Add → Bridge Node.
+# to paste into the shop: Servers → Add → Own server.
 #
 # Safe to run again: keys, customers and the token are kept.
 #
@@ -41,8 +41,8 @@ die()  { printf '\033[1;31mОшибка:\033[0m %s\n' "$*" >&2; exit 1; }
 [ "$(id -u)" = 0 ] || die "запустите от root: sudo bash node.sh"
 command -v apt-get >/dev/null || die "нужен Ubuntu или Debian"
 
-DIR=/opt/bridge-node
-STATE=/etc/bridge-node
+DIR=/opt/vpn-seller-node
+STATE=/etc/vpn-seller-node
 mkdir -p "$DIR" "$STATE"
 chmod 700 "$STATE"
 
@@ -83,7 +83,7 @@ fi
 # ---------------------------------------------------------------- kernel
 if [ "$TUNE" = 1 ]; then
   say "BBR и сетевые буферы"
-  cat > /etc/sysctl.d/99-bridge-node.conf <<'EOF'
+  cat > /etc/sysctl.d/99-vpn-seller-node.conf <<'EOF'
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
 net.core.rmem_max = 33554432
@@ -123,12 +123,12 @@ if [ ! -f /usr/local/share/xray/geoip.dat ]; then
 fi
 
 # ---------------------------------------------------------------- agent
-say "Ставлю агент Bridge Node"
+say "Ставлю агент VPN Seller Node"
 if [ -n "$SHOP" ]; then
-  retry curl -fsSL --connect-timeout 15 -o "$DIR/agent.py.new" "$SHOP/scripts/bridge-node.py" \
+  retry curl -fsSL --connect-timeout 15 -o "$DIR/agent.py.new" "$SHOP/scripts/vpn-seller-node.py" \
     || die "не скачался агент с $SHOP"
-elif [ -f "$(dirname "$0")/bridge-node.py" ]; then
-  cp "$(dirname "$0")/bridge-node.py" "$DIR/agent.py.new"
+elif [ -f "$(dirname "$0")/vpn-seller-node.py" ]; then
+  cp "$(dirname "$0")/vpn-seller-node.py" "$DIR/agent.py.new"
 else
   die "укажите --shop https://ваш-магазин"
 fi
@@ -139,7 +139,7 @@ chmod 755 "$DIR/agent.py"
 # the agent's own certificate (the shop pins its fingerprint)
 if [ ! -s "$STATE/cert.pem" ]; then
   openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 3650 \
-    -subj "/CN=bridge-node" -keyout "$STATE/key.pem" -out "$STATE/cert.pem" >/dev/null 2>&1
+    -subj "/CN=vpn-seller-node" -keyout "$STATE/key.pem" -out "$STATE/cert.pem" >/dev/null 2>&1
   chmod 600 "$STATE/key.pem"
 fi
 
@@ -170,9 +170,9 @@ say "Настраиваю Reality (SNI: $SNI)"
 python3 "$DIR/agent.py" init --host "$IP" --sni "$SNI" --listen "0.0.0.0:$APORT" \
   --tcp-port "$TCP_PORT" --xhttp-port "$XHTTP_PORT"
 
-cat > /etc/systemd/system/bridge-node.service <<EOF
+cat > /etc/systemd/system/vpn-seller-node.service <<EOF
 [Unit]
-Description=Bridge Node agent (VPN server of the shop)
+Description=VPN Seller Node agent (VPN server of the shop)
 After=network-online.target xray.service
 Wants=network-online.target
 
@@ -188,8 +188,8 @@ WantedBy=multi-user.target
 EOF
 systemctl daemon-reload
 systemctl enable xray >/dev/null 2>&1 || true
-systemctl enable bridge-node >/dev/null 2>&1
-systemctl restart bridge-node
+systemctl enable vpn-seller-node >/dev/null 2>&1
+systemctl restart vpn-seller-node
 
 # firewall, only if it is already on
 if command -v ufw >/dev/null && ufw status | grep -q "Status: active"; then
@@ -198,12 +198,12 @@ fi
 
 sleep 2
 systemctl is-active --quiet xray || warn "Xray не запустился: journalctl -u xray -n 30"
-systemctl is-active --quiet bridge-node || warn "Агент не запустился: journalctl -u bridge-node -n 30"
+systemctl is-active --quiet vpn-seller-node || warn "Агент не запустился: journalctl -u vpn-seller-node -n 30"
 
 echo
 echo "=================================================================="
 echo " Готово. Скопируйте строку ниже в магазин:"
-echo " Серверы → Добавить сервер → Bridge Node → «Строка подключения»"
+echo " Серверы → Добавить сервер → «Свой сервер» → «Строка подключения»"
 echo
 python3 "$DIR/agent.py" connect
 echo

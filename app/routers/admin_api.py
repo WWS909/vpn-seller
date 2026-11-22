@@ -855,7 +855,7 @@ def _apply_server(s: Server, body: ServerBody) -> None:
     if body.api_token is not None:
         s.api_token = body.api_token.strip()
     if pasted_token:
-        s.api_token = pasted_token          # the bridge://TOKEN@… line of a Bridge Node
+        s.api_token = pasted_token          # the vsnode://TOKEN@… line of a VPN Seller Node
     def clean(raw: str) -> str:
         if body.kind in TAG_KINDS:          # inbound tags / internal squad uuids
             return ",".join(t.strip() for t in raw.split(",") if t.strip())
@@ -875,8 +875,8 @@ def _apply_server(s: Server, body: ServerBody) -> None:
 
 
 def _url_and_token(body: ServerBody) -> tuple[str, str | None]:
-    """The address to store and, for a Bridge Node, the token that came in
-    the pasted bridge://TOKEN@host:port#fingerprint line."""
+    """The address to store and, for a VPN Seller Node, the token that came in
+    the pasted vsnode://TOKEN@host:port#fingerprint line."""
     if body.kind == "node":
         return nodes.parse_connect(body.url)
     return normalize_url(body.url, body.kind), None
@@ -1018,7 +1018,7 @@ def check_server(server_id: int, db: Session = Depends(get_db), _=A):
         return {"ok": False, "error": str(e)}
 
 
-# ---------------------------------------------------------------- Bridge Node
+# ---------------------------------------------------------------- VPN Seller Node
 NODE_KEYS = {"sni", "target", "fp", "new_keys", "tcp_enabled", "tcp_port", "xhttp_enabled",
              "xhttp_port", "xhttp_path", "xhttp_mode", "block_torrent", "ru_direct",
              "block_private", "host"}
@@ -1029,7 +1029,7 @@ def _node(db: Session, server_id: int) -> Server:
     if not s:
         raise HTTPException(404, "server not found")
     if s.kind != "node":
-        raise HTTPException(400, "это не Bridge Node / not a Bridge Node")
+        raise HTTPException(400, "это не VPN Seller Node / not a VPN Seller Node")
     return s
 
 
@@ -1050,7 +1050,24 @@ def node_info(server_id: int, db: Session = Depends(get_db), _=A):
         info = panel_for(s, timeout=10).info(fresh=True)
     except PanelError as e:
         return {"ok": False, "error": str(e), "others": others}
-    return {"ok": True, "info": info, "others": others}
+    latest = nodes.agent_release()[0]
+    return {"ok": True, "info": info, "others": others, "latest": latest,
+            "outdated": nodes.older(info.get("agent", ""), latest)}
+
+
+@router.post("/servers/{server_id}/node/update")
+def node_update(server_id: int, db: Session = Depends(get_db), admin=A):
+    """The node takes the agent from this shop and restarts itself (a few
+    seconds; Xray and customers are not touched)."""
+    s = _node(db, server_id)
+    if not env.public_url:
+        raise HTTPException(400, "PUBLIC_URL is not set")
+    try:
+        version = panel_for(s, timeout=40).update_agent(env.public_url)
+    except PanelError as e:
+        raise HTTPException(400, str(e))
+    core.audit(db, "Node agent updated", admin, f"{s.name} → {version}")
+    return {"ok": True, "version": version}
 
 
 @router.post("/servers/{server_id}/node/settings")

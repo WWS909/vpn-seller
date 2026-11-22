@@ -1021,9 +1021,11 @@ cleanFont:"Для этого стиля поставил шрифт Golos — е
   verifyTls:"Проверять сертификат", tlsOff:"Проверка выключена: подменённый сервер по дороге к панели сможет прочитать её пароль. Выключайте только для своей панели с самодельным сертификатом.", test:"Проверить подключение", testOk:"Подключено: {v}, инбаундов: {n}", panelKind:"Панель", panelUrlMz:"Адрес панели Marzban",
   panelUrlHintMz:"Адрес, по которому открывается дашборд Marzban, например https://host:8000/ — логин и пароль администратора ниже.",
   inboundsHintMz:"Теги инбаундов Marzban через запятую. Нажмите «Проверить», чтобы выбрать из списка.",
-  nodeBtn:"Узел", nodeLine:"Строка подключения", nodeLineHint:"Строка bridge://… которую установщик напечатал в конце. Вставьте её целиком.",
+  nodeKind:"Свой сервер", nodeCpu:"Процессор", nodeMem:"Память", nodeDisk:"Диск", nodeNet:"Трафик сервера с запуска: ↓ {rx} ГБ · ↑ {tx} ГБ · работает {d} дн.",
+  nodeUpdT:"Есть новый агент {v}", nodeUpdHint:"Обновление занимает секунды, клиентов не отключает.", nodeUpdBtn:"Обновить", nodeUpdDone:"Агент обновляется до {v}",
+  nodeBtn:"Узел", nodeLine:"Строка подключения", nodeLineHint:"Строка vsnode://… которую установщик напечатал в конце. Вставьте её целиком.",
   nodeInstallT:"1. Установите на сервер", nodeInstallLead:"Новый сервер с Ubuntu 22/24 или Debian 12. Зайдите на него по SSH и вставьте команду — она поставит Xray, Reality и агент, включит BBR и починит DNS.",
-  nodeInstallAfter:"2. В конце будет строка bridge://… — вставьте её в поле ниже и нажмите «Проверить». Это ключ от сервера: не пересылайте её никому.",
+  nodeInstallAfter:"2. В конце будет строка vsnode://… — вставьте её в поле ниже и нажмите «Проверить». Это ключ от сервера: не пересылайте её никому.",
   inboundsHintNode:"Пусто — клиенты получают оба входа (XHTTP и TCP). Нажмите «Проверить», чтобы выбрать.",
   nodeRoleBridge:"Мост → {n}", nodeRoleExit:"Выходной сервер", nodeStats:"Xray {x} · агент {a} · онлайн {o} · активных {c}",
   nodeLookT:"Как сервер выглядит снаружи", nodeSniHint:"Чужой сайт, под который маскируется сервер. Для моста в России — сайт из белого списка (ya.ru, vk.com…).",
@@ -1502,9 +1504,11 @@ cleanFont:"Golos is set for this style — you can change it below", fkOdd:"Unus
   verifyTls:"Verify certificate", tlsOff:"The check is off: a fake server on the way to the panel could read its password. Turn it off only for your own panel with a self-made certificate.", test:"Test connection", testOk:"Connected: {v}, inbounds: {n}", panelKind:"Panel", panelUrlMz:"Marzban panel address",
   panelUrlHintMz:"The address the Marzban dashboard opens at, e.g. https://host:8000/ — the admin login and password below.",
   inboundsHintMz:"Marzban inbound tags, comma-separated. Press “Test” to pick from the list.",
-  nodeBtn:"Node", nodeLine:"Connection line", nodeLineHint:"The bridge://… line the installer printed at the end. Paste it whole.",
+  nodeKind:"Own server", nodeCpu:"CPU", nodeMem:"Memory", nodeDisk:"Disk", nodeNet:"Server traffic since boot: ↓ {rx} GB · ↑ {tx} GB · up {d} d",
+  nodeUpdT:"New agent {v} available", nodeUpdHint:"Takes seconds, customers stay connected.", nodeUpdBtn:"Update", nodeUpdDone:"The agent is updating to {v}",
+  nodeBtn:"Node", nodeLine:"Connection line", nodeLineHint:"The vsnode://… line the installer printed at the end. Paste it whole.",
   nodeInstallT:"1. Install on the server", nodeInstallLead:"A fresh Ubuntu 22/24 or Debian 12 server. Log in over SSH and paste the command: it installs Xray, Reality and the agent, turns on BBR and fixes DNS.",
-  nodeInstallAfter:"2. At the end it prints a bridge://… line — paste it below and press Test. It is the key to the server: do not send it to anyone.",
+  nodeInstallAfter:"2. At the end it prints a vsnode://… line — paste it below and press Test. It is the key to the server: do not send it to anyone.",
   inboundsHintNode:"Empty — customers get both ways in (XHTTP and TCP). Press Test to pick.",
   nodeRoleBridge:"Bridge → {n}", nodeRoleExit:"Exit server", nodeStats:"Xray {x} · agent {a} · online {o} · active {c}",
   nodeLookT:"How the server looks from outside", nodeSniHint:"Someone else's site the server poses as. For a bridge in Russia, a whitelisted site (ya.ru, vk.com…).",
@@ -2043,7 +2047,7 @@ function srvExtra(s){
 function serverRow(s){
   return `<div class="srv"><span class="fl">${flag(s.country)}</span>
     <div><div class="n">${esc(s.name)} ${serverTag(s)}</div>
-      <div class="u">${esc(s.url)}${s.api_version ? " · " + esc(panelLabel(s.kind, s.api_version)) : s.kind === "marzban" ? " · Marzban" : s.kind === "remnawave" ? " · Remnawave" : s.kind === "node" ? " · Bridge Node" : ""}${
+      <div class="u">${esc(s.url)}${s.api_version ? " · " + esc(panelLabel(s.kind, s.api_version)) : s.kind === "marzban" ? " · Marzban" : s.kind === "remnawave" ? " · Remnawave" : s.kind === "node" ? " · VPN Seller Node" : ""}${
         s.clients_count ? " · " + esc(t("clients", { n:s.clients_count })) : ""}</div>
       ${srvExtra(s)}
       ${s.last_error ? `<div class="e">${esc(s.last_error)}</div>` : ""}</div>
@@ -2415,7 +2419,7 @@ async function pServers(){
   $("content").innerHTML = SERVERS.length ? SERVERS.map(s => `<div class="card"><div class="srv">
       <span class="fl">${flag(s.country)}</span>
       <div><div class="n">${esc(s.name)} ${serverTag(s)}</div>
-        <div class="u">${esc(s.url)} · ${esc(inbSummary(s))}${s.api_version ? " · " + esc(panelLabel(s.kind, s.api_version)) : s.kind === "marzban" ? " · Marzban" : s.kind === "remnawave" ? " · Remnawave" : s.kind === "node" ? " · Bridge Node" : ""}${
+        <div class="u">${esc(s.url)} · ${esc(inbSummary(s))}${s.api_version ? " · " + esc(panelLabel(s.kind, s.api_version)) : s.kind === "marzban" ? " · Marzban" : s.kind === "remnawave" ? " · Remnawave" : s.kind === "node" ? " · VPN Seller Node" : ""}${
           s.clients_count ? " · " + esc(t("clients", { n:s.clients_count })) : ""}</div>
         ${srvExtra(s)}
         ${s.last_error ? `<div class="e">${esc(s.last_error)}</div>` : ""}</div>
@@ -2458,7 +2462,7 @@ function serverModal(id){
     capacity:0, capacity_default:200 };
   openModal(`${mh(id ? s.name : t("addServer"))}
     <div class="field"><label>${esc(t("panelKind"))}</label><div class="tabs" id="sKind">
-      ${[["node", "Bridge Node"], ["3xui", "3x-ui"], ["marzban", "Marzban"], ["remnawave", "Remnawave"]].map(([k, l]) => `<button type="button" data-k="${k}" class="${(s.kind || "3xui") === k ? "on" : ""}"
+      ${[["node", t("nodeKind")], ["3xui", "3x-ui"], ["marzban", "Marzban"], ["remnawave", "Remnawave"]].map(([k, l]) => `<button type="button" data-k="${k}" class="${(s.kind || "3xui") === k ? "on" : ""}"
         onclick="setKind('${k}')">${l}</button>`).join("")}</div></div>
     <div class="two"><div class="field"><label>${esc(t("srvName"))}</label><input id="sName" value="${esc(s.name)}" maxlength="64"></div>
       <div class="field"><label>${esc(t("country"))}</label><input id="sCountry" value="${esc(s.country)}" maxlength="2" style="text-transform:uppercase"></div></div>
@@ -2525,7 +2529,7 @@ function setKind(k, first){
   $("lInb").textContent = t(rw ? "squads" : "inbounds");
   $("lTgInb").textContent = t(rw ? "tgInbRw" : "tgInb");
   $("hInb").textContent = t(nd ? "inboundsHintNode" : mz ? "inboundsHintMz" : rw ? "inboundsHintRw" : "inboundsHint");
-  $("sUrl").placeholder = nd ? "bridge://…" : mz ? "https://panel.example.com:8000/" : rw ? "https://panel.example.com/" : "https://panel.example.com:2053/secret/";
+  $("sUrl").placeholder = nd ? "vsnode://…" : mz ? "https://panel.example.com:8000/" : rw ? "https://panel.example.com/" : "https://panel.example.com:2053/secret/";
   $("sInb").placeholder = t("inbPh");
   if (!first){ $("sIbs").innerHTML = ""; $("sTest").textContent = ""; }
 }
@@ -2533,7 +2537,7 @@ const panelLabel = (kind, v) => {
   v = String(v || "");
   if (kind === "marzban" || v.startsWith("m")) return "Marzban " + v.replace(/^m/, "");
   if (kind === "remnawave" || v.startsWith("r")) return ("Remnawave " + v.replace(/^r/, "")).trim();
-  if (kind === "node" || v.startsWith("n")) return ("Bridge Node " + v.replace(/^n/, "")).trim();
+  if (kind === "node" || v.startsWith("n")) return ("VPN Seller Node " + v.replace(/^n/, "")).trim();
   return "3x-ui " + v;
 };
 /* The speed-up command, with this shop's own address: the script is served
@@ -2592,24 +2596,27 @@ async function deleteServer(id){
   try { await api(`/servers/${id}`, { method:"DELETE" }); closeAll(); pServers(); } catch (e){ fail(e); }
 }
 
-/* ============================ Bridge Node ============================ */
+/* ============================ VPN Seller Node ============================ */
 /* Our own VPN server: how it looks from outside (SNI, ports, ways in) and
    the chain — a bridge in Russia that sends everything on to an exit. */
 let NODE = null;
 const SNI_HINTS = ["dl.google.com", "www.microsoft.com", "www.apple.com", "www.samsung.com", "ya.ru", "vk.com", "ozon.ru", "max.ru"];
 async function nodeModal(id){
   const s = SERVERS.find(x => x.id === id);
-  openModal(`${mh(s.name, "Bridge Node")}<div class="hint">${esc(t("checking"))}</div>`);
+  openModal(`${mh(s.name, "VPN Seller Node")}<div class="hint">${esc(t("checking"))}</div>`);
   let d;
   try { d = await api(`/servers/${id}/node`); } catch (e){ return fail(e); }
-  if (!d.ok){ openModal(`${mh(s.name, "Bridge Node")}<div class="e" style="color:var(--danger)">${esc(d.error)}</div>
+  if (!d.ok){ openModal(`${mh(s.name, "VPN Seller Node")}<div class="e" style="color:var(--danger)">${esc(d.error)}</div>
     <div class="mf"><button class="btn ghost" onclick="closeAll()">OK</button></div>`); return; }
   NODE = { id, info:d.info };
   const i = d.info, tcp = i.inbounds.find(x => x.id === "vless-tcp"), xh = i.inbounds.find(x => x.id === "vless-xhttp");
   const exitName = i.chain ? (d.others.find(o => SERVERS.find(x => x.id === o.id && x.url.includes(i.chain.address))) || {}).name || i.chain.address : "";
   const role = i.role === "bridge" ? t("nodeRoleBridge", { n:exitName }) : t("nodeRoleExit");
   openModal(`${mh(s.name, role)}
-    <div class="u" style="margin-bottom:10px">${esc(t("nodeStats", { x:i.xray || "?", a:i.agent, o:i.online, c:i.active }))}${i.last_error ? ` · <span style="color:var(--danger)">${esc(i.last_error)}</span>` : ""}</div>
+    <div class="u" style="margin-bottom:6px">${esc(t("nodeStats", { x:i.xray || "?", a:i.agent, o:i.online, c:i.active }))}${i.last_error ? ` · <span style="color:var(--danger)">${esc(i.last_error)}</span>` : ""}</div>
+    ${nodeSys(i.system || {})}
+    ${d.outdated ? `<div class="rowtg" style="margin:4px 0 10px"><div><div class="rt">${esc(t("nodeUpdT", { v:d.latest }))}</div><div class="rs">${esc(t("nodeUpdHint"))}</div></div>
+      <button class="btn sm" onclick="nodeUpdate(this)">${ic("i-sync", "xs")}${esc(t("nodeUpdBtn"))}</button></div>` : ""}
     <h4 style="margin:6px 0">${esc(t("nodeLookT"))}</h4>
     <div class="two"><div class="field"><label>SNI</label><input id="nSni" list="nSniList" value="${esc(tcp.sni)}">
         <datalist id="nSniList">${SNI_HINTS.map(h => `<option value="${h}">`).join("")}</datalist>
@@ -2633,6 +2640,25 @@ async function nodeModal(id){
     <div class="field"><select id="nExit"><option value="">${esc(t("nodeNoChain"))}</option>${d.others.map(o =>
       `<option value="${o.id}" ${o.name === exitName ? "selected" : ""}>${flag(o.country)} ${esc(o.name)}</option>`).join("")}</select></div>
     <div class="mf"><button class="btn" onclick="nodeChain(this)">${ic("i-check", "xs")}${esc(t("nodeChainApply"))}</button></div>`);
+}
+const gb = v => (v / 1073741824).toFixed(v >= 107374182400 ? 0 : 1);
+function nodeSys(m){
+  if (!m || !m.mem_total) return "";
+  const pc = (a, b) => b ? Math.round(100 * a / b) : 0;
+  const bar = (label, p, extra) => `<div class="r"><span>${esc(label)} <span class="usub">· ${esc(extra)}</span></span><b>${p}%</b>
+    <div class="bar"><i style="width:${p}%;${p > 85 ? "background:var(--danger)" : ""}"></i></div></div>`;
+  const load = m.cpus ? Math.min(100, Math.round(100 * m.load / m.cpus)) : 0;
+  return `<div class="hbars" style="margin:4px 0 12px">
+    ${bar(t("nodeCpu"), load, `${m.load} / ${m.cpus} CPU`)}
+    ${bar(t("nodeMem"), pc(m.mem_used, m.mem_total), `${gb(m.mem_used)} / ${gb(m.mem_total)} GB`)}
+    ${bar(t("nodeDisk"), pc(m.disk_used, m.disk_total), `${gb(m.disk_used)} / ${gb(m.disk_total)} GB`)}
+  </div><div class="u" style="margin-bottom:10px">${esc(t("nodeNet", { rx:gb(m.net_rx || 0), tx:gb(m.net_tx || 0), d:Math.floor((m.uptime || 0) / 86400) }))}</div>`;
+}
+async function nodeUpdate(btn){
+  btn.disabled = true;
+  try { const r = await api(`/servers/${NODE.id}/node/update`, { method:"POST" }); toast(t("nodeUpdDone", { v:r.version }));
+    setTimeout(() => nodeModal(NODE.id), 4000); }
+  catch (e){ fail(e); } finally { btn.disabled = false; }
 }
 async function nodeSave(btn, newKeys){
   if (newKeys && !(await ask(t("nodeNewKeysQ")))) return;

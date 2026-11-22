@@ -1,7 +1,7 @@
 """
-Bridge Node: the shop's own VPN server.
+VPN Seller Node: the shop's own VPN server.
 
-The real agent (scripts/bridge-node.py) runs here as a process, over real
+The real agent (scripts/vpn-seller-node.py) runs here as a process, over real
 HTTPS with its own certificate; only the xray binary is replaced by
 tests/fake_xray.py, which answers the same command lines and keeps the
 "running" Xray in a JSON file the tests can read and poke.
@@ -26,8 +26,13 @@ import pytest
 from conftest import tg
 
 ROOT = Path(__file__).resolve().parent.parent
-AGENT = ROOT / "scripts" / "bridge-node.py"
+AGENT = ROOT / "scripts" / "vpn-seller-node.py"
 FAKE = ROOT / "tests" / "fake_xray.py"
+
+
+def _agent_version() -> str:
+    import re
+    return re.search(r'^VERSION = "([^"]+)"', AGENT.read_text(), re.M).group(1)
 
 
 def _free_port() -> int:
@@ -41,6 +46,9 @@ class Agent:
         self.dir = folder
         folder.mkdir(parents=True, exist_ok=True)
         self.port = _free_port()
+        # its own copy: the agent can replace itself (the update test)
+        self.agent = folder / "agent.py"
+        self.agent.write_text(AGENT.read_text())
         self.fake_state = folder / "xray-state.json"
         self.conf = folder / "xray" / "config.json"
         wrapper = folder / "xray-bin"
@@ -53,22 +61,26 @@ class Agent:
                     "BN_API_ADDR": "127.0.0.1:10085", "FAKE_XRAY_STATE": str(self.fake_state)}
         (folder / "state").mkdir(mode=0o700, exist_ok=True)
         subprocess.run(["openssl", "req", "-x509", "-newkey", "ec", "-pkeyopt",
-                        "ec_paramgen_curve:prime256v1", "-nodes", "-days", "30", "-subj", "/CN=bridge-node",
+                        "ec_paramgen_curve:prime256v1", "-nodes", "-days", "30", "-subj", "/CN=vpn-seller-node",
                         "-keyout", str(folder / "state" / "key.pem"), "-out", str(folder / "state" / "cert.pem")],
                        check=True, capture_output=True)
         self.run("init", "--host", "127.0.0.1", "--listen", f"127.0.0.1:{self.port}")
-        self.proc = subprocess.Popen([sys.executable, str(AGENT), "serve"], env=self.env,
-                                     stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        self.start()
+        self.line = self.run("connect").strip()
+
+    def start(self):
+        """What systemd does: (re)start the agent and wait for its port."""
+        self.proc = subprocess.Popen([sys.executable, str(self.agent), "serve"], env=self.env,
+                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         for _ in range(100):
             try:
                 socket.create_connection(("127.0.0.1", self.port), timeout=0.2).close()
                 break
             except OSError:
                 time.sleep(0.05)
-        self.line = self.run("connect").strip()
 
     def run(self, *args) -> str:
-        r = subprocess.run([sys.executable, str(AGENT), *args], env=self.env, capture_output=True, text=True)
+        r = subprocess.run([sys.executable, str(self.agent), *args], env=self.env, capture_output=True, text=True)
         assert r.returncode == 0, r.stderr
         return r.stdout
 
@@ -121,11 +133,11 @@ def test_connection_line_is_parsed_and_checked():
     from app.providers import PanelError, normalize_url
     from app.providers.node import parse_connect
     fp = "ab" * 32
-    url, token = parse_connect(f"bridge://tok123@1.2.3.4:23456#{fp}")
+    url, token = parse_connect(f"vsnode://tok123@1.2.3.4:23456#{fp}")
     assert url == f"https://1.2.3.4:23456/#{fp}" and token == "tok123"
     assert parse_connect(url) == (url, None)              # an edit keeps the stored token
-    assert normalize_url(f"bridge://t@[2001:db8::1]:9000#{fp}", "node") == f"https://[2001:db8::1]:9000/#{fp}"
-    for bad in ("bridge://1.2.3.4:23456#" + fp, "bridge://t@1.2.3.4#" + fp, "bridge://t@1.2.3.4:1#zz", ""):
+    assert normalize_url(f"vsnode://t@[2001:db8::1]:9000#{fp}", "node") == f"https://[2001:db8::1]:9000/#{fp}"
+    for bad in ("vsnode://1.2.3.4:23456#" + fp, "vsnode://t@1.2.3.4#" + fp, "vsnode://t@1.2.3.4:1#zz", ""):
         with pytest.raises(PanelError):
             parse_connect(bad)
 
@@ -157,7 +169,7 @@ def test_shop_talks_to_node_with_pinned_certificate(agents):
     from app.providers import PanelError
     p = _panel(a)
     res = p.test()
-    assert res["version"] == "n1.0.0" and {i["id"] for i in res["inbounds"]} == {"vless-tcp", "vless-xhttp"}
+    assert res["version"] == "n" + _agent_version() and {i["id"] for i in res["inbounds"]} == {"vless-tcp", "vless-xhttp"}
     # the certificate of another node under this address → refused
     from app.providers.node import parse_connect
     burl, _t = parse_connect(b.line)
@@ -313,14 +325,7 @@ def test_agent_survives_restart_of_itself(agents, tmp_path):
     p._call("POST", "/api/poll", {})
     restarts = a.xray()["restarts"]
     a.stop()
-    a.proc = subprocess.Popen([sys.executable, str(AGENT), "serve"], env=a.env,
-                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    for _ in range(100):
-        try:
-            socket.create_connection(("127.0.0.1", a.port), timeout=0.2).close()
-            break
-        except OSError:
-            time.sleep(0.05)
+    a.start()
     assert p.usage(spec) == 42 and a.xray()["restarts"] == restarts
     # init again (the installer run twice) keeps keys and customers
     pbk = p.info(fresh=True)["inbounds"][0]["pbk"]
@@ -340,7 +345,7 @@ def test_shop_adds_node_sells_and_builds_chain(client, admin, env, monkeypatch, 
     env.__init__()
     t = client.post("/api/admin/servers/test", headers=admin,
                     json={"name": "x", "kind": "node", "url": b.line}).json()
-    assert t["ok"] and t["version"] == "n1.0.0", t
+    assert t["ok"] and t["version"] == "n" + _agent_version(), t
     ids = {}
     for name, country, ag in (("Exit", "LV", b), ("Bridge", "RU", a)):
         r = client.post("/api/admin/servers", headers=admin, json={
@@ -376,6 +381,7 @@ def test_shop_adds_node_sells_and_builds_chain(client, admin, env, monkeypatch, 
 
     # node settings and chain from the panel
     n = client.get(f"/api/admin/servers/{ids['Bridge']}/node", headers=admin).json()
+    assert n["latest"] and n["outdated"] is False
     assert n["ok"] and n["info"]["role"] == "exit" and n["others"][0]["id"] == ids["Exit"]
     r = client.post(f"/api/admin/servers/{ids['Bridge']}/node/chain", headers=admin,
                     json={"exit_id": ids["Exit"]})
@@ -388,8 +394,71 @@ def test_shop_adds_node_sells_and_builds_chain(client, admin, env, monkeypatch, 
                       headers={"User-Agent": "Happ/3", "X-HWID": "n1"}).text
     bridge_links = [x for x in base64.b64decode(body).decode().splitlines() if "Bridge" in unquote(x)]
     assert all("sni=ya.ru" in x for x in bridge_links)   # new keys at once, not after the cache
+    # the same from the chat with the bot
+    from app import botadmin
+    from app.db import SessionLocal
+    db = SessionLocal()
+    try:
+        text, rows = botadmin.screen_node(db, "ru", ids["Bridge"])
+        assert "мост → Exit" in text and "Онлайн" in text
+        flat = [cb for row in rows for _l, cb in row]
+        assert f"a:nr:{ids['Bridge']}" in flat and f"a:nc:{ids['Bridge']}:0" in flat
+        assert any(f"a:nd:{ids['Bridge']}" == cb for row in botadmin.screen_servers(db, "ru")[1] for _l, cb in row)
+    finally:
+        db.close()
     r = client.post(f"/api/admin/servers/{ids['Bridge']}/node/chain", headers=admin, json={"exit_id": None})
     assert r.json()["info"]["role"] == "exit"
     assert client.post(f"/api/admin/servers/{ids['Bridge']}/node/restart", headers=admin).json()["ok"]
     # put the agent back the way other tests expect it
     client.post(f"/api/admin/servers/{ids['Bridge']}/node/settings", headers=admin, json={"sni": "dl.google.com"})
+
+
+def test_watchdog_restarts_a_silent_xray_and_reports_the_machine(agents):
+    a, _ = agents
+    p = _panel(a)
+    info = p.info(fresh=True)
+    m = info["system"]
+    assert m["mem_total"] > 0 and m["disk_total"] > 0 and m["cpus"] >= 1 and "uptime" in m
+    before = a.xray()["restarts"]
+    a.poke(running=False)                       # Xray died
+    for _ in range(3):
+        p._call("POST", "/api/poll", {})
+    x = a.xray()
+    assert x["running"] and x["restarts"] == before + 1
+    assert p.info(fresh=True)["watchdog_restarts"] == 1
+
+
+def test_agent_updates_itself_from_the_shop(tmp_path):
+    """The shop hands out a newer agent: the node checks its hash, replaces
+    itself and comes back as the new version with everything kept."""
+    import hashlib
+    import threading
+    from functools import partial
+    from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+
+    from app.providers import PanelError
+    ag = Agent(tmp_path / "n")
+    try:
+        p = _panel(ag, 7301)
+        spec = _spec("tg901")
+        p.ensure(spec)
+        web = tmp_path / "web" / "scripts"
+        web.mkdir(parents=True)
+        new = AGENT.read_text().replace('VERSION = "', 'VERSION = "9.', 1)
+        (web / "vpn-seller-node.py").write_text(new)
+        httpd = ThreadingHTTPServer(("127.0.0.1", 0), partial(SimpleHTTPRequestHandler, directory=str(tmp_path / "web")))
+        threading.Thread(target=httpd.serve_forever, daemon=True).start()
+        url = f"http://127.0.0.1:{httpd.server_address[1]}/scripts/vpn-seller-node.py"
+        with pytest.raises(PanelError, match="checksum"):
+            p._call("POST", "/api/update", {"url": url, "sha256": "0" * 64})
+        res = p._call("POST", "/api/update", {"url": url, "sha256": hashlib.sha256(new.encode()).hexdigest()})
+        assert res["version"].startswith("9.")
+        ag.proc.wait(5)                         # it exits; systemd starts the new one
+        ag.start()
+        from app.providers import node
+        node.drop(7301)
+        assert p.info(fresh=True)["agent"].startswith("9.")
+        assert "tg901" in ag.xray()["users"]["vless-tcp"]
+        httpd.shutdown()
+    finally:
+        ag.stop()

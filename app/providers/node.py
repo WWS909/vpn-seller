@@ -1,11 +1,11 @@
 """
-Bridge Node — the shop's own VPN server (scripts/bridge-node.py on the
+VPN Seller Node — the shop's own VPN server (scripts/vpn-seller-node.py on the
 server, installed by scripts/node.sh). No 3x-ui, no Marzban: the shop
 talks to a small agent that owns Xray there.
 
 The operator pastes one line the installer printed:
 
-    bridge://TOKEN@1.2.3.4:23456#<sha256 of the agent's certificate>
+    vsnode://TOKEN@1.2.3.4:23456#<sha256 of the agent's certificate>
 
 It is kept as url = https://1.2.3.4:23456/#<fingerprint> and api_token =
 TOKEN. The agent's certificate is its own (no domain needed); the shop
@@ -22,26 +22,51 @@ from __future__ import annotations
 import hashlib
 import http.client
 import json
+import re
 import socket
 import ssl
 import threading
 import time
 import uuid as uuidlib
+from pathlib import Path
 from urllib.parse import quote, urlencode, urlsplit, urlunsplit
 
 from .xui import VISION, ClientSpec, PanelError
 
 TAGS = ("vless-xhttp", "vless-tcp")          # the order keys are given in
+AGENT_FILE = Path(__file__).resolve().parents[2] / "scripts" / "vpn-seller-node.py"
+_release: tuple[float, str, str] | None = None
+
+
+def agent_release() -> tuple[str, str]:
+    """(version, sha256) of the agent this shop hands out — what the nodes
+    are updated to."""
+    global _release
+    try:
+        mtime = AGENT_FILE.stat().st_mtime
+    except OSError:
+        return "", ""
+    if _release is None or _release[0] != mtime:
+        data = AGENT_FILE.read_bytes()
+        m = re.search(rb'^VERSION = "([^"]+)"', data, re.M)
+        _release = (mtime, m.group(1).decode() if m else "", hashlib.sha256(data).hexdigest())
+    return _release[1], _release[2]
+
+
+def older(have: str, want: str) -> bool:
+    def parts(v):
+        return tuple(int(x) for x in re.findall(r"\d+", v or "")[:3])
+    return bool(have and want) and parts(have) < parts(want)
 CHAIN_PREFIX = "chain-"
 
 
 def parse_connect(raw: str) -> tuple[str, str | None]:
     """The pasted text → (url to store, token or None). Accepts the
-    bridge:// line or an already stored https://host:port/#fp."""
+    vsnode:// line or an already stored https://host:port/#fp."""
     raw = (raw or "").strip()
     if not raw:
         raise PanelError("paste the connection line the installer printed")
-    if raw.startswith("bridge://"):
+    if raw.startswith("vsnode://"):
         parts = urlsplit(raw)
         token = parts.username or ""
         host = parts.hostname or ""
@@ -51,7 +76,7 @@ def parse_connect(raw: str) -> tuple[str, str | None]:
             raise PanelError("bad port in the connection line") from e
         fp = _clean_fp(parts.fragment)
         if not (token and host and port and fp):
-            raise PanelError("the connection line is cut — copy the whole bridge://… line")
+            raise PanelError("the connection line is cut — copy the whole vsnode://… line")
         netloc = f"[{host}]:{port}" if ":" in host else f"{host}:{port}"
         return urlunsplit(("https", netloc, "/", "", fp)), token
     return normalize_url(raw), None
@@ -59,7 +84,7 @@ def parse_connect(raw: str) -> tuple[str, str | None]:
 
 def normalize_url(url: str) -> str:
     url = (url or "").strip()
-    if url.startswith("bridge://"):
+    if url.startswith("vsnode://"):
         return parse_connect(url)[0]
     if not url:
         raise PanelError("node address is empty")
@@ -136,7 +161,7 @@ class NodePanel:
 
     def _call(self, method: str, path: str, body: dict | None = None, ok404: bool = False):
         if not self.token:
-            raise PanelError("no node token — paste the bridge://… line again")
+            raise PanelError("no node token — paste the vsnode://… line again")
         conn = self._conn()
         try:
             data = json.dumps(body).encode() if body is not None else None
@@ -252,6 +277,17 @@ class NodePanel:
     def restart(self) -> None:
         self._call("POST", "/api/restart", {})
 
+    def update_agent(self, shop_url: str) -> str:
+        """Have the node fetch the shop's agent and restart itself.
+        Returns the version it is moving to."""
+        version, digest = agent_release()
+        if not digest:
+            raise PanelError("the shop has no agent file to give out")
+        res = self._call("POST", "/api/update", {
+            "url": shop_url.rstrip("/") + "/scripts/vpn-seller-node.py", "sha256": digest})
+        drop(self.server.id)
+        return str(res.get("version") or version)
+
 
 def share_link(ib: dict, uid: str, host: str, remark: str) -> str:
     q = {"type": "xhttp" if ib.get("network") == "xhttp" else "tcp",
@@ -269,7 +305,7 @@ def share_link(ib: dict, uid: str, host: str, remark: str) -> str:
 
 def link_chain(bridge, exit_server, timeout: float = 20.0) -> dict:
     """Make `bridge` send its customers' traffic on to `exit_server`. Both
-    are Bridge Nodes. On the exit, a service client "chain-<bridge id>"
+    are VPN Seller Nodes. On the exit, a service client "chain-<bridge id>"
     with a fresh key is made; the bridge gets its address and Reality
     settings. Returns the bridge's new info."""
     if getattr(bridge, "id", None) == getattr(exit_server, "id", None):

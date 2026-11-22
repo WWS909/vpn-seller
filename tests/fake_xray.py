@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-A stand-in for the xray binary in the Bridge Node tests: the same command
+A stand-in for the xray binary in the VPN Seller Node tests: the same command
 lines and the same output shapes, with the "running" Xray kept in a JSON
 file (FAKE_XRAY_STATE). `fake_xray.py restart` plays systemctl restart.
 Traffic is injected by the tests through the same file.

@@ -1,6 +1,6 @@
 """
 VPN panel integrations. A server is 3x-ui (2.x or 3.x), Marzban,
-Remnawave or our own Bridge Node; panel_for() returns the right client,
+Remnawave or our own VPN Seller Node; panel_for() returns the right client,
 all have the same methods.
 """
 
