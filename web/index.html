@@ -471,18 +471,18 @@ a{color:var(--sig-txt);text-decoration:none}
 .top{position:sticky;top:0;z-index:40;
      background:color-mix(in srgb,var(--ground) 76%,transparent);
      backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
-     padding:calc(var(--sa-top) + 12px) var(--pad) 10px;
+     padding:calc(var(--sa-top) + 7px) var(--pad) 7px;
      display:flex;align-items:center;justify-content:space-between;gap:12px}
 .brand{display:flex;align-items:center;gap:9px;font-family:var(--font-d);
        font-weight:500;font-size:16px;letter-spacing:-.01em;min-width:0}
-.brand .m{width:26px;height:26px;border-radius:max(4px,calc(var(--r) - 8px));background:var(--sig);flex:none;
+.brand .m{width:24px;height:24px;border-radius:max(4px,calc(var(--r) - 8px));background:var(--sig);flex:none;
           display:grid;place-items:center;color:var(--on-sig)}
 .brand b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brand i{color:var(--sig-txt);font-style:normal}
 .brand .m.logo{background:none;overflow:hidden}
 .brand .m.logo img{width:100%;height:100%;object-fit:contain;display:block}
 .tools{display:flex;align-items:center;gap:6px;flex:none}
-.tool{width:38px;height:38px;border-radius:var(--r-s);display:grid;place-items:center;
+.tool{width:34px;height:34px;border-radius:var(--r-s);display:grid;place-items:center;
       color:var(--txt-2);border:1px solid var(--line-soft);transition:.16s}
 .tool:hover{color:var(--txt);border-color:var(--line)}
 .tool.spin svg{animation:spin .7s linear infinite}
@@ -622,6 +622,12 @@ body.enter .meter i{animation:grow 1.1s .45s cubic-bezier(.16,1,.3,1) both}
 #done h2 i{color:var(--sig-txt);font-style:normal}
 #done p{margin-top:8px;color:var(--txt-2);font-size:14px;animation:spRise .6s .42s cubic-bezier(.16,1,.3,1) both}
 [data-motion="calm"] .dn-p,[data-motion="calm"] .dn-ring{display:none}
+/* the free trial: the days counted up big, in the shop's colour */
+.tr-n{display:flex;flex-direction:column;align-items:center;animation:spPop .7s cubic-bezier(.34,1.56,.64,1) both}
+.tr-n b{font-family:var(--font-d);font-weight:600;font-size:120px;line-height:.9;letter-spacing:-.05em;color:var(--sig-txt);
+  font-variant-numeric:tabular-nums}
+.tr-n span{margin-top:6px;font-family:var(--font-d);font-size:20px;color:var(--txt-2)}
+.tr-in h2{margin-top:20px !important}
 
 /* Screen title: an overline in caps and a large name with an accent dot. */
 .head{padding:10px 0 18px}
@@ -3489,6 +3495,8 @@ ru: {
   stars:"Stars", starsN:"внутри Telegram", card:"Карта", cardN:"и СБП", crypto:"Крипта", cryptoN:"USDT, TON…",
   noMethods:"Оплата пока не настроена",
   trialT:"Попробовать бесплатно", trialN:"{d} — без оплаты, один раз",
+  trialOnT:"Пробный период включён", trialOnN:"Подключите устройство — это займёт минуту",
+  vipT:"Работает без срока", vipN:"Без ограничений по времени, устройствам и трафику.", vipNoEnd:"без срока",
   dN:["день","дня","дней"],
   billReady:"Счёт готов", toPay:"К оплате", goPay:"Перейти к оплате", later:"Позже",
   billNote:"Оплатите на странице и вернитесь сюда — доступ откроется сам.",
@@ -3639,6 +3647,8 @@ en: {
   stars:"Stars", starsN:"in Telegram", card:"Card", cardN:"& bank", crypto:"Crypto", cryptoN:"USDT, TON…",
   noMethods:"Payments are not set up yet",
   trialT:"Try for free", trialN:"{d} — free, once",
+  trialOnT:"Your free trial is on", trialOnN:"Connect a device — it takes a minute",
+  vipT:"Works with no end", vipN:"No limits on time, devices or traffic.", vipNoEnd:"no end",
   dN:["day","days"],
   billReady:"Your bill", toPay:"To pay", goPay:"Go to payment", later:"Later",
   billNote:"Pay on the page and come back — access opens by itself.",
@@ -3989,26 +3999,12 @@ function syncChrome(){
     if (sheetOpen() || tab !== "home") tg.BackButton.show();
     else tg.BackButton.hide();
   } catch (e) {}
-  try {
-    const mb = tg.MainButton;
-    if (sheetOpen() || !ME){ mb.hide(); return; }
-    let label = "";
-    const left = ME.expires_at ? Math.ceil((ME.expires_at - Date.now() / 1000) / 86400) : 0;
-    if (salesPaused()) label = "";
-    else if (tab === "home" && (ME.grace_until || ME.tg_only_until) && !ME.has_subscription) label = t("renew");
-    else if (tab === "home" && !ME.has_subscription) label = mainLabel();
-    else if (tab === "home" && ME.has_subscription && left <= 5) label = t("renew");
-    if (!label){ mb.hide(); return; }
-    mb.setText(label); mb.show(); mb.enable();
-  } catch (e) {}
+  // Telegram's wide button below is not used: every screen has its own
+  // buttons, and showing it on one tab and hiding it on the next made the
+  // window jump, the menu riding up and down on every switch.
+  try { tg.MainButton.hide(); } catch (e) {}
 }
 function paidPlans(){ return (CFG && CFG.plans || []).filter(p => !p.is_trial); }
-function mainLabel(){
-  const ps = paidPlans();
-  const min = ps.length ? Math.min(...ps.map(p => p.price)) : 0;
-  return min ? t("chooseSub") + " — " + (LANG === "ru" ? "от " : "from ") + money(min) : t("chooseSub");
-}
-function onMain(){ if (!sheetOpen()) go("sub"); }
 function onBack(){
   if (sheetOpen()){ closeSheet(); return; }
   if (tab !== "home") go("home");
@@ -4293,6 +4289,10 @@ function drawHome(){
       <div class="sub">${esc(t("graceSub", { d:dateStr(ME.expires_at), g:dateStr(grace) }))}</div>
       ${salesPaused() ? `<div class="sub" style="color:var(--bad)">${esc(t("emSales"))}</div>`
         : `<button class="btn pri wide" onclick="go('sub')">${esc(t("renew"))} ${svg("i-arr", 17, 'class="ar"')}</button>`}`;
+  } else if (has && ME.vip){
+    body = `<div class="days"><b>∞</b><span>${esc(t("vipNoEnd"))}</span></div>
+      <div class="sub">${esc(t("vipN"))}</div>
+      <button class="btn pri wide" onclick="sheetConnect()">${esc(t("connectDevice"))}</button>`;
   } else if (has){
     const left = Math.max(0, Math.ceil((ME.expires_at - Date.now() / 1000) / 86400));
     const warn = ME.blocked ? t("blockedLead") : ME.traffic_blocked
@@ -4308,11 +4308,13 @@ function drawHome(){
   } else {
     body = `<h2>${t("chooseAccess")}<i>.</i></h2>
       <div class="sub">${esc((CFG && CFG.tagline && CFG.tagline[LANG]) || t("oneSub"))}${min ? " " + esc(t("from", { p:money(min) })) : ""}</div>
-      <button class="btn pri wide" onclick="go('sub')">${esc(t("chooseSub"))} ${svg("i-arr", 17, 'class="ar"')}</button>`;
+      ${homeTrial("pri")
+        ? homeTrial("pri") + `<button class="btn gho wide" style="margin-top:8px" onclick="go('sub')">${esc(t("chooseSub"))}</button>`
+        : `<button class="btn pri wide" onclick="go('sub')">${esc(t("chooseSub"))} ${svg("i-arr", 17, 'class="ar"')}</button>`}`;
   }
   $("heroBody").innerHTML = body;
   const daysNow = has ? Math.max(0, Math.ceil((ME.expires_at - Date.now() / 1000) / 86400)) : 0;
-  const daysEl = has ? document.querySelector("#heroBody .days b") : null;
+  const daysEl = has && !ME.vip ? document.querySelector("#heroBody .days b") : null;
   if (daysEl){
     const before = SEEN.days;
     if (showNum("days", daysEl, daysNow, v => String(v)) && daysNow > before){
@@ -4413,6 +4415,7 @@ function homeWords(st){
     const min = homeMinPrice();
     return [t("haNone"), ((CFG && CFG.tagline && CFG.tagline[LANG]) || t("oneSub")) + (min ? " " + t("from", { p:money(min) }) : ""), false];
   }
+  if (ME.vip) return [t("vipT"), t("vipN"), false];
   if (ME.traffic_blocked)
     return [t("haTraffic"), t((CFG.traffic_packs || []).length ? "trafficOutLead" : "trafficOutRenew"), true];
   const soon = st.left <= 3;
@@ -4428,7 +4431,7 @@ function homeMain(st){
     return (CFG.traffic_packs || []).length
       ? `<button class="btn pri wide" onclick="sheetTraffic()">${esc(t("topUp"))}</button>`
       : `<button class="btn pri wide" onclick="go('sub')">${esc(t("renew"))}</button>`;
-  if (st.has && st.left <= 3)
+  if (st.has && st.left <= 3 && !ME.vip)
     return `<button class="btn pri wide" onclick="go('sub')">${esc(t("renew"))}</button>
       <button class="btn gho wide" onclick="sheetConnect()">${esc(t("connectDevice"))}</button>`;
   if (st.has) return `<button class="btn pri wide" onclick="sheetConnect()">${svg("i-plus", 18, 'stroke-width="2"')}${esc(t("connectDevice"))}</button>`;
@@ -4468,7 +4471,9 @@ function homePickPlan(id){ pick.planId = id; pick.devices = 0; pick.quote = null
 function homeTerm(st){
   const plans = paidPlans();
   let out = "";
-  if (st.has){
+  if (st.has && ME.vip){
+    out += homeAnswerHead(st);
+  } else if (st.has){
     const end = new Date(st.end * 1000), today = new Date();
     const y = end.getFullYear(), m = end.getMonth(), last = new Date(y, m + 1, 0).getDate();
     const lead = (new Date(y, m, 1).getDay() + 6) % 7;
@@ -4811,7 +4816,7 @@ async function requote(loud){
 }
 
 /* One entry point for every purchase: subscription, gift, devices, traffic. */
-async function order(body, title, after){
+async function order(body, title, after, trial){
   if (!ME) return toast(t("openInTg"), "bad");
   if (salesPaused()) return toast(t("emSales"), "bad");
   if (!body.method) body.method = pick.method || "stars";
@@ -4819,7 +4824,7 @@ async function order(body, title, after){
   try {
     const r = await API.call("/api/app/order", { method:"POST", body });
     const pay = r.pay || {};
-    if (pay.type === "done"){ await finished(r, after); return; }
+    if (pay.type === "done"){ await finished({ ...r, trial:!!trial }, after); return; }
     // Paid from the balance, access is on its way (no server answered yet).
     if (pay.type === "paid"){ waitFor(r, title, after, true); return; }
     if (pay.type === "invoice"){
@@ -4839,11 +4844,46 @@ async function order(body, title, after){
 }
 
 async function finished(r, after){
-  await loadAll();
+  const was = !!(ME && ME.active);
+  await reload();
+  for (let i = 0; i < 8 && !(ME && ME.active) && !after; i++){   // up to ~12 s for a slow server
+    await new Promise(ok => setTimeout(ok, 1500));
+    await reload();
+  }
   if (after) return after(r);
   closeSheet();
   go("home");
-  celebrate(t("doneTitle"), t("subActive"));
+  if (r && r.trial && !was) celebrateTrial();
+  else celebrate(t("doneTitle"), t("subActive"));
+}
+/* loadAll() that is never skipped: if a load is running, it is waited for
+   and then the data is read once more. */
+async function reload(){
+  for (let i = 0; i < 40 && loading; i++) await new Promise(ok => setTimeout(ok, 100));
+  await loadAll();
+}
+/* The first, free days: a bigger moment than a renewal — the days count up
+   in the middle of the screen, then the usual tick and confetti. */
+function celebrateTrial(){
+  const days = ME && ME.expires_at ? Math.max(1, Math.round((ME.expires_at - Date.now() / 1000) / 86400)) : 0;
+  const motion = document.documentElement.getAttribute("data-motion");
+  if (!days || motion === "off"){ celebrate(t("trialOnT"), t("trialOnN")); return; }
+  const el = $("done");
+  el.innerHTML = `<div class="dn-in tr-in"><div class="tr-n"><b id="trN">0</b><span>${esc(pl(days, "dN"))}</span></div>
+    <h2>${esc(t("trialOnT"))}<i>.</i></h2><p>${esc(t("trialOnN"))}</p></div>`;
+  el.classList.remove("out");
+  el.hidden = false;
+  if (motion !== "calm") confetti(el);
+  try { tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred("success"); } catch (e) {}
+  const n = $("trN"), t0 = performance.now(), dur = 700;
+  const step = now => {
+    const k = Math.min(1, (now - t0) / dur), v = Math.round(days * (1 - Math.pow(1 - k, 3)));
+    if (n) n.textContent = v;
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+  clearTimeout(doneTimer);
+  doneTimer = setTimeout(doneHide, 2800);
 }
 
 /* One moment for a finished purchase: a check in the accent colour and a
@@ -5014,7 +5054,7 @@ function trialClick(id){
   if (ME && ME.trial_gate) return sheetChannel(ME.trial_gate, true);
   buyTrial(id);
 }
-function buyTrial(id){ order({ kind:"purchase", plan_id:id, method:pick.method || "stars" }, t("trialT")); }
+function buyTrial(id){ order({ kind:"purchase", plan_id:id, method:pick.method || "stars" }, t("trialT"), null, true); }
 
 /* ============================ extras ============================ */
 function needSub(){
@@ -5716,13 +5756,13 @@ if (window.Telegram && window.Telegram.WebApp){
   tg.expand();
   try { tg.disableVerticalSwipes(); } catch (e) {}   // a swipe used to close the app mid-payment
   try { tg.BackButton.onClick(onBack); } catch (e) {}
-  try { tg.MainButton.onClick(onMain); } catch (e) {}
   applySafeArea();
   if (tg.onEvent){
     tg.onEvent("safeAreaChanged", applySafeArea);
     tg.onEvent("contentSafeAreaChanged", applySafeArea);
     tg.onEvent("viewportChanged", applySafeArea);
     tg.onEvent("themeChanged", applyTheme);
+    tg.onEvent("activated", backAgain);
   }
   const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
   if (u && u.language_code) LANG = /^(ru|uk|be|kk)/.test(u.language_code) ? "ru" : "en";
@@ -5736,16 +5776,25 @@ try {
 const urlLang = new URLSearchParams(location.search).get("lang");
 if (urlLang === "ru" || urlLang === "en"){ LANG = urlLang; langChosenHere = true; }
 
-/* Back from a payment page: re-read the state. */
+/* Back from a payment page, the bot or a channel: re-read the state. */
 let lastSync = Date.now();
-document.addEventListener("visibilitychange", async () => {
-  if (document.visibilityState !== "visible" || loading) return;
-  if (Date.now() - lastSync < 6000) return;
+async function backAgain(){
+  if (document.visibilityState === "hidden" || loading) return;
+  if (Date.now() - lastSync < 4000) return;
   lastSync = Date.now();
   const was = ME && ME.active;
   await loadAll();
-  if (!was && ME && ME.active){ toast(t("subActive")); }
-});
+  if (!was && ME && ME.active){ celebrate(t("doneTitle"), t("subActive")); }
+}
+document.addEventListener("visibilitychange", backAgain);
+window.addEventListener("focus", backAgain);
+/* Without a subscription the state is looked at now and then by itself:
+   access given by the bot, the admin or a late payment shows up without
+   a manual refresh. */
+setInterval(() => {
+  if (document.visibilityState !== "visible" || loading || PREVIEW || !ME || ME.active || sheetOpen()) return;
+  lastSync = 0; backAgain();
+}, 20000);
 if (window.matchMedia)
   window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", applyTheme);
 

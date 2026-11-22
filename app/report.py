@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session, aliased
 from . import billing, core, notify
 from .config import settings as env
 from .models import Server, Transaction, User, now
+from .vip import FOREVER
 
 E = html.escape
 DAY = 86400
@@ -97,7 +98,7 @@ def collect(db: Session, t: int | None = None) -> dict:
         "new": db.query(User).filter(User.created_at >= a, User.created_at <= t).count(),
         "new_prev": db.query(User).filter(User.created_at >= b, User.created_at < a).count(),
         "trials": trials,
-        "active": db.query(User).filter(User.expires_at > t, User.is_blocked.is_(False)).count(),
+        "active": db.query(User).filter(User.expires_at > t, User.is_blocked.is_(False)).filter(User.expires_at < FOREVER).count(),     # the owner's own access is not a customer
         "ending": db.query(User).filter(User.expires_at > t, User.expires_at <= t + DAY,
                                         User.is_blocked.is_(False)).count(),
         "unpaid": int(unpaid),

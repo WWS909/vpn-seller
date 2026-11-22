@@ -18,6 +18,7 @@ from ..config import settings as env
 from ..db import get_db
 from ..models import (GB, Broadcast, SupportMessage, Device, Gift, Log, Payout, Plan, Promo, Review,
                       Receipt, Server, Transaction, User, now)
+from ..vip import FOREVER
 from ..providers import KINDS, TAG_KINDS, PanelError, drop_session, normalize_url, panel_for
 from ..providers import node as nodes
 
@@ -443,7 +444,7 @@ def overview(db: Session = Depends(get_db), _=A):
                     "gateway": tx.gateway or tx.method or "", "amount": round(float(tx.amount), 2),
                     "at": tx.paid_at or 0} for tx, u in recent],
         "users": db.query(User).count(),
-        "active": db.query(User).filter(User.expires_at > t, User.is_blocked.is_(False)).count(),
+        "active": db.query(User).filter(User.expires_at > t, User.is_blocked.is_(False)).filter(User.expires_at < FOREVER).count(),     # the owner's own access is not a customer
         "new_today": db.query(User).filter(User.created_at >= day0).count(),
         "revenue_month": round(float(revenue_month), 2),
         "revenue_today": round(float(revenue_today), 2),

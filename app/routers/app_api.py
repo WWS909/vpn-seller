@@ -148,6 +148,8 @@ def config(db: Session = Depends(get_db)):
 @router.get("/me")
 def me(tg: dict = Depends(tg_user), db: Session = Depends(get_db)):
     user = current_user(db, tg)
+    from .. import vip
+    is_vip = vip.ensure(db, user)
     plan = user.plan
     history = (db.query(Transaction)
                .filter(Transaction.user_id == user.id, Transaction.status == "success")
@@ -194,6 +196,7 @@ def me(tg: dict = Depends(tg_user), db: Session = Depends(get_db)):
         "trial_gate": channel.gate(db, user, "trial") if billing.trial_available(db, user) else None,
         "start": tg.get("_start", ""),
         "ref_balance": max(0.0, round(float(user.ref_balance or 0), 2)),
+        "vip": is_vip,
     }
 
 
