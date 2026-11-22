@@ -18,7 +18,8 @@ from ..config import settings as env
 from ..db import get_db
 from ..models import (GB, Broadcast, SupportMessage, Device, Gift, Log, Payout, Plan, Promo, Review,
                       Receipt, Server, Transaction, User, now)
-from ..providers import KINDS, PanelError, drop_session, normalize_url, panel_for
+from ..providers import KINDS, TAG_KINDS, PanelError, drop_session, normalize_url, panel_for
+from ..providers import node as nodes
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 A = Depends(auth.admin_required)
@@ -822,7 +823,7 @@ class ServerBody(BaseModel):
     verify_tls: bool = True
     enabled: bool = True
     sort: int = 0
-    kind: str = "3xui"                  # 3xui | marzban | remnawave
+    kind: str = "3xui"                  # 3xui | marzban | remnawave | node
     capacity: int = Field(0, ge=0, le=100000)         # people online the server is meant for, 0 = default
     bypass: bool = False                # gets through whitelists; its traffic is sold by the GB
 
@@ -847,14 +848,16 @@ def _apply_server(s: Server, body: ServerBody) -> None:
     s.kind = body.kind
     s.name = body.name.strip()
     s.country = body.country.strip().upper()
-    s.url = normalize_url(body.url, body.kind)
+    s.url, pasted_token = _url_and_token(body)
     s.username = body.username.strip()
     if body.password is not None:
         s.password = body.password
     if body.api_token is not None:
         s.api_token = body.api_token.strip()
+    if pasted_token:
+        s.api_token = pasted_token          # the vsnode://TOKEN@… line of a VPN Seller Node
     def clean(raw: str) -> str:
-        if body.kind in ("marzban", "remnawave"):   # inbound tags / internal squad uuids
+        if body.kind in TAG_KINDS:          # inbound tags / internal squad uuids
             return ",".join(t.strip() for t in raw.split(",") if t.strip())
         return ",".join(str(i) for i in [int(x) for x in raw.replace(" ", "").split(",") if x.isdigit()])
     s.inbound_ids = clean(body.inbound_ids)
@@ -869,6 +872,14 @@ def _apply_server(s: Server, body: ServerBody) -> None:
     s.capacity = body.capacity
     s.bypass = body.bypass
     s.api_version = ""          # re-detect with the new settings
+
+
+def _url_and_token(body: ServerBody) -> tuple[str, str | None]:
+    """The address to store and, for a VPN Seller Node, the token that came in
+    the pasted vsnode://TOKEN@host:port#fingerprint line."""
+    if body.kind == "node":
+        return nodes.parse_connect(body.url)
+    return normalize_url(body.url, body.kind), None
 
 
 def _check_tg_inbounds(s: Server) -> None:
@@ -907,10 +918,12 @@ def test_server(body: ServerBody, server_id: int | None = None,
     from types import SimpleNamespace
     stored = db.get(Server, server_id) if server_id else None
     try:
+        url, pasted_token = _url_and_token(body)
+        token = body.api_token if body.api_token is not None else (stored.api_token if stored else "")
         snap = SimpleNamespace(
-            id=-(server_id or 1) - 1000, url=normalize_url(body.url, body.kind), username=body.username,
+            id=-(server_id or 1) - 1000, url=url, username=body.username,
             password=body.password if body.password is not None else (stored.password if stored else ""),
-            api_token=body.api_token if body.api_token is not None else (stored.api_token if stored else ""),
+            api_token=pasted_token or token, name=body.name, country=body.country,
             inbound_ids=body.inbound_ids, sub_url=body.sub_url, verify_tls=body.verify_tls,
             api_version="", kind=body.kind)
         res = panel_for(snap, timeout=12).test()
@@ -1003,6 +1016,118 @@ def check_server(server_id: int, db: Session = Depends(get_db), _=A):
         s.last_error = str(e)[:250]
         db.commit()
         return {"ok": False, "error": str(e)}
+
+
+# ---------------------------------------------------------------- VPN Seller Node
+NODE_KEYS = {"sni", "target", "fp", "new_keys", "tcp_enabled", "tcp_port", "xhttp_enabled",
+             "xhttp_port", "xhttp_path", "xhttp_mode", "block_torrent", "ru_direct",
+             "block_private", "host"}
+
+
+def _node(db: Session, server_id: int) -> Server:
+    s = db.get(Server, server_id)
+    if not s:
+        raise HTTPException(404, "server not found")
+    if s.kind != "node":
+        raise HTTPException(400, "это не VPN Seller Node / not a VPN Seller Node")
+    return s
+
+
+def _keys_changed(server_id: int) -> None:
+    """The server's keys changed: subscriptions must fetch them anew, not
+    serve the cached ones for another minute and a half."""
+    with access._links_lock:
+        for k in [k for k in access._links_cache if k[0] == server_id]:
+            access._links_cache.pop(k, None)
+
+
+@router.get("/servers/{server_id}/node")
+def node_info(server_id: int, db: Session = Depends(get_db), _=A):
+    s = _node(db, server_id)
+    others = [{"id": o.id, "name": o.name, "country": o.country}
+              for o in db.query(Server).filter(Server.kind == "node", Server.id != s.id).all()]
+    try:
+        info = panel_for(s, timeout=10).info(fresh=True)
+    except PanelError as e:
+        return {"ok": False, "error": str(e), "others": others}
+    latest = nodes.agent_release()[0]
+    return {"ok": True, "info": info, "others": others, "latest": latest,
+            "outdated": nodes.older(info.get("agent", ""), latest)}
+
+
+@router.post("/servers/{server_id}/node/update")
+def node_update(server_id: int, db: Session = Depends(get_db), admin=A):
+    """The node takes the agent from this shop and restarts itself (a few
+    seconds; Xray and customers are not touched)."""
+    s = _node(db, server_id)
+    if not env.public_url:
+        raise HTTPException(400, "PUBLIC_URL is not set")
+    try:
+        version = panel_for(s, timeout=40).update_agent(env.public_url)
+    except PanelError as e:
+        raise HTTPException(400, str(e))
+    core.audit(db, "Node agent updated", admin, f"{s.name} → {version}")
+    return {"ok": True, "version": version}
+
+
+@router.post("/servers/{server_id}/node/settings")
+def node_settings(server_id: int, body: dict, db: Session = Depends(get_db), admin=A):
+    s = _node(db, server_id)
+    clean = {k: v for k, v in body.items() if k in NODE_KEYS}
+    if not clean:
+        raise HTTPException(400, "nothing to change")
+    try:
+        info = panel_for(s, timeout=40).settings(clean)
+    except PanelError as e:
+        raise HTTPException(400, str(e))
+    _keys_changed(s.id)
+    core.audit(db, "Node settings", admin, f"{s.name}: {', '.join(sorted(clean))}")
+    return {"ok": True, "info": info}
+
+
+class ChainBody(BaseModel):
+    exit_id: int | None = None          # None = stop being a bridge
+
+
+@router.post("/servers/{server_id}/node/chain")
+def node_chain(server_id: int, body: ChainBody, db: Session = Depends(get_db), admin=A):
+    """Make this node a bridge to another node (the chain through a Russian
+    server for the whitelists), or a plain server again."""
+    s = _node(db, server_id)
+    others = db.query(Server).filter(Server.kind == "node", Server.id != s.id).all()
+    try:
+        if body.exit_id is None:
+            info = nodes.unlink_chain(s, others)
+            what = "off"
+        else:
+            x = next((o for o in others if o.id == body.exit_id), None)
+            if x is None:
+                raise HTTPException(404, "exit server not found")
+            info = nodes.link_chain(s, x, timeout=40)
+            # The service client of an older chain on another exit is not needed.
+            for o in others:
+                if o.id != x.id:
+                    try:
+                        nodes.NodePanel(o, timeout=8)._call(
+                            "POST", "/api/clients/delete", {"email": f"{nodes.CHAIN_PREFIX}{s.id}"})
+                    except PanelError:
+                        pass
+            what = f"→ {x.name}"
+    except PanelError as e:
+        raise HTTPException(400, str(e))
+    core.audit(db, "Node chain", admin, f"{s.name} {what}")
+    return {"ok": True, "info": info}
+
+
+@router.post("/servers/{server_id}/node/restart")
+def node_restart(server_id: int, db: Session = Depends(get_db), admin=A):
+    s = _node(db, server_id)
+    try:
+        panel_for(s, timeout=40).restart()
+    except PanelError as e:
+        raise HTTPException(400, str(e))
+    core.audit(db, "Node restarted", admin, s.name)
+    return {"ok": True}
 
 
 _server_sync: dict[int, dict] = {}

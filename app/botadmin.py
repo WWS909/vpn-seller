@@ -55,6 +55,16 @@ T = {
         "srv_line": "{flag}<b>{name}</b> — {state}\n{url} · {ver} · клиентов: {n}",
         "b_check": "Проверить {name}", "b_on": "Включить {name}", "b_off": "Выключить {name}",
         "checked_ok": "{name}: связь есть, {ver}, инбаундов: {n}", "checked_bad": "{name}: {e}",
+        "b_node": "⚙ {name}", "node_bad": "<b>{name}</b>\n\nНет связи с сервером: {e}",
+        "node": ("<b>{flag}{name}</b> — {role}\n\nОнлайн: {online} · активных клиентов: {active}\n"
+                 "Xray {xray} · агент {agent}{upd}\nНагрузка: {load} · память {mem} · диск {disk}\n"
+                 "Входы: {ways}\nSNI: {sni}"),
+        "node_exit": "выходной сервер", "node_bridge": "мост → {exit}", "node_upd": " (есть {v})",
+        "b_nrestart": "Перезапустить Xray", "b_nyes": "Да, перезапустить", "b_nupdate": "Обновить агент",
+        "b_nchain": "Цепочка → {name}", "b_nchain_off": "Выключить цепочку", "b_nback": "Серверы",
+        "node_restart_q": "<b>{name}</b>\n\nПерезапустить Xray? Все клиенты этого сервера переподключатся.",
+        "node_restarted": "Xray перезапущен", "node_updated": "Агент обновляется до {v}",
+        "node_chain_on": "Цепочка включена", "node_chain_off": "Цепочка выключена",
         "orders": "<b>Заказы</b>", "orders_stuck": "\n\nОплачены, но не выданы:\n{list}",
         "orders_last": "\n\nПоследние оплаты:\n{list}", "orders_none": "\n\nОплат пока нет.",
         "b_grant": "Выдать #{id}", "granted": "Заказ #{id} выдан", "grant_fail": "Заказ #{id}: {e}",
@@ -124,6 +134,16 @@ T = {
         "srv_line": "{flag}<b>{name}</b> — {state}\n{url} · {ver} · clients: {n}",
         "b_check": "Check {name}", "b_on": "Turn on {name}", "b_off": "Turn off {name}",
         "checked_ok": "{name}: reachable, {ver}, inbounds: {n}", "checked_bad": "{name}: {e}",
+        "b_node": "⚙ {name}", "node_bad": "<b>{name}</b>\n\nThe server does not answer: {e}",
+        "node": ("<b>{flag}{name}</b> — {role}\n\nOnline: {online} · active customers: {active}\n"
+                 "Xray {xray} · agent {agent}{upd}\nLoad: {load} · memory {mem} · disk {disk}\n"
+                 "Ways in: {ways}\nSNI: {sni}"),
+        "node_exit": "exit server", "node_bridge": "bridge → {exit}", "node_upd": " ({v} available)",
+        "b_nrestart": "Restart Xray", "b_nyes": "Yes, restart", "b_nupdate": "Update the agent",
+        "b_nchain": "Chain → {name}", "b_nchain_off": "Turn the chain off", "b_nback": "Servers",
+        "node_restart_q": "<b>{name}</b>\n\nRestart Xray? Everyone on this server reconnects.",
+        "node_restarted": "Xray restarted", "node_updated": "The agent is updating to {v}",
+        "node_chain_on": "Chain on", "node_chain_off": "Chain off",
         "orders": "<b>Orders</b>", "orders_stuck": "\n\nPaid, not granted:\n{list}",
         "orders_last": "\n\nLatest payments:\n{list}", "orders_none": "\n\nNo payments yet.",
         "b_grant": "Grant #{id}", "granted": "Order #{id} granted", "grant_fail": "Order #{id}: {e}",
@@ -229,6 +249,8 @@ def panel_label(kind: str | None, version: str | None) -> str:
         return "Marzban " + v.lstrip("m")
     if kind == "remnawave" or v.startswith("r"):
         return ("Remnawave " + v.lstrip("r")).strip()
+    if kind == "node" or v.startswith("n"):
+        return ("VPN Seller Node " + v.lstrip("n")).strip()
     return "3x-ui " + (v or "?")
 
 
@@ -341,8 +363,93 @@ def screen_servers(db: Session, lang: str) -> tuple[str, list]:
                         n=s.clients_count or 0))
         kb.append([(_t(lang, "b_check", name=s.name[:20]), f"a:sc:{s.id}"),
                    (_t(lang, "b_off" if s.enabled else "b_on", name=s.name[:20]), f"a:st:{s.id}")])
+        if s.kind == "node":
+            kb.append([(_t(lang, "b_node", name=s.name[:28]), f"a:nd:{s.id}")])
     kb.append(_back(lang))
     return _t(lang, "servers", list="\n\n".join(lines)), kb
+
+
+def _size(v) -> str:
+    v = float(v or 0)
+    for unit in ("B", "KB", "MB", "GB", "TB"):
+        if v < 1024 or unit == "TB":
+            return f"{v:.0f} {unit}" if unit in ("B", "KB") else f"{v:.1f} {unit}"
+        v /= 1024
+    return ""
+
+
+def screen_node(db: Session, lang: str, server_id: int) -> tuple[str, list]:
+    """One VPN Seller Node from the chat: how it is, restart, the chain."""
+    from .providers import PanelError, panel_for
+    from .providers import node as nodes
+    s = db.get(Server, server_id)
+    back = [(_t(lang, "b_nback"), "a:srv")]
+    if not s or s.kind != "node":
+        return screen_servers(db, lang)
+    flag = access.flag(s.country)
+    try:
+        i = panel_for(s, timeout=10).info(fresh=True)
+    except PanelError as e:
+        return _t(lang, "node_bad", name=E(s.name), e=E(str(e)[:150])), [back]
+    others = db.query(Server).filter(Server.kind == "node", Server.id != s.id).all()
+    exit_name = ""
+    if i.get("chain"):
+        host = str(i["chain"].get("address") or "")
+        exit_name = next((o.name for o in others if f"//{host}:" in (o.url or "")), host)
+    latest = nodes.agent_release()[0]
+    sysm = i.get("system") or {}
+    pct = lambda a, b: f"{round(100 * (a or 0) / b)}%" if b else "—"  # noqa: E731
+    ways = ", ".join(f"{'XHTTP' if ib['id'] == 'vless-xhttp' else 'TCP'} :{ib['port']}"
+                     for ib in i.get("inbounds") or [] if ib.get("enable")) or "—"
+    text = _t(lang, "node", flag=(flag + " ") if flag else "", name=E(s.name),
+              role=_t(lang, "node_bridge", exit=E(exit_name)) if i.get("role") == "bridge" else _t(lang, "node_exit"),
+              online=i.get("online", 0), active=i.get("active", 0), xray=E(i.get("xray") or "?"),
+              agent=E(i.get("agent") or "?"),
+              upd=_t(lang, "node_upd", v=latest) if nodes.older(i.get("agent", ""), latest) else "",
+              load=f"{sysm.get('load', '—')}/{sysm.get('cpus', '—')}",
+              mem=pct(sysm.get("mem_used"), sysm.get("mem_total")),
+              disk=pct(sysm.get("disk_used"), sysm.get("disk_total")),
+              ways=ways, sni=E(next((ib.get("sni") for ib in i.get("inbounds") or []), "")))
+    rows = [[(_t(lang, "b_nrestart"), f"a:nr:{s.id}")]]
+    if nodes.older(i.get("agent", ""), latest):
+        rows.append([(_t(lang, "b_nupdate"), f"a:nu:{s.id}")])
+    for o in others:
+        if o.name != exit_name:
+            rows.append([(_t(lang, "b_nchain", name=o.name[:24]), f"a:nc:{s.id}:{o.id}")])
+    if i.get("role") == "bridge":
+        rows.append([(_t(lang, "b_nchain_off"), f"a:nc:{s.id}:0")])
+    rows.append(back)
+    return text, rows
+
+
+def _node_action(db: Session, lang: str, sender: dict, act: str, parts: list) -> tuple[str, tuple]:
+    from fastapi import HTTPException
+
+    from .routers import admin_api
+    sid = int(parts[2])
+    s = db.get(Server, sid)
+    if not s or s.kind != "node":
+        return "", screen_servers(db, lang)
+    actor = _actor(sender)
+    if act == "nr":
+        return "", (_t(lang, "node_restart_q", name=E(s.name)),
+                    [[(_t(lang, "b_nyes"), f"a:nry:{sid}")], [(_t(lang, "b_back"), f"a:nd:{sid}")]])
+    try:
+        if act == "nry":
+            admin_api.node_restart(sid, db=db, admin=actor)
+            note = _t(lang, "node_restarted")
+        elif act == "nu":
+            res = admin_api.node_update(sid, db=db, admin=actor)
+            note = _t(lang, "node_updated", v=res.get("version", ""))
+        elif act == "nc":
+            exit_id = int(parts[3]) or None
+            admin_api.node_chain(sid, admin_api.ChainBody(exit_id=exit_id), db=db, admin=actor)
+            note = _t(lang, "node_chain_on" if exit_id else "node_chain_off")
+        else:
+            note = ""
+    except HTTPException as e:
+        note = str(e.detail)[:180]
+    return note, screen_node(db, lang, sid)
 
 
 def screen_orders(db: Session, lang: str) -> tuple[str, list]:
@@ -751,6 +858,10 @@ def handle_callback(db: Session, cq: dict) -> None:
                 core.audit(db, "Server " + ("enabled" if s.enabled else "disabled"), _actor(sender), s.name)
                 note = _t(lang, "done")
             screen = screen_servers(db, lang)
+        elif act == "nd":                                   # a VPN Seller Node
+            screen = screen_node(db, lang, int(parts[2]))
+        elif act in ("nr", "nry", "nu", "nc"):
+            note, screen = _node_action(db, lang, sender, act, parts)
         elif act == "og":                                   # grant a paid order
             note = _grant(db, lang, sender, int(parts[2]))
             screen = screen_orders(db, lang)

@@ -550,7 +550,7 @@ def collect_links(db: Session, user: User, info: dict | None = None, tg: int = 0
         # the nodes in the panel by place — the name starts with a flag,
         # "🇩🇪 Frankfurt" — that name is kept: one panel may have nodes in
         # several countries. Otherwise the key carries our server's name.
-        own = len(items) > 1 and (s.kind or "3xui") in ("remnawave", "marzban")
+        own = len(items) > 1 and (s.kind or "3xui") in ("remnawave", "marzban", "node")
         for i, link in enumerate(items):
             if own and _starts_with_flag(remark_of(link)):
                 links.append(link)

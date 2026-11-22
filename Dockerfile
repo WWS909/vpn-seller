@@ -8,7 +8,7 @@ RUN pip install -r requirements.txt
 
 COPY app ./app
 COPY web ./web
-COPY scripts/tune.sh scripts/ru-probe.py ./scripts/
+COPY scripts/tune.sh scripts/ru-probe.py scripts/node.sh scripts/vpn-seller-node.py ./scripts/
 COPY VERSION CHANGELOG.md CHANGELOG.en.md ./
 COPY deploy/entrypoint.sh /entrypoint.sh
 
