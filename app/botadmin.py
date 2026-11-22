@@ -229,6 +229,8 @@ def panel_label(kind: str | None, version: str | None) -> str:
         return "Marzban " + v.lstrip("m")
     if kind == "remnawave" or v.startswith("r"):
         return ("Remnawave " + v.lstrip("r")).strip()
+    if kind == "node" or v.startswith("n"):
+        return ("Bridge Node " + v.lstrip("n")).strip()
     return "3x-ui " + (v or "?")
 
 

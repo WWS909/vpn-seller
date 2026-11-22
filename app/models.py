@@ -145,7 +145,7 @@ class Server(Base):
     verify_tls = Column(Boolean, default=True)
     enabled = Column(Boolean, default=True)
     sort = Column(Integer, default=0)
-    kind = Column(String(12), default="3xui")        # 3xui | marzban | remnawave
+    kind = Column(String(12), default="3xui")        # 3xui | marzban | remnawave | node
 
     api_version = Column(String(16), default="")     # "3", "2", "m0.8.4" (Marzban), "r2.3.0" (Remnawave)
     last_ok_at = Column(Integer, default=0)
@@ -176,7 +176,7 @@ class Server(Base):
     def inbounds(self) -> list:
         """Inbound ids (3x-ui) or tags (Marzban) this server gives out."""
         parts = [x.strip() for x in (self.inbound_ids or "").split(",") if x.strip()]
-        return parts if self.kind in ("marzban", "remnawave") else [int(x) for x in parts if x.isdigit()]
+        return parts if self.kind in ("marzban", "remnawave", "node") else [int(x) for x in parts if x.isdigit()]
 
 
 class Device(Base):

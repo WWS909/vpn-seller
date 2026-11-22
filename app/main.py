@@ -352,7 +352,7 @@ def vendor_file(name: str):
 
 
 SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
-PUBLIC_SCRIPTS = ("tune.sh",)
+PUBLIC_SCRIPTS = ("tune.sh", "node.sh", "bridge-node.py")
 
 
 @app.get("/scripts/{name}", include_in_schema=False)
@@ -363,7 +363,7 @@ def server_script(name: str):
     if name not in PUBLIC_SCRIPTS or not (SCRIPTS / name).is_file():
         raise HTTPException(404)
     return PlainTextResponse((SCRIPTS / name).read_text(encoding="utf-8"),
-                             media_type="text/x-shellscript",
+                             media_type="text/x-python" if name.endswith(".py") else "text/x-shellscript",
                              headers={"Cache-Control": "no-cache"})
 
 
