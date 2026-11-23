@@ -242,6 +242,23 @@ class MarzbanPanel:
             if not users or offset >= int(data.get("total") or 0):
                 return out
 
+    def clients(self) -> list[dict]:
+        """Every user on the panel, for moving them into the shop."""
+        out, offset = [], 0
+        while True:
+            data = self._request("GET", "api/users", params={"offset": offset, "limit": 500}) or {}
+            users = data.get("users") or []
+            for u in users:
+                exp = int(u.get("expire") or 0)
+                if not exp and u.get("status") == "on_hold" and u.get("on_hold_expire_duration"):
+                    exp = int(time.time()) + int(u["on_hold_expire_duration"])
+                out.append({"name": u.get("username", ""), "tg_id": 0, "expires": exp,
+                            "total": int(u.get("data_limit") or 0), "used": int(u.get("used_traffic") or 0),
+                            "enabled": u.get("status") not in ("disabled",)})
+            offset += len(users)
+            if not users or offset >= int(data.get("total") or 0):
+                return out
+
     def reset_traffic(self, spec: ClientSpec) -> None:
         self._request("POST", f"api/user/{quote(username_of(spec.email))}/reset")
 

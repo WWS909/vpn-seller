@@ -18,6 +18,7 @@ from ..config import settings as env
 from ..db import get_db
 from ..models import (GB, Broadcast, SupportMessage, Device, Gift, Log, Payout, Plan, Promo, Review,
                       Receipt, Server, Transaction, User, now)
+from ..vip import FOREVER
 from ..providers import KINDS, TAG_KINDS, PanelError, drop_session, normalize_url, panel_for
 from ..providers import node as nodes
 
@@ -443,7 +444,7 @@ def overview(db: Session = Depends(get_db), _=A):
                     "gateway": tx.gateway or tx.method or "", "amount": round(float(tx.amount), 2),
                     "at": tx.paid_at or 0} for tx, u in recent],
         "users": db.query(User).count(),
-        "active": db.query(User).filter(User.expires_at > t, User.is_blocked.is_(False)).count(),
+        "active": db.query(User).filter(User.expires_at > t, User.is_blocked.is_(False)).filter(User.expires_at < FOREVER).count(),     # the owner's own access is not a customer
         "new_today": db.query(User).filter(User.created_at >= day0).count(),
         "revenue_month": round(float(revenue_month), 2),
         "revenue_today": round(float(revenue_today), 2),
@@ -1250,6 +1251,61 @@ def updates_auto(body: AutoUpdateBody, db: Session = Depends(get_db), admin=A):
     core.put(db, "auto_update_hour", str(body.hour))
     core.audit(db, "Auto update " + ("on" if body.auto else "off"), admin, f"{body.hour}:00")
     return updates.view(db)
+
+
+# ================================================================ moving customers in (the owner only)
+class ImportBody(BaseModel):
+    names: list[str] = Field(default_factory=list, max_length=20000)
+    devices: int = 3
+    never_days: int = 30
+
+
+def _import_server(db: Session, server_id: int) -> Server:
+    s = db.get(Server, server_id)
+    if not s:
+        raise HTTPException(404, "server not found")
+    if (s.kind or "3xui") not in ("3xui", "marzban", "remnawave"):
+        # the shop's own servers only ever have the shop's customers
+        raise HTTPException(400, "this server has nobody to move in")
+    return s
+
+
+@router.get("/import/links")
+def import_links(db: Session = Depends(get_db), _=A):
+    from .. import importer
+    return importer.claims(db)
+
+
+@router.delete("/import/links/{claim_id}")
+def import_link_delete(claim_id: int, db: Session = Depends(get_db), _=A):
+    from ..models import ImportClaim
+    c = db.get(ImportClaim, claim_id)
+    if c and not c.claimed_by:
+        db.delete(c)
+        db.commit()
+    return {"ok": True}
+
+
+@router.get("/import/{server_id}")
+def import_preview(server_id: int, db: Session = Depends(get_db), _=A):
+    from .. import importer
+    s = _import_server(db, server_id)
+    try:
+        return {"server": s.name, **importer.read(db, s)}
+    except PanelError as e:
+        raise HTTPException(502, f"panel: {e}")
+
+
+@router.post("/import/{server_id}")
+def import_run(server_id: int, body: ImportBody, db: Session = Depends(get_db), admin=A):
+    from .. import importer
+    s = _import_server(db, server_id)
+    if not body.names:
+        raise HTTPException(400, "nothing chosen")
+    try:
+        return importer.run(db, s, [str(n)[:128] for n in body.names], body.devices, body.never_days, admin)
+    except PanelError as e:
+        raise HTTPException(502, f"panel: {e}")
 
 
 # ================================================================ database (the owner only)

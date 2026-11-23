@@ -374,6 +374,27 @@ class RemnawavePanel:
             if not users or start >= int(data.get("total") or 0):
                 return out
 
+    def clients(self) -> list[dict]:
+        """Every user on the panel, for moving them into the shop."""
+        out, start = [], 0
+        while True:
+            data = self._request("GET", "api/users", params={"start": start, "size": 500}) or {}
+            users = data.get("users") or []
+            for u in users:
+                exp = 0
+                if u.get("expireAt"):
+                    try:
+                        exp = int(dt.datetime.fromisoformat(str(u["expireAt"]).replace("Z", "+00:00")).timestamp())
+                    except ValueError:
+                        exp = 0
+                tid = str(u.get("telegramId") or "").strip()
+                out.append({"name": u.get("username", ""), "tg_id": int(tid) if tid.isdigit() else 0,
+                            "expires": exp, "total": int(u.get("trafficLimitBytes") or 0),
+                            "used": self._used(u), "enabled": u.get("status") != "DISABLED"})
+            start += len(users)
+            if not users or start >= int(data.get("total") or 0):
+                return out
+
     def reset_traffic(self, spec: ClientSpec) -> None:
         u = self._get(username_of(spec.email))
         if u:

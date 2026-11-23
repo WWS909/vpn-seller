@@ -88,6 +88,9 @@ def _for_server(spec: ClientSpec, snap, user: User) -> ClientSpec:
     lets them in only while they have gigabytes there, and its panel stops
     them itself at the bought amount (the counters of that panel)."""
     out = ClientSpec(**spec.__dict__)
+    if getattr(snap, "bypass", False) and int(user.tg_id or 0) in env.admin_telegram_ids:
+        out.total_bytes = 0                    # the owner: the bypass servers too, without a limit
+        return out
     if getattr(snap, "bypass", False):
         left = bypass_left(user)
         out.enable = bool(spec.enable and left > 0)
