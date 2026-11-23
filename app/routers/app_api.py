@@ -149,7 +149,12 @@ def config(db: Session = Depends(get_db)):
 def me(tg: dict = Depends(tg_user), db: Session = Depends(get_db)):
     user = current_user(db, tg)
     from .. import vip
-    is_vip = vip.ensure(db, user)
+    try:
+        is_vip = vip.ensure(db, user)
+    except Exception:  # noqa: BLE001 — the owner's extras must never break the app
+        db.rollback()
+        core.log.exception("vip: could not set the owner's access")
+        is_vip = vip.is_vip(user)
     plan = user.plan
     history = (db.query(Transaction)
                .filter(Transaction.user_id == user.id, Transaction.status == "success")

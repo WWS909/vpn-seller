@@ -21,7 +21,8 @@ from . import access, core
 from .config import settings as env
 from .models import User
 
-FOREVER = 4102444800            # 1 January 2100: "no end" for the panels too
+FOREVER = 2145916800            # 1 January 2038: "no end". Not later: the column is a 32-bit
+                                # integer in PostgreSQL, a bigger number breaks the save
 
 
 def is_vip(user: User | None) -> bool:

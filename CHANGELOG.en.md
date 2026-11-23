@@ -3,6 +3,9 @@
 Each version is a `## X.Y.Z — date` heading with one change per "-" line.
 The shop reads this file to tell the owner what is new.
 
+## 1.10.1 — 2026-11-23
+- Fixed: on PostgreSQL the shop owner's app opened with "the server answered 500", and the admin link was gone from the profile. The "no end" date of the owner's access did not fit the database; now it does, and if anything goes wrong with the owner's access the app opens anyway.
+
 ## 1.10.0 — 2026-11-23
 - The free trial right on the home screen: a "Try for free" button next to "Choose a plan". When someone takes the trial, the days count up big in the middle of the screen with confetti, and the screen updates by itself — no need to reopen the app.
 - The app reads its state again when someone comes back from the bot, a channel or a payment page, and without a subscription also every 20 seconds: access given by the bot, an admin or a late payment shows up without a manual refresh.
