@@ -63,11 +63,12 @@ And this is the same home screen in five styles:
 
 <p align="center"><img src="docs/screenshots/styles-en.webp" alt="Five styles"></p>
 
-And four more — Newspaper, Brutal, Terminal and Ticket: they change not only colours but how the cards, buttons and plans are drawn.
+And six more — Newspaper, Brutal, Terminal, Ticket, Poster and Notebook: they change not only colours but how the cards, buttons and plans are drawn.
 
 <p align="center"><img src="docs/screenshots/styles-new-en.webp" alt="Newspaper, Brutal and Terminal"></p>
 
 Ticket is a boarding pass: notches at the sides of every block, perforations instead of rules, and a plan is a ticket with a tear-off stub carrying the price.
+Poster is a Swiss poster: no cards, heavy rules and a huge figure of the days left. Notebook is squared paper with a margin, hand-drawn outlines, handwritten titles and a highlighter.
 
 <p align="center"><img src="docs/screenshots/styles-ticket-en.webp" alt="The Ticket style: home, plans, light theme"></p>
 

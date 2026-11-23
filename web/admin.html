@@ -781,7 +781,7 @@ ru: {
   payTunnel:"Магазин работает через временный туннель: его адрес меняется после перезапуска сервера, и адреса уведомлений в кабинетах касс перестанут работать. Для касс подключите домен: на сервере vpn-seller address. Telegram Stars работают и так.",
   casts:"Рассылки", reviews:"Отзывы", gifts:"Подарки", pay:"Оплата", updates:"Обновления", settings:"Настройки", logs:"Журнал", look:"Оформление",
   imp:"Перенос клиентов", impSub:"из панели, где вы продавали ключи вручную", impFrom:"Откуда переносить", impPanel:"Панель",
-  impRead:"Прочитать клиентов", impNoSrv:"Сначала добавьте сервер с этой панелью", copy:"Скопировать",
+  impRead:"Прочитать клиентов", impNoSrv:"Нужен сервер с панелью 3x-ui, Marzban или Remnawave, где остались старые клиенты", copy:"Скопировать",
   impStep1:"Магазин читает клиентов из панели и ничего в ней не меняет.",
   impStep2:"У кого в панели есть Telegram ID, подписка появится в магазине сразу — человек откроет бота и увидит её.",
   impStep3:"Остальным магазин сделает личные ссылки: отправьте каждому его ссылку, по ней дни перейдут к нему.",
@@ -1279,7 +1279,7 @@ en: {
   payTunnel:"The shop runs through a temporary tunnel: its address changes when the server restarts, and the notification addresses in the gateways stop working. Connect a domain for gateways: vpn-seller address on the server. Telegram Stars work anyway.",
   casts:"Broadcasts", reviews:"Reviews", gifts:"Gifts", pay:"Payments", updates:"Updates", settings:"Settings", logs:"Log", look:"Look",
   imp:"Move customers in", impSub:"from a panel where you sold keys by hand", impFrom:"Move from", impPanel:"Panel",
-  impRead:"Read customers", impNoSrv:"Add a server with that panel first", copy:"Copy",
+  impRead:"Read customers", impNoSrv:"Add a server with the 3x-ui, Marzban or Remnawave panel where the old customers are", copy:"Copy",
   impStep1:"The shop reads the customers from the panel and changes nothing in it.",
   impStep2:"Those with a Telegram ID on the panel get the subscription in the shop at once — they open the bot and find it there.",
   impStep3:"For the rest the shop makes personal links: send each person theirs, and the days move to whoever opens it.",
@@ -5058,6 +5058,7 @@ async function pImport(){
   head(t("imp"), t("impSub"), `<a class="btn ghost sm" href="#servers">← ${esc(t("servers"))}</a>`);
   let srv, links;
   try { [srv, links] = await Promise.all([api("/servers"), api("/import/links")]); } catch (e){ return fail(e); }
+  srv = srv.filter(x => (x.kind || "3xui") !== "node");      // the shop's own servers have only its own customers
   if (!IMP_SRV || !srv.some(x => x.id === IMP_SRV)) IMP_SRV = srv[0] ? srv[0].id : 0;
   const steps = ["impStep1", "impStep2", "impStep3"].map(k => `<li>${esc(t(k))}</li>`).join("");
   $("content").innerHTML = `

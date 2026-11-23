@@ -1264,6 +1264,9 @@ def _import_server(db: Session, server_id: int) -> Server:
     s = db.get(Server, server_id)
     if not s:
         raise HTTPException(404, "server not found")
+    if (s.kind or "3xui") not in ("3xui", "marzban", "remnawave"):
+        # the shop's own servers only ever have the shop's customers
+        raise HTTPException(400, "this server has nobody to move in")
     return s
 
 

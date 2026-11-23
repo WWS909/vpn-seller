@@ -3,6 +3,15 @@
 Each version is a `## X.Y.Z — date` heading with one change per "-" line.
 The shop reads this file to tell the owner what is new.
 
+## 1.10.0 — 2026-11-23
+- The free trial right on the home screen: a "Try for free" button next to "Choose a plan". When someone takes the trial, the days count up big in the middle of the screen with confetti, and the screen updates by itself — no need to reopen the app.
+- The app reads its state again when someone comes back from the bot, a channel or a payment page, and without a subscription also every 20 seconds: access given by the bot, an admin or a late payment shows up without a manual refresh.
+- Telegram's wide button at the bottom ("Choose a plan") is gone: the screens have their own buttons, and this one appeared on one tab and hid on the next, making the menu jump on every switch.
+- The header with the logo and profile is lower.
+- The owner's access: whoever's Telegram ID was given at install has a subscription with no end, no device and no traffic limit, on every server. It is not a plan — it cannot be bought, it is in no list and not counted as a customer; in the app the owner sees "∞" instead of days.
+- Moving customers in from a panel: Servers → "Move customers in". The shop reads the customers from 3x-ui, Marzban or Remnawave (the panel is not changed). Those with a Telegram ID get the subscription in the shop at once; for the rest the shop makes personal links — the days go to whoever opens the link, once. Exactly the days and traffic left are moved; a longer subscription in the shop is kept.
+- Two new styles: "Poster" (a Swiss poster: no cards, heavy rules, a huge figure of days) and "Notebook" (squared paper, hand-drawn outlines, handwritten titles, a highlighter). Two new home pictures: "Northern lights" and "Taiga".
+
 ## 1.9.1 — 2026-11-22
 - An own server installs even when GitHub does not open from it (it happens with some hosters). The installer takes Xray from GitHub first and, failing that, from the shop: the shop keeps a copy of Xray and hands it to its servers. The file is checked against the release checksum.
 - The installer no longer downloads the official XTLS script: it installs Xray itself, with the same systemd service.
