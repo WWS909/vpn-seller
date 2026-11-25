@@ -231,6 +231,10 @@ MOTIONS = ("lively", "calm", "off")
 # How the blocks of a screen come in (when the motion is lively): rise from
 # below, spring in, slide from the side, come out of a blur, or unfold downwards.
 ENTERS = ("rise", "spring", "slide", "blur", "unfold")
+# The bottom menu: as the style draws it, or a floating glass bar with a
+# highlight of its own (a glowing hill, a lamp, a bubble, a drop, a stretching
+# capsule, a dot, a neon ring).
+NAVBARS = ("auto", "wave", "beam", "bubble", "drop", "capsule", "dot", "ring")
 EFFECTS = ("none", "snow", "leaves", "petals", "meteors")
 # The bar at the top with the logo: as the style paints it, the shop's colour,
 # a colour of its own (top_color), a gradient of the shop's colour, or a picture.
@@ -419,6 +423,7 @@ def look(db: Session) -> dict:
         "layout": _pick(core.get(db, "layout"), LAYOUTS, "classic"),
         "home": _pick(core.get(db, "home"), HOMES, "classic"),
         "enter": _pick(core.get(db, "enter"), ENTERS, "rise"),
+        "navbar": _pick(core.get(db, "navbar"), NAVBARS, "auto"),
         "top": _pick(core.get(db, "top"), TOPS, "auto"),
         "top_color": core.get(db, "top_color") if HEX.match(core.get(db, "top_color") or "") else "",
         "art": _pick(core.get(db, "art"), ARTS, "none"),
@@ -450,7 +455,7 @@ def html_attrs(lk: dict) -> str:
             f' data-cards="{lk.get("cards", "solid")}" data-splash="{lk.get("splash_kind", "auto")}"'
             f' data-layout="{lk.get("layout", "classic")}" data-home="{lk.get("home", "classic")}"'
             f' data-enter="{lk.get("enter", "rise")}" data-top="{_top_kind(lk)}" data-art="{_art_kind(lk)}"'
-            f' data-buttons="{lk.get("buttons", "auto")}"')
+            f' data-buttons="{lk.get("buttons", "auto")}" data-navbar="{lk.get("navbar", "auto")}"')
 
 
 def _top_kind(lk: dict) -> str:
@@ -526,6 +531,7 @@ def preview(params: dict) -> dict:
             "layout": _pick(str(params.get("layout")), LAYOUTS, "classic"),
             "home": _pick(str(params.get("home")), HOMES, "classic"),
             "enter": _pick(str(params.get("enter")), ENTERS, "rise"),
+            "navbar": _pick(str(params.get("navbar")), NAVBARS, "auto"),
             "buttons": _pick(str(params.get("buttons")), BUTTONS, "auto"),
             "top": _top_kind(lk_top), "art": _art_kind(lk_top),
             "splash": _pick(str(params.get("splash_kind")), SPLASHES, "auto")}),

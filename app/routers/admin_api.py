@@ -1698,7 +1698,7 @@ def save_settings(data: dict, db: Session = Depends(get_db), admin=A):
         for opt, allowed in (("backdrop", theme.BACKDROPS), ("icons", theme.ICONS),
                              ("motion", theme.MOTIONS), ("effect", theme.EFFECTS),
                              ("cards", theme.CARDS), ("layout", theme.LAYOUTS), ("home", theme.HOMES), ("splash", ("0", "1")),
-                             ("enter", theme.ENTERS), ("top", theme.TOPS), ("art", theme.ARTS), ("buttons", theme.BUTTONS),
+                             ("enter", theme.ENTERS), ("navbar", theme.NAVBARS), ("top", theme.TOPS), ("art", theme.ARTS), ("buttons", theme.BUTTONS),
                              ("celebrate", theme.CELEBRATES), ("haptics", ("0", "1")),
                              ("splash_kind", theme.SPLASHES), *theme.SPLASH_OPTS.items()):
             if key == opt and value not in allowed:
@@ -1979,7 +1979,7 @@ def theme_info(db: Session = Depends(get_db), _=A):
             "current": theme.current(db), "logo": theme.logo_url(db),
             "look": theme.look(db),
             "options": {"backdrop": theme.BACKDROPS, "icons": theme.ICONS, "layout": theme.LAYOUTS, "home": theme.HOMES,
-                        "motion": theme.MOTIONS, "effect": theme.EFFECTS, "enter": theme.ENTERS, "top": theme.TOPS,
+                        "motion": theme.MOTIONS, "effect": theme.EFFECTS, "enter": theme.ENTERS, "navbar": theme.NAVBARS, "top": theme.TOPS,
                         "art": theme.ARTS, "buttons": theme.BUTTONS, "celebrate": theme.CELEBRATES,
                         "cards": theme.CARDS}}
 

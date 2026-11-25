@@ -72,6 +72,7 @@ DEFAULTS: dict[str, str] = {
     "layout": "classic",                # the style of the surfaces: app/theme.py LAYOUTS
     "home": "classic",                  # what the home screen is built around: app/theme.py HOMES
     "enter": "rise",                    # how the blocks come in: app/theme.py ENTERS
+    "navbar": "auto",                   # the bottom menu: app/theme.py NAVBARS
     "top": "auto",                      # the header bar with the logo: app/theme.py TOPS
     "top_color": "",                    # its colour when top is "custom": #RRGGBB
     "art": "none",                      # the picture at the top of home: app/theme.py ARTS

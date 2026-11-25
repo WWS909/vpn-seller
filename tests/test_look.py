@@ -168,7 +168,7 @@ def test_theme_info_lists_colours_and_parts(client, admin):
     neon = next(p for p in d["presets"] if p["id"] == "neon")
     assert neon["accent"] == "#3DFF9A" and neon["surface"] == "black" and neon["ground"] == "#000000"
     assert set(d["options"]) == {"backdrop", "icons", "motion", "effect", "cards", "layout", "home",
-                                 "enter", "top", "art", "buttons", "celebrate"}
+                                 "enter", "navbar", "top", "art", "buttons", "celebrate"}
     assert d["look"]["layout"] == "classic"
     assert "winter" in d["options"]["backdrop"] and "pixel" in d["options"]["icons"] and "lacquer" in d["options"]["cards"]
     assert d["look"]["motion"] == "lively" and d["look"]["cards"] == "solid"
@@ -197,7 +197,7 @@ def test_live_preview_gives_the_same_css_as_the_page(client, admin):
     assert "family=Comfortaa" in pv["font_href"]
     assert pv["attrs"] == {"backdrop": "aurora", "icons": "badge", "motion": "lively", "effect": "none",
                            "cards": "solid", "layout": "classic", "home": "classic", "splash": "auto",
-                           "enter": "rise", "buttons": "auto", "top": "auto", "art": "none"}
+                           "enter": "rise", "navbar": "auto", "buttons": "auto", "top": "auto", "art": "none"}
     client.post("/api/admin/settings", headers=admin, json=body)
     page = client.get("/app").text
     assert pv["css"].split("}")[0] in page          # the same variables as the real page
@@ -587,3 +587,15 @@ def test_entrance_buttons_effects_and_confetti(client, admin):
     assert 'data-enter="spring"' in tag and 'data-buttons="stamp"' in tag and 'data-effect="leaves"' in tag and 'data-art="city"' in tag
     boot = _boot(client)
     assert boot["celebrate"] == "confetti" and boot["haptics"] is False and boot["effect"] == "leaves"
+
+
+def test_bottom_menu_kind_is_saved_and_drawn(client, admin):
+    from app import theme
+    assert client.get("/api/admin/theme", headers=admin).json()["look"]["navbar"] == "auto"
+    assert 'data-navbar="auto"' in client.get("/app").text
+    for kind in theme.NAVBARS:
+        assert client.post("/api/admin/settings", headers=admin, json={"navbar": kind}).status_code == 200
+        assert f'data-navbar="{kind}"' in client.get("/app").text
+    assert client.post("/api/admin/settings", headers=admin, json={"navbar": "zigzag"}).status_code == 400
+    pv = client.post("/api/admin/theme/preview", headers=admin, json={"theme_preset": "custom", "theme_accent": "#FF7A45", "theme_surface": "graphite", "font": "comfortaa", "navbar": "ring"}).json()
+    assert pv["attrs"]["navbar"] == "ring"

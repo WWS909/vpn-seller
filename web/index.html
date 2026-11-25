@@ -59,6 +59,10 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none !important}
 html,body{height:100%}
+/* Nothing may stick out sideways: a screen sliding in from the right made the
+   page 22px wider for a moment, the phone zoomed out to fit it and the menu
+   at the bottom dropped and came back on every switch to the right. */
+html,body{overflow-x:clip}
 body{
   background:var(--ground);color:var(--txt);
   font-family:var(--font-b);font-size:15px;line-height:1.45;
@@ -3057,6 +3061,114 @@ body.resolve .screen.on #quickRows>.row:nth-child(n+3){animation-delay:.22s}
 :root:is([data-enter="slide"],[data-enter="unfold"]):not([data-motion="calm"]) body.enter .screen.on>*:nth-child(5){animation-delay:.36s}
 :root:is([data-enter="slide"],[data-enter="unfold"]):not([data-motion="calm"]) body.enter .screen.on>*:nth-child(n+6){animation-delay:.45s}
 
+/* ============================================================
+   The bottom menu (data-navbar). "auto" is the menu of the style above;
+   the others make it a floating glass bar with their own highlight.
+   The highlight follows --i, the index of the open tab; .mv is set for
+   a moment on every switch, for the kinds that stretch or jump.
+   ============================================================ */
+.nav .nvx{display:none}
+:root[data-navbar]:not([data-navbar="auto"]) .nav{
+  --nvbg:color-mix(in srgb,var(--card) 86%,transparent);
+  left:12px;right:12px;bottom:calc(max(var(--sa-bot), env(safe-area-inset-bottom)) + 10px);
+  max-width:496px;padding-bottom:0;border-radius:26px;
+  background:var(--nvbg);border:1px solid var(--line-soft);
+  -webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
+  box-shadow:0 14px 34px -14px rgba(0,0,0,.7)}
+:root[data-navbar]:not([data-navbar="auto"]) .screen{
+  padding-bottom:calc(var(--nav) + max(var(--sa-bot), env(safe-area-inset-bottom)) + 44px)}
+:root[data-navbar]:not([data-navbar="auto"]) .toast{
+  bottom:calc(var(--nav) + max(var(--sa-bot), env(safe-area-inset-bottom)) + 30px)}
+:root[data-navbar]:not([data-navbar="auto"]) .nav .pill{display:grid}
+:root[data-navbar]:not([data-navbar="auto"]) .nav .pill i{box-shadow:none;opacity:1}
+:root[data-navbar]:not([data-navbar="auto"]) .nav button .ni{background:none;outline:0;
+  transition:transform .5s cubic-bezier(.34,1.35,.5,1),color .2s}
+:root[data-navbar]:not([data-navbar="auto"]) .nav button.on .ni{background:none;box-shadow:none;border:0}
+:root[data-navbar]:not([data-navbar="auto"]) .nav button.on{color:var(--sig-txt)}
+
+/* 1. Wave: a glowing edge that rises in a hill over the open tab */
+:root[data-navbar][data-navbar="wave"] .nav{border-color:rgba(var(--sig-rgb),.3);border-top-color:transparent;
+  box-shadow:0 0 22px -8px rgba(var(--sig-rgb),.7),0 14px 34px -14px rgba(0,0,0,.7)}
+:root[data-navbar][data-navbar="wave"] .nav .pill{display:none}
+:root[data-navbar][data-navbar="wave"] .nav .nvx{display:block;position:absolute;left:-1px;right:-1px;top:-39px;height:40px;
+  overflow:hidden;pointer-events:none;
+  -webkit-mask:linear-gradient(90deg,transparent 6px,#000 26px,#000 calc(100% - 26px),transparent calc(100% - 6px));
+          mask:linear-gradient(90deg,transparent 6px,#000 26px,#000 calc(100% - 26px),transparent calc(100% - 6px))}
+:root[data-navbar][data-navbar="wave"] .nav .nvs{position:absolute;left:0;bottom:0;width:200%;display:flex;align-items:flex-end;
+  transform:translate3d(calc((var(--i, 0) + .5) * 12.5% - 50%),0,0);
+  transition:transform .55s cubic-bezier(.34,1.25,.5,1);
+  filter:drop-shadow(0 0 4px rgba(var(--sig-rgb),.85))}
+:root[data-navbar][data-navbar="wave"] .nav .nvs b{flex:1;border-bottom:1.5px solid var(--sig)}
+:root[data-navbar][data-navbar="wave"] .nav .nvs svg{flex:none;width:92px;height:26px;display:block;overflow:visible}
+:root[data-navbar][data-navbar="wave"] .nav .nvs path{fill:color-mix(in srgb,var(--card) 92%,transparent);stroke:var(--sig);stroke-width:1.5}
+:root[data-navbar][data-navbar="wave"] .nav button.on .ni{transform:translateY(-13px)}
+:root[data-navbar][data-navbar="wave"] .nav button.on .ni svg{filter:drop-shadow(0 0 6px rgba(var(--sig-rgb),.7))}
+
+/* 2. Beam: a lamp on the top edge shines down on the open tab */
+:root[data-navbar][data-navbar="beam"] .nav .pill{top:0;height:100%}
+:root[data-navbar][data-navbar="beam"] .nav .pill i{width:66px;height:100%;border-radius:0;
+  background:linear-gradient(rgba(var(--sig-rgb),.4),rgba(var(--sig-rgb),0) 90%);
+  clip-path:polygon(29% 0,71% 0,100% 100%,0 100%)}
+:root[data-navbar][data-navbar="beam"] .nav .pill::before{content:"";position:absolute;top:-1px;left:50%;width:30px;height:3px;margin-left:-15px;
+  border-radius:0 0 3px 3px;background:var(--sig);box-shadow:0 0 12px 1px rgba(var(--sig-rgb),.9)}
+:root[data-navbar][data-navbar="beam"] .nav button.on .ni svg{filter:drop-shadow(0 0 7px rgba(var(--sig-rgb),.75))}
+:root[data-navbar][data-navbar="beam"] .nav.mv .pill i{animation:nvFlick .5s ease}
+@keyframes nvFlick{0%,30%{opacity:.25}100%{opacity:1}}
+
+/* 3. Bubble: the open tab jumps up into a coloured circle set into the bar */
+:root[data-navbar][data-navbar="bubble"] .nav{--nvbg:var(--card);border-color:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+:root[data-navbar][data-navbar="bubble"] .nav .pill{top:-21px;height:48px}
+:root[data-navbar][data-navbar="bubble"] .nav .pill i{width:48px;height:48px;border-radius:50%;background:var(--sig);
+  box-shadow:0 0 0 6px var(--card),0 10px 20px -6px rgba(var(--sig-rgb),.8)}
+:root[data-navbar][data-navbar="bubble"] .nav button.on .ni{transform:translateY(-18px);color:var(--on-sig)}
+:root[data-navbar][data-navbar="bubble"] .nav.mv .pill i{animation:nvBubble .55s cubic-bezier(.34,1.45,.5,1)}
+@keyframes nvBubble{0%{transform:translateY(18px) scale(.4)}100%{transform:none}}
+
+/* 4. Drop: the bar flows up into a drop around the open tab, sinks and rises again on a switch */
+:root[data-navbar][data-navbar="drop"] .nav{--nvbg:var(--card);border-color:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+:root[data-navbar][data-navbar="drop"] .nav .pill{top:-25px;height:46px}
+:root[data-navbar][data-navbar="drop"] .nav .pill i{width:46px;height:46px;border-radius:50%;background:var(--card);
+  box-shadow:inset 0 0 0 1.5px rgba(var(--sig-rgb),.45)}
+:root[data-navbar][data-navbar="drop"] .nav .pill::after{content:"";position:absolute;left:50%;top:12px;width:74px;height:15px;margin-left:-37px;z-index:-1;
+  background:radial-gradient(circle at 0 0,transparent 14px,var(--card) 14.6px) left/50% 100% no-repeat,
+             radial-gradient(circle at 100% 0,transparent 14px,var(--card) 14.6px) right/50% 100% no-repeat;
+  transform-origin:50% 100%}
+:root[data-navbar][data-navbar="drop"] .nav button.on .ni{transform:translateY(-23px)}
+:root[data-navbar][data-navbar="drop"] .nav.mv .pill i{animation:nvSink .6s cubic-bezier(.34,1.3,.5,1)}
+:root[data-navbar][data-navbar="drop"] .nav.mv .pill::after{animation:nvNeck .6s cubic-bezier(.34,1.3,.5,1)}
+:root[data-navbar][data-navbar="drop"] .nav.mv button.on .ni{animation:nvRise .6s cubic-bezier(.34,1.3,.5,1)}
+@keyframes nvSink{0%,35%{transform:translateY(26px) scale(.55)}100%{transform:none}}
+@keyframes nvNeck{0%,35%{transform:scaleY(0)}100%{transform:none}}
+@keyframes nvRise{0%,35%{transform:none}100%{transform:translateY(-23px)}}
+
+/* 5. Capsule: a glass capsule that stretches like liquid on its way */
+:root[data-navbar][data-navbar="capsule"] .nav .pill{top:calc((var(--nav) - 50px) / 2);height:50px}
+:root[data-navbar][data-navbar="capsule"] .nav .pill i{width:calc(100% - 12px);height:50px;border-radius:19px;
+  background:linear-gradient(rgba(var(--sig-rgb),.24),rgba(var(--sig-rgb),.1));
+  box-shadow:inset 0 0 0 1px rgba(var(--sig-rgb),.4),inset 0 1px 0 rgba(255,255,255,.16),0 6px 16px -8px rgba(var(--sig-rgb),.8)}
+:root[data-navbar][data-navbar="capsule"] .nav.mv .pill i{animation:nvStretch .5s cubic-bezier(.3,.7,.4,1)}
+@keyframes nvStretch{40%{transform:scale(1.25,.88)}}
+
+/* 6. Dot: a glowing dot under the open tab that runs out into a line on the way */
+:root[data-navbar][data-navbar="dot"] .nav .pill{top:auto;bottom:3px;height:5px}
+:root[data-navbar][data-navbar="dot"] .nav .pill i{width:5px;height:5px;border-radius:3px;background:var(--sig);
+  box-shadow:0 0 8px 1px rgba(var(--sig-rgb),.85)}
+:root[data-navbar][data-navbar="dot"] .nav button.on .ni{transform:translateY(-3px)}
+:root[data-navbar][data-navbar="dot"] .nav button:not(.on){opacity:.75}
+:root[data-navbar][data-navbar="dot"] .nav.mv .pill i{animation:nvDot .5s cubic-bezier(.3,.7,.4,1)}
+@keyframes nvDot{45%{width:30px}}
+
+/* 7. Ring: icons only, a neon ring moves round the open one */
+:root[data-navbar][data-navbar="ring"] .nav button{font-size:0;gap:0}
+:root[data-navbar][data-navbar="ring"] .nav .pill{top:calc((var(--nav) - 46px) / 2);height:46px}
+:root[data-navbar][data-navbar="ring"] .nav .pill i{width:46px;height:46px;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(var(--sig-rgb),.2),rgba(var(--sig-rgb),0));
+  box-shadow:inset 0 0 0 1.5px var(--sig),0 0 14px -2px rgba(var(--sig-rgb),.9),inset 0 0 10px -3px rgba(var(--sig-rgb),.9)}
+:root[data-navbar][data-navbar="ring"] .nav.mv .pill i{animation:nvRing .5s cubic-bezier(.3,.7,.4,1)}
+@keyframes nvRing{45%{transform:scale(.7)}}
+
+:root[data-motion="calm"] .nav.mv :is(.pill i,.pill::after,button .ni){animation:none}
+
 /* confetti after a payment: a canvas over the tick */
 #done canvas.cf{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
 </style>
@@ -4127,6 +4239,11 @@ function go(id){
   window.scrollTo(0, 0);
   catchUp();
 }
+let navDemoT = [];
+function navDemo(){
+  navDemoT.forEach(clearTimeout);
+  navDemoT = ["locs", "devs", "sub", "home"].map((id, n) => setTimeout(() => go(id), 250 + n * 750));
+}
 function drawNav(){
   const nav = $("nav");
   // Built once (and on a language change), so the highlight can travel.
@@ -4135,10 +4252,19 @@ function drawNav(){
     nav.innerHTML = TABS.map(x =>
       `<button data-tab="${x.id}" onclick="go('${x.id}')">
          <span class="ni">${svg(x.ic, 21)}</span>${esc(t(x.k))}
-       </button>`).join("") + `<span class="pill" aria-hidden="true"><i></i></span>`;
+       </button>`).join("") + `<span class="pill" aria-hidden="true"><i></i></span>` +
+      // the edge with a hill, for the "wave" menu
+      `<span class="nvx" aria-hidden="true"><span class="nvs"><b></b><svg viewBox="0 0 92 26">` +
+      `<path d="M0 25.25C20 25.25 26 3 46 3S72 25.25 92 25.25"/></svg><b></b></span></span>`;
     nav.dataset.lang = LANG;
   }
-  nav.style.setProperty("--i", Math.max(0, TABS.findIndex(x => x.id === tab)));
+  const i = Math.max(0, TABS.findIndex(x => x.id === tab)), was = nav.style.getPropertyValue("--i");
+  nav.style.setProperty("--i", i);
+  if (was !== "" && +was !== i){
+    // a moment of "moving" for the menus that stretch or jump on the way
+    nav.classList.remove("mv"); void nav.offsetWidth; nav.classList.add("mv");
+    clearTimeout(nav._mv); nav._mv = setTimeout(() => nav.classList.remove("mv"), 700);
+  }
   nav.querySelectorAll("button").forEach(b => {
     const on = b.dataset.tab === tab;
     b.classList.toggle("on", on);
@@ -6266,7 +6392,7 @@ function applyLook(m){
     if (l.getAttribute("href") !== m.font_href) l.href = m.font_href;
   }
   const a = m.attrs || {};
-  ["backdrop", "icons", "motion", "effect", "cards", "splash", "layout", "home", "enter", "top", "art", "buttons"].forEach(k => { if (a[k]) root.setAttribute("data-" + k, a[k]); });
+  ["backdrop", "icons", "motion", "effect", "cards", "splash", "layout", "home", "enter", "top", "art", "buttons", "navbar"].forEach(k => { if (a[k]) root.setAttribute("data-" + k, a[k]); });
   if (m.brand) Object.assign(BRAND, m.brand);
   ["art_image", "celebrate", "haptics"].forEach(k => { if (m[k] !== undefined) window.KV_BRAND[k] = m[k]; });
   if (m.name != null){ window.KV_BRAND = Object.assign(window.KV_BRAND || {}, { brand:m.name }); if (CFG) CFG.brand = m.name; $("spName").textContent = m.name; $("spName").setAttribute("data-full", m.name); }
@@ -6311,6 +6437,8 @@ if (PREVIEW){
     if (e.origin !== location.origin) return;
     const m = e.data || {};
     if (m.type === "kv-look"){ applyLook(m); if (m.replay) replaySplash(); }
+    // the panel picked a bottom menu: walk through the tabs to show it
+    else if (m.type === "kv-navdemo") navDemo();
     else if (m.type === "kv-splash") replaySplash();
     else if (m.type === "kv-enter"){ document.body.classList.remove("enter", "entered"); entered = false; void document.body.offsetWidth; enter(); }
     else if (m.type === "kv-done") celebrate(t("doneTitle"), t("subActive"));
